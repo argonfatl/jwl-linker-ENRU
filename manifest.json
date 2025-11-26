@@ -1,0 +1,11 @@
+{
+	"id": "jwl-linker-EN-RU",
+	"name": "JWL Linker-EN-RU",
+	"version": "0.5.0",
+	"minAppVersion": "1.0.0",
+	"description": "Display all bible references In Reading View as JW Library links English and Russian, and adds a Command to convert bible references and jw.org Finder links in Editing View to permanent JW Library links.",
+	"author": "Argonfatl",
+	"authorUrl": "https://github.com/argonfatl/jwl-linker",
+	"fundingUrl": "https://github.com/argonfatl/jwl-linker",
+	"isDesktopOnly": false
+}
