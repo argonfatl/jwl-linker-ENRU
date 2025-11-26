@@ -1,9 +1,9 @@
 {
 	"id": "jwl-linker-EN-RU",
 	"name": "JWL Linker-EN-RU",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"minAppVersion": "1.0.0",
-	"description": "Display all bible references In Reading View as JW Library links English and Russian, and adds a Command to convert bible references and jw.org Finder links in Editing View to permanent JW Library links.",
+	"description": "Comprehensive JW Library linker supporting Bible references and JW publications in English and Russian. Features: auto-formatting (od 15 par. 3 → od chap. 15 par. 3), multi-language WOL search, content extraction, and support for Watchtower, Awake!, books (od, it-1, cl, si, etc.), with automatic language detection and dual-mode citations.",
 	"author": "Argonfatl",
 	"authorUrl": "https://github.com/argonfatl/jwl-linker",
 	"fundingUrl": "https://github.com/argonfatl/jwl-linker",

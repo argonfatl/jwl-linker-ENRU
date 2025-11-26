@@ -84,6 +84,7 @@ const InterfaceStrings = {
     menuCiteJworgCallout: 'Цитировать ссылку jw.org как выноску',
     menuCitePublication: 'Цитировать поиск публикации',
     menuLookupWOL: 'Найти выделенный текст в WOL',
+    menuCiteSelectedText: 'Цитировать выделенный текст',
     menuAddTitle: 'Добавить заголовок к ссылке jw.org',
     menuConvertScripture: 'Преобразовать стихи в JW Library',
     menuConvertJworg: 'Преобразовать ссылку jw.org в JW Library',
@@ -147,6 +148,7 @@ const InterfaceStrings = {
     menuCiteJworgCallout: 'Cite jw.org url as callout',
     menuCitePublication: 'Cite publication lookup',
     menuLookupWOL: 'Lookup selected text on WOL',
+    menuCiteSelectedText: 'Cite selected text',
     menuAddTitle: 'Add title to jw.org url',
     menuConvertScripture: 'Convert scriptures to JW Library',
     menuConvertJworg: 'Convert jw.org url to JW Library',
@@ -159,6 +161,65 @@ const InterfaceStrings = {
 
 // Dynamic Lang object based on interface language setting
 let Lang = InterfaceStrings.Russian;
+
+// Publications not available online by language
+const OfflinePublications = {
+  Russian: {
+    'ep': 'Евангелизаторы',
+    'po': 'Пособие для проповедников',
+    'sg': 'Руководство для школы служения',
+    'yb': 'Ежегодник Свидетелей Иеговы'
+  },
+  English: {
+    'ep': 'Evangelizers',
+    'po': 'Preaching Handbook',
+    'sg': 'School Guidebook',
+    'yb': 'Yearbook of Jehovah\'s Witnesses'
+  }
+};
+
+/**
+ * Check if publication is available online
+ * @param {string} pubCode - Publication code (e.g., 'ep', 'be')
+ * @param {string} lang - Language code ('RU', 'EN')
+ * @param {number} year - Publication year (optional, for Watchtower filtering)
+ * @returns {Object} - {isOffline: boolean, message: string}
+ */
+function checkPublicationAvailability(pubCode, lang = 'EN', year = null) {
+  const isRussian = lang === 'RU';
+  const offlineList = isRussian ? OfflinePublications.Russian : OfflinePublications.English;
+
+  // Check Watchtower year availability
+  if (pubCode === 'w' && year !== null) {
+    const minYear = isRussian ? 1986 : 1950;
+    if (year < minYear) {
+      const message = isRussian ?
+        `📅 Сторожевая башня ${year} года недоступна онлайн. Доступны выпуски с ${minYear} года` :
+        `📅 The Watchtower ${year} is not available online. Available from ${minYear} onwards`;
+
+      return {
+        isOffline: true,
+        message: message
+      };
+    }
+  }
+
+  if (offlineList[pubCode]) {
+    const message = isRussian ?
+      `📖 "${offlineList[pubCode]}" доступна только в печатном варианте` :
+      `📖 "${offlineList[pubCode]}" is available only in print format`;
+
+    return {
+      isOffline: true,
+      message: message
+    };
+  }
+
+  return {
+    isOffline: false,
+    message: ''
+  };
+}
 
 const Languages = {
   Auto: 'AUTO',
@@ -219,8 +280,8 @@ const Config = {
   // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3
   englishPubRegex: /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
-  // Formats: od 15 par. 3, od 15 абз. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3
-  otherPubRegex: /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:p\.\s*)?(\d+)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g,
+  // Formats: od 15 par. 3, od 15 абз. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, si pp. 300-301 par. 11
+  otherPubRegex: /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.\s*)?(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -233,6 +294,7 @@ const Cmd = {
   citeParagraphCallout: 'citeParagraphCallout',
   openSelectedinWOL: 'openSelectedInWOL',
   citePublicationLookup: 'citePublicationLookup',
+  citeSelectedText: 'citeSelectedText',
   addLinkTitle: 'addLinkTitle',
   convertScriptureToJWLibrary: 'convertScriptureToJWLibrary',
   convertWebToJWLibrary: 'convertWebToJWLibrary',
@@ -620,6 +682,35 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
+   * Cite selected text in callout format
+   */
+  citeSelectedText(editor) {
+    const activeEditor = this.confirmEditor(editor);
+    if (!activeEditor) return;
+
+    const { selection, line } = this._getEditorSelection(activeEditor, false);
+    if (selection) {
+      // Split text into lines and format each line with callout prefix
+      const lines = selection.split('\n');
+      const citationLines = lines.map(line => `> ${line}`);
+
+      // Create citation callout with selected text
+      const citationHeader = this.settings.interfaceLang === 'Russian' ? '> [!cite] ЦИТАТА' : '> [!cite] QUOTE';
+      const citation = `${citationHeader}\n${citationLines.join('\n')}`;
+
+      // Replace selection with citation
+      activeEditor.replaceSelection(citation);
+
+      const successMessage = this.settings.interfaceLang === 'Russian' ?
+        'Текст оформлен как цитата' :
+        'Text formatted as citation';
+      new Notice(successMessage, 2000);
+    } else {
+      new Notice(Lang.noSelection, Config.delay);
+    }
+  }
+
+  /**
    * KEY FEATURE
    * Editing/Preview View only:
    * Cite publication lookup reference, returns all pages in the reference, below
@@ -878,6 +969,12 @@ class JWLLinkerPlugin extends Plugin {
         text: Lang.menuLookupWOL,
         icon: 'search',
         fn: (editor) => this.openSelectedInWOL(editor),
+      },
+      {
+        id: Cmd.citeSelectedText,
+        text: Lang.menuCiteSelectedText,
+        icon: 'quote',
+        fn: (editor) => this.citeSelectedText(editor),
         sep: true,
       },
       {
@@ -1113,6 +1210,14 @@ class JWLLinkerPlugin extends Plugin {
     const [fullMatch, year, monthNum, page, paragraph] = match;
     console.log('Parsed:', { fullMatch, year, monthNum, page, paragraph });
 
+    // Check if Watchtower year is available online
+    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+    const availability = checkPublicationAvailability('w', 'RU', publicationYear);
+    if (availability.isOffline) {
+      console.log('Russian Watchtower not available for year:', publicationYear);
+      return `${input}\n${availability.message}`;
+    }
+
     // Create WOL search URL directly
     const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1302,6 +1407,14 @@ class JWLLinkerPlugin extends Plugin {
     console.log('English publication match found:', match);
     const [fullMatch, year, monthDay, page, paragraph] = match;
     console.log('Parsed:', { fullMatch, year, monthDay, page, paragraph });
+
+    // Check if Watchtower year is available online
+    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+    const availability = checkPublicationAvailability('w', 'EN', publicationYear);
+    if (availability.isOffline) {
+      console.log('English Watchtower not available for year:', publicationYear);
+      return `${input}\n${availability.message}`;
+    }
 
     // Parse month/day format (e.g., "6/1" -> month=6, day=1)
     const [month, day] = monthDay.split('/').map(n => parseInt(n));
@@ -1545,7 +1658,7 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Trying to parse other publication:', input);
 
     // Use exec for proper group extraction
-    const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:p\.\s*)?(\d+)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g;
+    const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.\s*)?(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -1557,6 +1670,20 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Other publication match found:', match);
     const [fullMatch, pubCode, issueOrPage, page, paragraph] = match;
     console.log('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
+
+    // Check if publication is available online
+    let lang = this.settings?.lang || 'Auto';
+    if (lang === 'Auto') {
+      lang = detectLanguage(input);
+    } else {
+      lang = Languages[lang] || 'EN';
+    }
+
+    const availability = checkPublicationAvailability(pubCode, lang);
+    if (availability.isOffline) {
+      console.log('Publication not available online:', pubCode);
+      return `${input}\n${availability.message}`;
+    }
 
     // Auto-format certain publications to use chapter format
     let formattedInput = input;
@@ -1577,14 +1704,7 @@ class JWLLinkerPlugin extends Plugin {
       console.log('Auto-formatted reference:', input, '→', formattedInput);
     }
 
-    // Create publication title mapping based on detected language
-    let lang = this.settings?.lang || 'Auto';
-    if (lang === 'Auto') {
-      lang = detectLanguage(formattedInput);
-    } else {
-      lang = Languages[lang] || 'EN';
-    }
-
+    // Use already detected language from availability check above
     const isRussian = lang === 'RU';
 
     const publicationTitles = isRussian ? {
@@ -1603,7 +1723,9 @@ class JWLLinkerPlugin extends Plugin {
       'jv': 'Свидетели Иеговы — возвещатели Царства Бога',
       'dp': 'Обратите внимание на пророчество Даниила!',
       'ip-1': 'Пророчество Исаии — свет для всего человечества I',
-      'ip-2': 'Пророчество Исаии — свет для всего человечества II'
+      'ip-2': 'Пророчество Исаии — свет для всего человечества II',
+      'be': 'Учимся в Школе теократического служения',
+      'th': 'Развивай навыки чтения и способность'
     } : {
       'od': 'Organized to Do Jehovah\'s Will',
       'it-1': 'Insight on the Scriptures, Volume 1',
@@ -1620,7 +1742,9 @@ class JWLLinkerPlugin extends Plugin {
       'jv': 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom',
       'dp': 'Pay Attention to Daniel\'s Prophecy!',
       'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I',
-      'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II'
+      'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
+      'be': 'Learn From the Theocratic Ministry School',
+      'th': 'Apply Yourself to Reading and Teaching'
     };
 
     const publicationTitle = publicationTitles[pubCode] || `Publication ${pubCode.toUpperCase()}`;
@@ -1630,9 +1754,12 @@ class JWLLinkerPlugin extends Plugin {
     const chapterTerm = isRussian ? 'глава' : 'chap.';
     const parTerm = isRussian ? 'абз.' : 'par.';
 
+    // Determine page prefix based on whether it's a range or single page
+    const pagePrefix = page && page.includes('-') ? (isRussian ? 'сс.' : 'pp.') : (isRussian ? 'с.' : 'p.');
+
     if (hasChapter && page && paragraph) {
-      // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2
-      title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${isRussian ? 'с.' : 'p.'} ${page} ${parTerm} ${paragraph}`;
+      // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2 / si pp. 300-301 par. 11
+      title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
     } else if (hasChapter && paragraph) {
       // Format: od chap. 15 par. 1 / od глава 15 абз. 1
       title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${parTerm} ${paragraph}`;
@@ -1640,14 +1767,14 @@ class JWLLinkerPlugin extends Plugin {
       // Format: od chap. 15 / od глава 15
       title = `${publicationTitle} ${chapterTerm} ${issueOrPage}`;
     } else if (page && paragraph) {
-      // Format: od 15 p. 20 par. 3 / od 15 с. 20 абз. 3
-      title = `${publicationTitle} ${issueOrPage} ${isRussian ? 'с.' : 'p.'} ${page} ${parTerm} ${paragraph}`;
+      // Format: od 15 p. 20 par. 3 / od 15 с. 20 абз. 3 / si pp. 300-301 par. 11
+      title = `${publicationTitle} ${issueOrPage} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
     } else if (paragraph) {
       // Format: od 15 par. 3 / od 15 абз. 3
       title = `${publicationTitle} ${issueOrPage} ${parTerm} ${paragraph}`;
     } else if (page) {
-      // Format: it-1 332 / it-1 с. 332
-      title = `${publicationTitle} ${isRussian ? 'с.' : 'p.'} ${page}`;
+      // Format: it-1 332 / it-1 с. 332 / si pp. 300-301
+      title = `${publicationTitle} ${pagePrefix} ${page}`;
     } else {
       // Format: it-1 332, od 15, g 24/01
       title = `${publicationTitle} ${issueOrPage}`;
