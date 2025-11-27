@@ -366,6 +366,8 @@ const Config = {
   russianPubRegex: /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g,
   // Russian publication with month names regex (w25 Март с. 8 абз. 2)
   russianPubMonthRegex: /w(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
+  // Russian publication with day and month names regex (w10 15 Января с. 3 абз. 1)
+  russianPubDayMonthRegex: /w(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
   // English publication reference regex (formats like w65 6/1 p. 329 par. 6)
   // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3
   englishPubRegex: /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
@@ -535,17 +537,44 @@ const SpanishMonths = {
  * @returns {string} - Formatted text or original if no match
  */
 function autoFormatRussianWatchtower(input) {
+  // First check for day + month format (w10 15 Января с. 3 абз. 1)
+  const dayMonthRegex = Config.russianPubDayMonthRegex;
+  dayMonthRegex.lastIndex = 0;
+  const dayMonthMatch = dayMonthRegex.exec(input);
+
+  if (dayMonthMatch) {
+    const [fullMatch, year, day, monthName, page, paragraph] = dayMonthMatch;
+    const monthNumber = RussianMonths[monthName.toLowerCase()];
+
+    if (monthNumber) {
+      const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+
+      if (publicationYear < 2016) {
+        // Pre-2016: Use day/month format (w10 15/1 с. 3 абз. 1)
+        const formatted = `w${year} ${monthNumber}/${day} с. ${page} абз. ${paragraph}`;
+        console.log('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
+        return input.replace(fullMatch, formatted);
+      } else {
+        // Post-2016: Use .month format (w16.01 3, абз. 1)
+        const formatted = `w${year}.${monthNumber} ${page}, абз. ${paragraph}`;
+        console.log('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
+        return input.replace(fullMatch, formatted);
+      }
+    }
+  }
+
+  // Then check for month-only format (w25 Март с. 8 абз. 2)
   const monthRegex = Config.russianPubMonthRegex;
   monthRegex.lastIndex = 0;
-  const match = monthRegex.exec(input);
+  const monthMatch = monthRegex.exec(input);
 
-  if (match) {
-    const [fullMatch, year, monthName, page, paragraph] = match;
+  if (monthMatch) {
+    const [fullMatch, year, monthName, page, paragraph] = monthMatch;
     const monthNumber = RussianMonths[monthName.toLowerCase()];
 
     if (monthNumber) {
       const formatted = `w${year}.${monthNumber} ${page}, абз. ${paragraph}`;
-      console.log('Auto-formatted Russian Watchtower:', input, '→', formatted);
+      console.log('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
