@@ -198,7 +198,7 @@ const InterfaceStrings = {
     settingsCitationLink: 'Enlazar escritura citada',
     settingsCitationLinkDesc: 'Enlazar referencia bíblica a JW Library al citar versículos.',
     settingsDualMode: 'Modo dual de publicaciones',
-    settingsDualModeDesc: 'Mostrar publicaciones en inglés y español simultáneamente.',
+    settingsDualModeDesc: 'Mostrar publicaciones en múltiples idiomas simultáneamente.',
     settingsReset: 'Restablecer',
     settingsResetDesc: 'Esto no se puede deshacer.',
     settingsResetDefault: 'Restablecer a predeterminado',
@@ -368,8 +368,8 @@ const Config = {
   // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3
   englishPubRegex: /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
-  // Formats: od 15 par. 3, od 15 абз. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, si pp. 300-301 par. 11
-  otherPubRegex: /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.\s*)?(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g,
+  // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
+  otherPubRegex: /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -1760,7 +1760,7 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Trying to parse other publication:', input);
 
     // Use exec for proper group extraction
-    const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.\s*)?(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.)\s*(\d+))?/g;
+    const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -1789,16 +1789,20 @@ class JWLLinkerPlugin extends Plugin {
 
     // Auto-format certain publications to use chapter format
     let formattedInput = input;
-    const hasChapter = input.includes('chap.') || input.includes('глава');
+    const hasChapter = input.includes('chap.') || input.includes('глава') || input.includes('cap.');
 
-    // Detect if input contains Russian terms
+    // Detect language-specific terms in input
     const isRussianInput = /абз\.|глава/.test(input);
+    const isSpanishInput = /párr\.|cap\./.test(input);
 
     // For "od" and "cl" publications, automatically add chapter format if not present
     if ((pubCode === 'od' || pubCode === 'cl') && !hasChapter && paragraph) {
       if (isRussianInput) {
         // Russian format: od 15 абз. 3 → od глава 15 абз. 3
         formattedInput = input.replace(/^(od|cl)\s+(\d+)\s+(абз\.\s*\d+)/, `$1 глава $2 $3`);
+      } else if (isSpanishInput) {
+        // Spanish format: od 15 párr. 3 → od cap. 15 párr. 3
+        formattedInput = input.replace(/^(od|cl)\s+(\d+)\s+(párr\.\s*\d+)/, `$1 cap. $2 $3`);
       } else {
         // English format: od 15 par. 3 → od chap. 15 par. 3
         formattedInput = `${pubCode} chap. ${issueOrPage} par. ${paragraph}`;
@@ -3091,7 +3095,8 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .addDropdown((drop) => {
         const interfaceOptions = {
           'Russian': 'Русский',
-          'English': 'English'
+          'English': 'English',
+          'Spanish': 'Español'
         };
         drop
           .addOptions(interfaceOptions)
@@ -3109,21 +3114,41 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .setName(Lang.settingsCitationLang)
       .setDesc(Lang.settingsCitationLangDesc)
       .addDropdown((drop) => {
-        const languageOptions = Lang.settingsInterfaceLang === 'Язык интерфейса' ? {
-          'Auto': 'Автоопределение',
-          'Russian': 'Русский',
-          'English': 'English',
-          'German': 'Deutsch',
-          'French': 'Français',
-          'Dutch': 'Nederlands'
-        } : {
-          'Auto': 'Auto-detection',
-          'Russian': 'Russian',
-          'English': 'English',
-          'German': 'German',
-          'French': 'French',
-          'Dutch': 'Dutch'
-        };
+        let languageOptions;
+        if (Lang.settingsInterfaceLang === 'Язык интерфейса') {
+          // Russian interface
+          languageOptions = {
+            'Auto': 'Автоопределение',
+            'Russian': 'Русский',
+            'English': 'English',
+            'Spanish': 'Español',
+            'German': 'Deutsch',
+            'French': 'Français',
+            'Dutch': 'Nederlands'
+          };
+        } else if (Lang.settingsInterfaceLang === 'Idioma de la interfaz') {
+          // Spanish interface
+          languageOptions = {
+            'Auto': 'Detección automática',
+            'Russian': 'Ruso',
+            'English': 'Inglés',
+            'Spanish': 'Español',
+            'German': 'Alemán',
+            'French': 'Francés',
+            'Dutch': 'Holandés'
+          };
+        } else {
+          // English interface
+          languageOptions = {
+            'Auto': 'Auto-detection',
+            'Russian': 'Russian',
+            'English': 'English',
+            'Spanish': 'Spanish',
+            'German': 'German',
+            'French': 'French',
+            'Dutch': 'Dutch'
+          };
+        }
         drop
           .addOptions(languageOptions)
           .setValue(this.plugin.settings.lang)
