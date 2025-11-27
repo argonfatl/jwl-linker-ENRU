@@ -409,6 +409,12 @@ function detectLanguage(text) {
     return 'RU';
   }
 
+  // Check for Spanish terms and patterns (check before other languages)
+  if (/párr\.|cap\.|pág\.|págs\.|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro|^(1|2|3)\s*(Samuel|Reyes|Crónicas)/.test(text)) {
+    console.log('detectLanguage returning: ES (Spanish terms detected)');
+    return 'ES';
+  }
+
   // Check for common German book patterns
   if (/^(1|2|3)\s*(Mose|Samuel|Könige|Chronik)|Offenbarung|Römer|Korinther|Galater|Epheser|Philipper|Kolosser|Thessalonicher|Timotheus|Hebräer|Petrus/.test(text)) {
     return 'DE';
@@ -422,11 +428,6 @@ function detectLanguage(text) {
   // Check for Dutch patterns
   if (/^(1|2|3)\s*(Samuel|Koningen|Kronieken)|Openbaring|Romeinen|Korintiërs|Galaten|Efeziërs|Filippenzen|Kolossenzen|Tessalonicenzen|Timotheüs|Hebreeën|Petrus/.test(text)) {
     return 'NL';
-  }
-
-  // Check for Spanish patterns
-  if (/^(1|2|3)\s*(Samuel|Reyes|Crónicas)|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro/.test(text)) {
-    return 'ES';
   }
 
   // Default to English
@@ -484,6 +485,24 @@ const RussianMonths = {
   'октябрь': '10', 'октября': '10',
   'ноябрь': '11', 'ноября': '11',
   'декабрь': '12', 'декабря': '12'
+};
+
+/**
+ * Spanish month names mapping
+ */
+const SpanishMonths = {
+  'enero': '01',
+  'febrero': '02',
+  'marzo': '03',
+  'abril': '04',
+  'mayo': '05',
+  'junio': '06',
+  'julio': '07',
+  'agosto': '08',
+  'septiembre': '09', 'setiembre': '09',
+  'octubre': '10',
+  'noviembre': '11',
+  'diciembre': '12'
 };
 
 /**
@@ -685,6 +704,13 @@ class JWLLinkerPlugin extends Plugin {
     // Make test functions globally available for debugging
     window.testRussianPubRegex = testRussianPubRegex;
     window.testEnglishPubRegex = testEnglishPubRegex;
+    window.testLanguageDetection = (input) => {
+      console.log('=== Testing Language Detection ===');
+      console.log('Input:', input);
+      const detected = detectLanguage(input);
+      console.log('Detected language:', detected);
+      return detected;
+    };
   }
 
   onunload() { }
@@ -1901,7 +1927,7 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     if (hasChapter && page && paragraph) {
-      // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2 / si pp. 300-301 par. 11
+      // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2
       title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
     } else if (hasChapter && paragraph) {
       // Format: od chap. 15 par. 1 / od глава 15 абз. 1
@@ -1910,13 +1936,13 @@ class JWLLinkerPlugin extends Plugin {
       // Format: od chap. 15 / od глава 15
       title = `${publicationTitle} ${chapterTerm} ${issueOrPage}`;
     } else if (page && paragraph) {
-      // Format: od 15 p. 20 par. 3 / od 15 с. 20 абз. 3 / si pp. 300-301 par. 11
-      title = `${publicationTitle} ${issueOrPage} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
+      // Format: si pp. 300-301 par. 11 / si págs. 300-301 párr. 11 / si сс. 300-301 абз. 11
+      title = `${publicationTitle} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
     } else if (paragraph) {
       // Format: od 15 par. 3 / od 15 абз. 3
       title = `${publicationTitle} ${issueOrPage} ${parTerm} ${paragraph}`;
     } else if (page) {
-      // Format: it-1 332 / it-1 с. 332 / si pp. 300-301
+      // Format: it-1 332 / si pp. 300-301 / si págs. 300-301
       title = `${publicationTitle} ${pagePrefix} ${page}`;
     } else {
       // Format: it-1 332, od 15, g 24/01
