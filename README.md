@@ -8,7 +8,7 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 - 📖 **Bible References**: Automatic conversion to JW Library links with verse text extraction
 - 📚 **Publication Support**: Watchtower, Awake!, books (od, it-1, cl, si, etc.) in multiple formats
 - 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
-- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` (English/Russian/Spanish)
+- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names (English/Russian/Spanish)
 - 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, English/Spanish: 1950+)
 - 🎯 **Dual Mode**: Show publications in multiple languages simultaneously
 - 💬 **Smart Citations**: Extract paragraph text with callout formatting
@@ -41,9 +41,22 @@ Restart Obsidian and go to the *Community Plugins Settings* page to enable the p
 - **Page Ranges**: `si pp. 300-301 par. 11`, `si сс. 300-301 абз. 11`, `si págs. 300-301 párr. 11`
 
 ## Auto-formatting Examples
+
+### Publication Auto-formatting
 - **English**: `od 15 par. 3` → `od chap. 15 par. 3`
 - **Russian**: `od 15 абз. 3` → `od глава 15 абз. 3`
 - **Spanish**: `od 15 párr. 3` → `od cap. 15 párr. 3`
+
+### Watchtower Month Names Auto-formatting
+**Pre-2016 (Two issues per month):**
+- **Russian**: `w10 15 Января с. 3 абз. 1` → `w10 1/15 с. 3 абз. 1`
+- **English**: `w10 15 January p. 3 par. 1` → `w10 1/15 p. 3 par. 1`
+- **Spanish**: `w10 15 Enero pág. 3 párr. 1` → `w10 1/15 pág. 3 párr. 1`
+
+**Post-2016 (One issue per month):**
+- **Russian**: `w16 Январь с. 3 абз. 1` → `w16.01 3, абз. 1`
+- **English**: `w25 March p. 8 par. 2` → `w25 3/1 p. 8 par. 2`
+- **Spanish**: `w25 Marzo pág. 8 párr. 2` → `w25 3/1 pág. 8 párr. 2`
 
 # 🎯 How to Use In Reading View
 
@@ -186,6 +199,11 @@ Click any generated link to open directly in your installed *JW Library* app at 
   - English: "chap.", "par.", "p."
   - Russian: "глава", "абз.", "с."
   - Spanish: "cap.", "párr.", "pág."
+- **Use natural month names** - plugin auto-converts Watchtower month names:
+  - Russian: "Январь", "Февраль", "Март", etc.
+  - English: "January", "February", "March", etc.
+  - Spanish: "Enero", "Febrero", "Marzo", etc.
+- **Historical accuracy** - plugin respects pre-2016 two-issue format vs. post-2016 single-issue format
 
 ## Supported Publication Codes
 - **Books**: `od`, `it-1`, `it-2`, `si`, `cl`, `jv`, `dp`, `ip-1`, `ip-2`, `be`, `th`
@@ -194,5 +212,5 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-**Version**: 0.6.0 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.6.4 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
 
