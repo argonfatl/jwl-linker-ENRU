@@ -1,21 +1,21 @@
-# JWL Linker EN-RU Plugin for [Obsidian](https://obsidian.md)
+# JWL Linker EN-RU-ES Plugin for [Obsidian](https://obsidian.md)
 
-**Comprehensive multilingual JW Library linker** supporting Bible references and JW publications in **English and Russian**. Features automatic language detection, multi-format publication support, and intelligent content extraction from WOL.
+**Comprehensive multilingual JW Library linker** supporting Bible references and JW publications in **English, Russian, and Spanish**. Features automatic language detection, multi-format publication support, and intelligent content extraction from WOL.
 
 ## ✨ Key Features
 
 - 📖 **Bible References**: Automatic conversion to JW Library links with verse text extraction
 - 📚 **Publication Support**: Watchtower, Awake!, books (od, it-1, cl, si, etc.) in multiple formats
-- 🌍 **Multilingual**: Full English and Russian support with auto-detection
-- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` (English/Russian)
-- 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, English: 1950+)
-- 🎯 **Dual Mode**: Show publications in both languages simultaneously
+- 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
+- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` (English/Russian/Spanish)
+- 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, English/Spanish: 1950+)
+- 🎯 **Dual Mode**: Show publications in multiple languages simultaneously
 - 💬 **Smart Citations**: Extract paragraph text with callout formatting
 - 📝 **Text Quoting**: Convert selected text to citation callouts
 
 # How to Install
 
-Download the [latest version](https://github.com/MrBertie/jwl-linker/archive/refs/heads/main.zip) from this link, and unzip it.  
+Download the [latest version](https://github.com/argonfatl/jwl-linker-ENRU/archive/refs/heads/main.zip) from this link, and unzip it.  
 You see a folder called `jwl-linker-main`; rename this folder as `jwl-linker` and then add it into your `{Obsidian Vault}/.obsidian/plugins` folder.  
 Restart Obsidian and go to the *Community Plugins Settings* page to enable the plugin.
 
@@ -26,20 +26,23 @@ Restart Obsidian and go to the *Community Plugins Settings* page to enable the p
 ## Bible References
 - **English**: `Rom 1:20`, `1 Cor 9:26`, `Psalm 89:18`
 - **Russian**: `Рим 1:20`, `1 Кор 9:26`, `Псалом 89:18`
+- **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`
 
 ## Watchtower Publications
 - **English**: `w65 6/1 p. 329 par. 6`, `w24 1/15 p. 12 par. 3`
 - **Russian**: `w86.01 28, абз. 11`, `w24.12 15, абз. 5`
+- **Spanish**: `w65 6/1 pág. 329 párr. 6`, `w24 1/15 pág. 12 párr. 3`
 
 ## Other Publications
-- **Books**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
+- **English**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
 - **Russian**: `od 15 абз. 3`, `cl глава 8 с. 77 абз. 2`
-- **Page Ranges**: `si pp. 300-301 par. 11`, `si сс. 300-301 абз. 11`
+- **Spanish**: `od 15 párr. 3`, `cl cap. 8 pág. 77 párr. 2`
+- **Page Ranges**: `si pp. 300-301 par. 11`, `si сс. 300-301 абз. 11`, `si págs. 300-301 párr. 11`
 
 ## Auto-formatting Examples
-- `od 15 par. 3` → `od chap. 15 par. 3`
-- `od 15 абз. 3` → `od глава 15 абз. 3`
-- `cl 8 par. 2` → `cl chap. 8 par. 2`
+- **English**: `od 15 par. 3` → `od chap. 15 par. 3`
+- **Russian**: `od 15 абз. 3` → `od глава 15 абз. 3`
+- **Spanish**: `od 15 párr. 3` → `od cap. 15 párr. 3`
 
 # 🎯 How to Use In Reading View
 
@@ -79,18 +82,23 @@ To access the commands:
 # 🌍 Multilingual Support
 
 ## Language Detection
-- **Automatic**: Detects Cyrillic characters for Russian, defaults to English
-- **Manual**: Set preferred language in plugin settings
-- **Dual Mode**: Show publications in both English and Russian simultaneously
+- **Automatic**: Detects Cyrillic characters for Russian, Spanish Bible book names, defaults to English
+- **Manual**: Set preferred language in plugin settings (English/Russian/Spanish)
+- **Dual Mode**: Show publications in multiple languages simultaneously
 
 ## Publication Availability
 - **Russian Watchtower**: Available from 1986 onwards (`w86.01` and later)
-- **English Watchtower**: Available from 1950 onwards (`w50 1/1` and later)
-- **Offline Publications**: Automatic detection with localized messages
+- **English/Spanish Watchtower**: Available from 1950 onwards (`w50 1/1` and later)
+- **Offline Publications**: Automatic detection with localized messages in all three languages
 
 ## Language-Specific Features
-- **Auto-formatting**: Converts `par.` ↔ `абз.`, `chap.` ↔ `глава`, `p.` ↔ `с.`
-- **Publication Titles**: Displays in appropriate language (e.g., "Сторожевая башня" vs "The Watchtower")
+- **Auto-formatting**: 
+  - English: `par.` ↔ `chap.` ↔ `p.`
+  - Russian: `абз.` ↔ `глава` ↔ `с.`
+  - Spanish: `párr.` ↔ `cap.` ↔ `pág.`
+- **Publication Titles**: Displays in appropriate language
+  - "The Watchtower" / "Сторожевая башня" / "La Atalaya"
+  - "Awake!" / "Пробудитесь!" / "¡Despertad!"
 - **Interface**: Menu items and messages in selected interface language
 
 # 📝 Example Outputs
@@ -109,6 +117,13 @@ w86.01 28, абз. 11
 > **11** Большинство людей сегодня не признают принцип главенства...
 ```
 
+## Publication Citation (Spanish)
+```markdown
+od 15 párr. 3
+> [!cite] PUBL. — [Organizados para hacer la voluntad de Jehová cap. 15 párr. 3](https://wol.jw.org/...)
+> **3** La mayoría de las personas hoy no reconocen el principio de la jefatura...
+```
+
 ## Dual Mode Output
 ```markdown
 od 15 par. 3
@@ -121,11 +136,19 @@ od 15 par. 3
 > **3** Большинство людей сегодня не признают принцип главенства...
 ```
 
-## Text Citation
+## Text Citation Examples
 ```markdown
-Selected text: "This is important information"
-> [!cite] ЦИТАТА
+English: "This is important information"
+> [!cite] QUOTE
 > This is important information
+
+Russian: "Это важная информация"
+> [!cite] ЦИТАТА
+> Это важная информация
+
+Spanish: "Esta es información importante"
+> [!cite] CITA
+> Esta es información importante
 ```
 
 # ⚙️ Plugin Settings
@@ -133,8 +156,8 @@ Selected text: "This is important information"
 ## Display Options
 - **Verse Template**: Customize format for Bible verse citations
 - **Callout Templates**: Customize format for callout-style citations  
-- **Language Settings**: Interface language (Russian/English) and citation language
-- **Dual Mode**: Enable simultaneous English/Russian publication display
+- **Language Settings**: Interface language (Russian/English/Spanish) and citation language
+- **Dual Mode**: Enable simultaneous multi-language publication display
 
 ## Advanced Options
 - **History Size**: Number of recent citations to keep in sidebar
@@ -158,7 +181,10 @@ Click any generated link to open directly in your installed *JW Library* app at 
 - **Select text** before running commands for best results
 - **Use dual mode** when working with multilingual content
 - **Check publication years** - older Watchtowers may not be available online
-- **Verify auto-formatting** - plugin automatically adds "chap." and "глава" where appropriate
+- **Verify auto-formatting** - plugin automatically adds language-appropriate terms:
+  - English: "chap.", "par.", "p."
+  - Russian: "глава", "абз.", "с."
+  - Spanish: "cap.", "párr.", "pág."
 
 ## Supported Publication Codes
 - **Books**: `od`, `it-1`, `it-2`, `si`, `cl`, `jv`, `dp`, `ip-1`, `ip-2`, `be`, `th`
@@ -167,5 +193,5 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-**Version**: 0.5.1 | **Languages**: English, Russian | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.6.0 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
 

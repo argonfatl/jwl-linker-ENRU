@@ -156,6 +156,70 @@ const InterfaceStrings = {
     menuOpenSidebar: 'Open sidebar',
     menuParaCount: 'No. of paragraphs to cite?',
     menuCitationLink: 'Link cited scripture?',
+  },
+  Spanish: {
+    name: 'JWL Linker',
+    invalidScripture: '⚠️ Esta no es una referencia bíblica válida.',
+    invalidUrl: '⚠️ Esta no es una URL válida de wol.jw.org.',
+    onlineLookupFailed: '⚠️ Falló la búsqueda bíblica en línea. Inténtalo de nuevo.',
+    noEditor: '⚠️ No hay editor activo disponible.',
+    noSelection: '⚠️ Nada en la línea del cursor o sin selección.',
+    noHistoryYet: 'No hay historial para mostrar.',
+    noTitle: 'Título faltante',
+    loadingCitation: '⏳ Cargando cita:',
+    copiedHistoryMsg: 'Elemento del historial copiado al portapapeles',
+    helpIntro: 'Esta barra lateral muestra todos los versículos, párrafos y publicaciones recientes que has citado usando el plugin.',
+    helpCopy: 'Haz clic en cualquier elemento arriba para copiarlo al portapapeles.',
+    helpClear: 'Haz clic aquí para limpiar el historial de búsqueda.',
+    hideTip: 'Haz clic para ocultar',
+    help: 'Ayuda',
+    emptyPara: '*⟪ Párrafo vacío ⟫*',
+    paragraphOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10' },
+    historySize: { 0: '0', 10: 10, 20: 20, 30: 30, 40: 40, 50: 50, 75: 75, 100: 100 },
+    // Settings strings
+    settingsDisplay: 'Visualización',
+    settingsDisplayDesc: 'Puedes usar las siguientes sustituciones en las plantillas: {title}, {text}',
+    settingsVerseTemplate: 'Plantilla para cita de versículos',
+    settingsVerseTemplateDesc: 'Usa esta plantilla al citar versículos bíblicos en formato de texto normal',
+    settingsVerseCallout: 'Plantilla para cita de versículos en destacado',
+    settingsVerseCalloutDesc: 'Usa esta plantilla al citar versículos bíblicos usando el formato de destacado',
+    settingsPubTemplate: 'Plantilla para cita de publicación',
+    settingsPubTemplateDesc: 'Usa esta plantilla al citar publicaciones en formato de texto normal (jw.org o búsqueda de artículo)',
+    settingsPubCallout: 'Plantilla para cita de publicación en destacado',
+    settingsPubCalloutDesc: 'Usa esta plantilla al citar publicaciones usando el formato de destacado (jw.org o búsqueda de artículo)',
+    settingsInterfaceLang: 'Idioma de la interfaz',
+    settingsInterfaceLangDesc: 'Elige el idioma de la interfaz para el plugin.',
+    settingsCitationLang: 'Idioma de las citas',
+    settingsCitationLangDesc: 'Elige el idioma para las citas o usa detección automática.',
+    settingsHistorySize: 'Número de elementos del historial',
+    settingsHistorySizeDesc: 'Cuántos elementos del historial mostrar en la barra lateral.',
+    settingsBoldNumbers: 'Números iniciales en negrita',
+    settingsBoldNumbersDesc: 'Aplicar formato en negrita a los números iniciales en versículos o párrafos en el texto citado.',
+    settingsCitationLink: 'Enlazar escritura citada',
+    settingsCitationLinkDesc: 'Enlazar referencia bíblica a JW Library al citar versículos.',
+    settingsDualMode: 'Modo dual de publicaciones',
+    settingsDualModeDesc: 'Mostrar publicaciones en inglés y español simultáneamente.',
+    settingsReset: 'Restablecer',
+    settingsResetDesc: 'Esto no se puede deshacer.',
+    settingsResetDefault: 'Restablecer a predeterminado',
+    settingsResetDefaultDesc: 'Devolver todas las configuraciones a sus valores predeterminados originales.',
+    settingsClearHistory: 'Limpiar historial',
+    settingsClearHistoryDesc: 'Limpiar la lista de elementos en la barra lateral del historial.',
+    // Menu commands
+    menuCiteVerses: 'Citar versículos',
+    menuCiteVersesCallout: 'Citar versículos como destacado',
+    menuCiteJworgUrl: 'Citar URL de jw.org',
+    menuCiteJworgCallout: 'Citar URL de jw.org como destacado',
+    menuCitePublication: 'Citar búsqueda de publicación',
+    menuLookupWOL: 'Buscar texto seleccionado en WOL',
+    menuCiteSelectedText: 'Citar texto seleccionado',
+    menuAddTitle: 'Agregar título a URL de jw.org',
+    menuConvertScripture: 'Convertir escrituras a JW Library',
+    menuConvertJworg: 'Convertir URL de jw.org a JW Library',
+    menuOpenJWLibrary: 'Abrir escritura en JW Library',
+    menuOpenSidebar: 'Abrir barra lateral',
+    menuParaCount: '¿Número de párrafos a citar?',
+    menuCitationLink: '¿Enlazar escritura citada?',
   }
 };
 
@@ -175,6 +239,12 @@ const OfflinePublications = {
     'po': 'Preaching Handbook',
     'sg': 'School Guidebook',
     'yb': 'Yearbook of Jehovah\'s Witnesses'
+  },
+  Spanish: {
+    'ep': 'Evangelizadores',
+    'po': 'Manual para predicadores',
+    'sg': 'Guía para la escuela de servicio',
+    'yb': 'Anuario de los testigos de Jehová'
   }
 };
 
@@ -186,16 +256,20 @@ const OfflinePublications = {
  * @returns {Object} - {isOffline: boolean, message: string}
  */
 function checkPublicationAvailability(pubCode, lang = 'EN', year = null) {
-  const isRussian = lang === 'RU';
-  const offlineList = isRussian ? OfflinePublications.Russian : OfflinePublications.English;
+  const offlineList = OfflinePublications[lang === 'RU' ? 'Russian' : lang === 'ES' ? 'Spanish' : 'English'];
 
   // Check Watchtower year availability
   if (pubCode === 'w' && year !== null) {
-    const minYear = isRussian ? 1986 : 1950;
+    const minYear = (lang === 'RU') ? 1986 : 1950; // Same for Spanish and English
     if (year < minYear) {
-      const message = isRussian ?
-        `📅 Сторожевая башня ${year} года недоступна онлайн. Доступны выпуски с ${minYear} года` :
-        `📅 The Watchtower ${year} is not available online. Available from ${minYear} onwards`;
+      let message;
+      if (lang === 'RU') {
+        message = `📅 Сторожевая башня ${year} года недоступна онлайн. Доступны выпуски с ${minYear} года`;
+      } else if (lang === 'ES') {
+        message = `📅 La Atalaya ${year} no está disponible en línea. Disponible desde ${minYear} en adelante`;
+      } else {
+        message = `📅 The Watchtower ${year} is not available online. Available from ${minYear} onwards`;
+      }
 
       return {
         isOffline: true,
@@ -205,9 +279,14 @@ function checkPublicationAvailability(pubCode, lang = 'EN', year = null) {
   }
 
   if (offlineList[pubCode]) {
-    const message = isRussian ?
-      `📖 "${offlineList[pubCode]}" доступна только в печатном варианте` :
-      `📖 "${offlineList[pubCode]}" is available only in print format`;
+    let message;
+    if (lang === 'RU') {
+      message = `📖 "${offlineList[pubCode]}" доступна только в печатном варианте`;
+    } else if (lang === 'ES') {
+      message = `📖 "${offlineList[pubCode]}" está disponible solo en formato impreso`;
+    } else {
+      message = `📖 "${offlineList[pubCode]}" is available only in print format`;
+    }
 
     return {
       isOffline: true,
@@ -228,6 +307,7 @@ const Languages = {
   Dutch: 'NL',
   French: 'FR',
   Russian: 'RU',
+  Spanish: 'ES',
 };
 
 // Function to detect if text contains Russian characters
@@ -236,14 +316,22 @@ function isRussianText(text) {
 }
 
 // Function to get appropriate URLs based on language
-function getConfigForLanguage(isRussian = false) {
-  if (isRussian) {
+function getConfigForLanguage(lang = 'EN') {
+  if (lang === 'RU') {
     return {
       jwlLocale: '&wtlocale=U',  // Russian uses 'U' in JW Library
       wolRoot: 'https://wol.jw.org/ru/wol/d/',
       wolPublications: 'https://wol.jw.org/ru/wol/d/r2/lp-u/',
       wolLookup: 'https://wol.jw.org/ru/wol/l/r2/lp-u?q=',
       webFinder: 'https://www.jw.org/finder?wtlocale=U&'  // Web finder also uses U for Russian
+    };
+  } else if (lang === 'ES') {
+    return {
+      jwlLocale: '&wtlocale=S',  // Spanish uses 'S' in JW Library
+      wolRoot: 'https://wol.jw.org/es/wol/d/',
+      wolPublications: 'https://wol.jw.org/es/wol/d/r4/lp-s/',
+      wolLookup: 'https://wol.jw.org/es/wol/l/r4/lp-s?q=',
+      webFinder: 'https://www.jw.org/finder?wtlocale=S&'  // Web finder uses S for Spanish
     };
   } else {
     return {
@@ -336,6 +424,11 @@ function detectLanguage(text) {
     return 'NL';
   }
 
+  // Check for Spanish patterns
+  if (/^(1|2|3)\s*(Samuel|Reyes|Crónicas)|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro/.test(text)) {
+    return 'ES';
+  }
+
   // Default to English
   console.log('detectLanguage returning: EN (default)');
   return 'EN';
@@ -352,7 +445,8 @@ function getFinderUrl(lang) {
     'EN': 'https://www.jw.org/finder?wtlocale=E&',
     'DE': 'https://www.jw.org/finder?wtlocale=X&',
     'FR': 'https://www.jw.org/finder?wtlocale=F&',
-    'NL': 'https://www.jw.org/finder?wtlocale=O&'
+    'NL': 'https://www.jw.org/finder?wtlocale=O&',
+    'ES': 'https://www.jw.org/finder?wtlocale=S&'   // Spanish uses 'S'
   };
   return urls[lang] || urls['EN'];
 }
@@ -368,7 +462,8 @@ function getJWLibraryLocale(lang) {
     'EN': '&wtlocale=E',
     'DE': '&wtlocale=X',
     'FR': '&wtlocale=F',
-    'NL': '&wtlocale=O'
+    'NL': '&wtlocale=O',
+    'ES': '&wtlocale=S'   // Spanish uses 'S'
   };
   return locales[lang] || locales['EN'];
 }
@@ -393,7 +488,7 @@ const RussianMonths = {
 
 /**
  * Update interface language
- * @param {string} interfaceLang - Interface language (Russian, English)
+ * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
  */
 function updateInterfaceLanguage(interfaceLang) {
   Lang = InterfaceStrings[interfaceLang] || InterfaceStrings.Russian;
@@ -695,15 +790,22 @@ class JWLLinkerPlugin extends Plugin {
       const citationLines = lines.map(line => `> ${line}`);
 
       // Create citation callout with selected text
-      const citationHeader = this.settings.interfaceLang === 'Russian' ? '> [!cite] ЦИТАТА' : '> [!cite] QUOTE';
+      let citationHeader, successMessage;
+      if (this.settings.interfaceLang === 'Russian') {
+        citationHeader = '> [!cite] ЦИТАТА';
+        successMessage = 'Текст оформлен как цитата';
+      } else if (this.settings.interfaceLang === 'Spanish') {
+        citationHeader = '> [!cite] CITA';
+        successMessage = 'Texto formateado como cita';
+      } else {
+        citationHeader = '> [!cite] QUOTE';
+        successMessage = 'Text formatted as citation';
+      }
+
       const citation = `${citationHeader}\n${citationLines.join('\n')}`;
 
       // Replace selection with citation
       activeEditor.replaceSelection(citation);
-
-      const successMessage = this.settings.interfaceLang === 'Russian' ?
-        'Текст оформлен как цитата' :
-        'Text formatted as citation';
       new Notice(successMessage, 2000);
     } else {
       new Notice(Lang.noSelection, Config.delay);
@@ -1443,7 +1545,7 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     const isRussian = lang === 'RU';
-    const langConfig = getConfigForLanguage(isRussian);
+    const langConfig = getConfigForLanguage(lang);
 
     console.log('Detected language for English publication:', lang, 'isRussian:', isRussian);
 
@@ -1706,56 +1808,93 @@ class JWLLinkerPlugin extends Plugin {
 
     // Use already detected language from availability check above
     const isRussian = lang === 'RU';
+    const isSpanish = lang === 'ES';
 
-    const publicationTitles = isRussian ? {
-      'od': 'Организованы исполнять волю Иеговы',
-      'it-1': 'Понимание Писания, том 1',
-      'it-2': 'Понимание Писания, том 2',
-      'si': 'Все Писание вдохновлено Богом и полезно',
-      'g': 'Пробудитесь!',
-      'w': 'Сторожевая башня',
-      'km': 'Наше царственное служение',
-      'mwb': 'Наша христианская жизнь и служение',
-      'lff': 'Слушай Бога и живи вечно',
-      'rr': 'Рассуждение на основании Писаний',
-      'rs': 'Рассуждение на основании Писаний',
-      'cl': 'Приближайтесь к Иегове',
-      'jv': 'Свидетели Иеговы — возвещатели Царства Бога',
-      'dp': 'Обратите внимание на пророчество Даниила!',
-      'ip-1': 'Пророчество Исаии — свет для всего человечества I',
-      'ip-2': 'Пророчество Исаии — свет для всего человечества II',
-      'be': 'Учимся в Школе теократического служения',
-      'th': 'Развивай навыки чтения и способность'
-    } : {
-      'od': 'Organized to Do Jehovah\'s Will',
-      'it-1': 'Insight on the Scriptures, Volume 1',
-      'it-2': 'Insight on the Scriptures, Volume 2',
-      'si': 'All Scripture Is Inspired of God and Beneficial',
-      'g': 'Awake!',
-      'w': 'The Watchtower',
-      'km': 'Our Kingdom Ministry',
-      'mwb': 'Our Christian Life and Ministry—Meeting Workbook',
-      'lff': 'Listen to God and Live Forever',
-      'rr': 'Reasoning From the Scriptures',
-      'rs': 'Reasoning From the Scriptures',
-      'cl': 'Draw Close to Jehovah',
-      'jv': 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom',
-      'dp': 'Pay Attention to Daniel\'s Prophecy!',
-      'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I',
-      'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
-      'be': 'Learn From the Theocratic Ministry School',
-      'th': 'Apply Yourself to Reading and Teaching'
-    };
+    let publicationTitles;
+    if (isRussian) {
+      publicationTitles = {
+        'od': 'Организованы исполнять волю Иеговы',
+        'it-1': 'Понимание Писания, том 1',
+        'it-2': 'Понимание Писания, том 2',
+        'si': 'Все Писание вдохновлено Богом и полезно',
+        'g': 'Пробудитесь!',
+        'w': 'Сторожевая башня',
+        'km': 'Наше царственное служение',
+        'mwb': 'Наша христианская жизнь и служение',
+        'lff': 'Слушай Бога и живи вечно',
+        'rr': 'Рассуждение на основании Писаний',
+        'rs': 'Рассуждение на основании Писаний',
+        'cl': 'Приближайтесь к Иегове',
+        'jv': 'Свидетели Иеговы — возвещатели Царства Бога',
+        'dp': 'Обратите внимание на пророчество Даниила!',
+        'ip-1': 'Пророчество Исаии — свет для всего человечества I',
+        'ip-2': 'Пророчество Исаии — свет для всего человечества II',
+        'be': 'Учимся в Школе теократического служения',
+        'th': 'Развивай навыки чтения и способность'
+      };
+    } else if (isSpanish) {
+      publicationTitles = {
+        'od': 'Organizados para hacer la voluntad de Jehová',
+        'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
+        'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2',
+        'si': 'Toda Escritura es inspirada de Dios y provechosa',
+        'g': '¡Despertad!',
+        'w': 'La Atalaya',
+        'km': 'Nuestro Ministerio del Reino',
+        'mwb': 'Nuestra Vida Cristiana y Ministerio—Cuaderno de reunión',
+        'lff': 'Escucha a Dios y vivirás para siempre',
+        'rr': 'Razonamiento a partir de las Escrituras',
+        'rs': 'Razonamiento a partir de las Escrituras',
+        'cl': 'Acerquémonos a Jehová',
+        'jv': 'Los testigos de Jehová, proclamadores del Reino de Dios',
+        'dp': '¡Presta atención a la profecía de Daniel!',
+        'ip-1': 'La profecía de Isaías: luz para toda la humanidad I',
+        'ip-2': 'La profecía de Isaías: luz para toda la humanidad II',
+        'be': 'Benefíciese de la Escuela del Ministerio Teocrático',
+        'th': 'Aplícate a la lectura y la enseñanza'
+      };
+    } else {
+      publicationTitles = {
+        'od': 'Organized to Do Jehovah\'s Will',
+        'it-1': 'Insight on the Scriptures, Volume 1',
+        'it-2': 'Insight on the Scriptures, Volume 2',
+        'si': 'All Scripture Is Inspired of God and Beneficial',
+        'g': 'Awake!',
+        'w': 'The Watchtower',
+        'km': 'Our Kingdom Ministry',
+        'mwb': 'Our Christian Life and Ministry—Meeting Workbook',
+        'lff': 'Listen to God and Live Forever',
+        'rr': 'Reasoning From the Scriptures',
+        'rs': 'Reasoning From the Scriptures',
+        'cl': 'Draw Close to Jehovah',
+        'jv': 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom',
+        'dp': 'Pay Attention to Daniel\'s Prophecy!',
+        'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I',
+        'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
+        'be': 'Learn From the Theocratic Ministry School',
+        'th': 'Apply Yourself to Reading and Teaching'
+      };
+    }
 
     const publicationTitle = publicationTitles[pubCode] || `Publication ${pubCode.toUpperCase()}`;
 
-    // Create title for display (use Russian terms if detected)
+    // Create title for display (use language-specific terms)
     let title;
-    const chapterTerm = isRussian ? 'глава' : 'chap.';
-    const parTerm = isRussian ? 'абз.' : 'par.';
+    let chapterTerm, parTerm, pagePrefix;
 
-    // Determine page prefix based on whether it's a range or single page
-    const pagePrefix = page && page.includes('-') ? (isRussian ? 'сс.' : 'pp.') : (isRussian ? 'с.' : 'p.');
+    if (isRussian) {
+      chapterTerm = 'глава';
+      parTerm = 'абз.';
+      pagePrefix = page && page.includes('-') ? 'сс.' : 'с.';
+    } else if (isSpanish) {
+      chapterTerm = 'cap.';
+      parTerm = 'párr.';
+      pagePrefix = page && page.includes('-') ? 'págs.' : 'pág.';
+    } else {
+      chapterTerm = 'chap.';
+      parTerm = 'par.';
+      pagePrefix = page && page.includes('-') ? 'pp.' : 'p.';
+    }
 
     if (hasChapter && page && paragraph) {
       // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2 / si pp. 300-301 par. 11
@@ -1780,7 +1919,7 @@ class JWLLinkerPlugin extends Plugin {
       title = `${publicationTitle} ${issueOrPage}`;
     }
 
-    const langConfig = getConfigForLanguage(isRussian);
+    const langConfig = getConfigForLanguage(lang);
 
     console.log('Detected language for other publication:', lang, 'isRussian:', isRussian);
 
@@ -1873,9 +2012,14 @@ class JWLLinkerPlugin extends Plugin {
     if (isRussian) {
       // Keep "ПУБЛ." for Russian
       template = template.replace('PUB.', 'ПУБЛ.');
+    } else if (isSpanish) {
+      // Use "PUBL." for Spanish
+      template = template.replace('PUB.', 'PUBL.');
+      template = template.replace('ПУБЛ.', 'PUBL.');
     } else {
       // Use "PUB." for English
       template = template.replace('ПУБЛ.', 'PUB.');
+      template = template.replace('PUBL.', 'PUB.');
     }
 
     // Fix template to not break markdown links
@@ -1952,7 +2096,15 @@ class JWLLinkerPlugin extends Plugin {
         }
 
         const isRussian = lang === 'RU';
-        const languageLabel = isRussian ? '**Russian:**' : '**English:**';
+        const isSpanish = lang === 'ES';
+        let languageLabel;
+        if (isRussian) {
+          languageLabel = '**Russian:**';
+        } else if (isSpanish) {
+          languageLabel = '**Spanish:**';
+        } else {
+          languageLabel = '**English:**';
+        }
 
         const output = [];
         output.push(input);
