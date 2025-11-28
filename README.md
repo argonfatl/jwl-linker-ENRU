@@ -71,7 +71,7 @@ The plugin provides comprehensive commands for scriptures, publications, and cit
 
 To access the commands:
 - On Desktop: right-click next to the scripture, and hover on *JWL Linker* to see the list of commands.
-![Menu](menu.png)
+![Menu](menu1.png)
   
 - On Mobile: add a toolbar item for the *JWL Linker* command.
 
