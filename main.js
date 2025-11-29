@@ -2343,6 +2343,70 @@ class JWLLinkerPlugin extends Plugin {
     match = regex.exec(input);
 
     if (!match) {
+      // Try month/day format: w03 7/15 22 [par. N] (supports English par., Russian абз., Spanish párr.)
+      regex = /w(\d{2})\s+(\d{1,2})\/(\d{1,2})\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/g;
+      regex.lastIndex = 0;
+      match = regex.exec(input);
+
+      if (match) {
+        const [fullMatch, year, month, day, page, paragraph] = match;
+        console.log('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
+
+        // Convert to standard format for processing
+        const paddedMonth = month.padStart(2, '0');
+        const englishInput = `w${year} ${month}/${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`;
+        const russianInput = `w${year}.${paddedMonth} ${page}${paragraph ? `, абз. ${paragraph}` : ''}`;
+        const spanishInput = `w${year} ${month}/${day} pág. ${page}${paragraph ? ` párr. ${paragraph}` : ''}`;
+
+        console.log('Converted formats:', { englishInput, russianInput, spanishInput });
+
+        const output = [];
+        output.push(input); // keep original input on first line
+
+        try {
+          // Get English citation
+          console.log('Fetching English citation for:', englishInput);
+          const englishCitation = await this._fetchEnglishPublicationCitation(englishInput, view, command);
+
+          // Get Russian citation if paragraph is specified
+          let russianCitation = '';
+          if (paragraph) {
+            console.log('Fetching Russian citation for:', russianInput);
+            russianCitation = await this._fetchRussianPublicationCitationCallout(russianInput, view, command);
+          }
+
+          // Get Spanish citation if paragraph is specified
+          let spanishCitation = '';
+          if (paragraph) {
+            console.log('Fetching Spanish citation for:', spanishInput);
+            spanishCitation = await this._fetchOtherPublicationCitation(spanishInput, view, command);
+          }
+
+          // Format dual output
+          output.push('**English:**');
+          output.push(englishCitation.split('\n').slice(1).join('\n')); // Remove input line from English
+
+          if (russianCitation) {
+            output.push('');
+            output.push('**Russian:**');
+            output.push(russianCitation.split('\n').slice(1).join('\n')); // Remove input line from Russian
+          }
+
+          if (spanishCitation) {
+            output.push('');
+            output.push('**Spanish:**');
+            output.push(spanishCitation.split('\n').slice(1).join('\n')); // Remove input line from Spanish
+          }
+
+          return output.join('\n');
+        } catch (error) {
+          console.error('Error in dual mode month/day format:', error);
+          return `${input} | ${Lang.onlineLookupFailed}`;
+        }
+      }
+    }
+
+    if (!match) {
       // Try English publication format: w65 6/1 p. 329 par. 6
       Config.englishPubRegex.lastIndex = 0;
       match = Config.englishPubRegex.exec(input);
