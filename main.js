@@ -381,7 +381,7 @@ const Config = {
   spanishPubDayMonthRegex: /w(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
-  otherPubRegex: /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
+  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -1743,8 +1743,13 @@ class JWLLinkerPlugin extends Plugin {
       view?.showHistory();
       text = content.join('');
       text = this._boldInitialNumber(text);
+
+      // Check if paragraph content was actually found
+      if (!text || text.includes('Русский текст не найден') || text.includes('Не удалось загрузить WOL')) {
+        text = `На странице нет нумерации абзацев. Попробуйте поиск: [${russianInput}](${russianLookupUrl}). ${text}`;
+      }
     } else {
-      text = `**${paragraph}** Содержимое не найдено.`;
+      text = `На странице нет нумерации абзацев. **${paragraph}** Содержимое не найдено. Попробуйте поиск: [${russianInput}](${russianLookupUrl})`;
     }
 
     // Use callout template like English version
@@ -1771,8 +1776,8 @@ class JWLLinkerPlugin extends Plugin {
   async _fetchEnglishPublicationCitation(input, view, command) {
     console.log('Trying to parse English publication:', input);
 
-    // Use exec for proper group extraction - English format only
-    const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g;
+    // Use exec for proper group extraction - English format (paragraph optional)
+    const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -1805,7 +1810,7 @@ class JWLLinkerPlugin extends Plugin {
     // For years like 65, it should be 1965; for years like 24, it could be 1924 or 2024
     // Since w65 is clearly 1965, we'll assume years < 50 are 20xx, >= 50 are 19xx
     const displayYear = parseInt(year) >= 50 ? `19${year}` : `20${year}`;
-    const title = `The Watchtower ${displayYear} ${englishMonth} ${day} p. ${page} par. ${paragraph}`;
+    const title = `The Watchtower ${displayYear} ${englishMonth} ${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`;
 
     // Create better search URLs for English publications
     const paddedMonth = month.toString().padStart(2, '0');
@@ -2010,6 +2015,13 @@ class JWLLinkerPlugin extends Plugin {
     // Use actual text if available for both old and modern publications
     // If no text found, fall back to search links
     let textToUse = actualText || webLink;
+
+    // Check if paragraph was specified but no content found, or if no paragraph was specified
+    if (paragraph && !actualText) {
+      textToUse = `No paragraph numbering found on the page. Try search: [${searchQuery1}](${wolUrl1}). ` + textToUse;
+    } else if (!paragraph) {
+      textToUse = `No paragraph numbering found on the page. Specify paragraph number to get content. Try search: [${searchQuery2}](${wolUrl2}). ` + textToUse;
+    }
 
     // If using callout template, format text properly for callout
     if (template.includes('> [!cite]')) {
@@ -2311,6 +2323,19 @@ class JWLLinkerPlugin extends Plugin {
     // Use actual text if available, otherwise fall back to search links
     let textToUse = actualText || webLink;
 
+    // Check if paragraph was specified but no content found
+    if (paragraph && !actualText) {
+      let noParMessage;
+      if (isRussian) {
+        noParMessage = `На странице нет нумерации абзацев. Попробуйте поиск: [${formattedInput}](${wolUrl1}). `;
+      } else if (isSpanish) {
+        noParMessage = `En la página no hay numeración de párrafos. Pruebe la búsqueda: [${formattedInput}](${wolUrl1}). `;
+      } else {
+        noParMessage = `No paragraph numbering found on the page. Try search: [${formattedInput}](${wolUrl1}). `;
+      }
+      textToUse = noParMessage + textToUse;
+    }
+
     // If using callout template, format text properly for callout
     if (template.includes('> [!cite]')) {
       // Format text for callout - each line should start with '>' but avoid double '>'
@@ -2360,6 +2385,11 @@ class JWLLinkerPlugin extends Plugin {
 
         console.log('Converted formats:', { englishInput, russianInput, spanishInput });
 
+        // Create WOL search URLs for each language
+        const englishWolUrl = `https://wol.jw.org/en/wol/l/r1/lp-e?q=${encodeURIComponent(englishInput)}`;
+        const russianWolUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(russianInput)}`;
+        const spanishWolUrl = `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(spanishInput)}`;
+
         const output = [];
         output.push(input); // keep original input on first line
 
@@ -2373,6 +2403,9 @@ class JWLLinkerPlugin extends Plugin {
           if (paragraph) {
             console.log('Fetching Russian citation for:', russianInput);
             russianCitation = await this._fetchRussianPublicationCitationCallout(russianInput, view, command);
+          } else {
+            // No paragraph specified - show message about missing paragraph numbering
+            russianCitation = `${russianInput}\nНа странице нет нумерации абзацев. Укажите номер абзаца для получения содержимого. Попробуйте поиск: [${russianInput}](${russianWolUrl})`;
           }
 
           // Get Spanish citation if paragraph is specified
@@ -2380,6 +2413,9 @@ class JWLLinkerPlugin extends Plugin {
           if (paragraph) {
             console.log('Fetching Spanish citation for:', spanishInput);
             spanishCitation = await this._fetchOtherPublicationCitation(spanishInput, view, command);
+          } else {
+            // No paragraph specified - show message about missing paragraph numbering
+            spanishCitation = `${spanishInput}\nEn la página no hay numeración de párrafos. Especifique el número de párrafo para obtener el contenido. Pruebe la búsqueda: [${spanishInput}](${spanishWolUrl})`;
           }
 
           // Format dual output
@@ -3975,7 +4011,7 @@ const Bible = {
       'притчи прит',
       'экклесиаст экк',
       'песняйсаломона песнп',
-      'исаия ис',
+      'исаия исайя ис',
       'иеремия иер',
       'плачиеремии плач',
       'иезекииль иез',
