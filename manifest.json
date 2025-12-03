@@ -1,7 +1,7 @@
 {
 	"id": "jwl-linker-en-ru-es",
 	"name": "JWL Linker EN-RU-ES",
-	"version": "0.6.4",
+	"version": "0.6.5",
 	"minAppVersion": "1.0.0",
 	"description": "Comprehensive JW Library linker supporting Bible references and JW publications in English, Russian, and Spanish. Features: auto-formatting (od 15 par. 3 → od chap. 15 par. 3)",
 	"author": "Argonfatl",
