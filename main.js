@@ -1939,41 +1939,100 @@ class JWLLinkerPlugin extends Plugin {
       citationTitle = `[${title}](${linkUrl})`;
     }
 
-    // Try to fetch actual content from WOL for both old and modern publications
+    // Try to fetch actual content from WOL
     let actualText = '';
 
-    // Use search URL like modern publications do, not direct links
-    const contentUrl = wolUrl1; // Use search URL: w90 1/1
+    // For modern publications (2000+), first search to find the article, then extract paragraph
+    const searchUrl = wolUrl2; // Use simpler search: w03 4/1
+    console.log('Searching WOL with URL:', searchUrl);
 
-    const cache = view?.getFromHistory(contentUrl);
+    const cache = view?.getFromHistory(searchUrl);
     if (cache) {
       actualText = cache.content.join('');
     } else {
       try {
-        const dom = await this._fetchDOM(contentUrl);
-        if (dom) {
-          // Try to extract content from direct WOL page (same selectors as modern publications)
-          let text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-          if (!text) {
-            // Try selectors for direct publication pages
-            const directSelectors = ['.docSubContent', '.bodyTxt', '.sb', '.so', '.sc', '.si', '.se'];
-            for (const selector of directSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
+        // Step 1: Search for the article
+        const searchDom = await this._fetchDOM(searchUrl);
+        if (searchDom) {
+          // Try to find the article link in search results
+          const resultLink = searchDom.querySelector('.result a, .cardLine1 a, .searchResult a');
+          let articleUrl = resultLink ? resultLink.getAttribute('href') : null;
+
+          if (articleUrl) {
+            // Make URL absolute if needed
+            if (articleUrl.startsWith('/')) {
+              articleUrl = 'https://wol.jw.org' + articleUrl;
+            }
+            console.log('Found article URL:', articleUrl);
+
+            // Step 2: Fetch the article page
+            const articleDom = await this._fetchDOM(articleUrl);
+            if (articleDom && paragraph) {
+              // Try to find the specific paragraph by number
+              // WOL uses various paragraph ID formats
+              const parSelectors = [
+                `#p${paragraph}`,
+                `[data-pid="${paragraph}"]`,
+                `.pGroup p:nth-child(${paragraph})`,
+                `.bodyTxt p:nth-child(${paragraph})`
+              ];
+
+              let parText = '';
+              for (const selector of parSelectors) {
+                parText = this._getElementAsText(articleDom, selector, TargetType.jwonline);
+                if (parText && parText.trim()) {
+                  console.log('Found paragraph with selector:', selector);
+                  break;
+                }
+              }
+
+              // If specific paragraph not found, try to extract all paragraphs and find by number
+              if (!parText) {
+                const allParagraphs = articleDom.querySelectorAll('.pGroup p, .bodyTxt p, .sb, .si');
+                if (allParagraphs.length >= parseInt(paragraph)) {
+                  const targetPar = allParagraphs[parseInt(paragraph) - 1];
+                  if (targetPar) {
+                    parText = targetPar.textContent?.trim() || '';
+                    console.log('Found paragraph by index:', paragraph);
+                  }
+                }
+              }
+
+              if (parText) {
+                actualText = this._boldInitialNumber(parText);
+              }
+            }
+
+            // If no paragraph specified or not found, get general content
+            if (!actualText) {
+              const contentSelectors = ['.docSubContent', '.bodyTxt', '.pGroup', '.sb'];
+              for (const selector of contentSelectors) {
+                const text = this._getElementAsText(articleDom || searchDom, selector, TargetType.jwonline);
+                if (text && text.trim()) {
+                  actualText = this._boldInitialNumber(text);
+                  break;
+                }
+              }
             }
           }
-          if (!text) {
-            // Fallback to search result selectors
-            const searchSelectors = ['.searchResult', '.cardLine1', '.cardLine2', '.result', '.pub-content'];
-            for (const selector of searchSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
+
+          // Fallback: extract from search results
+          if (!actualText) {
+            let text = this._getElementAsText(searchDom, '.resultItems', TargetType.jwonline);
+            if (!text) {
+              const fallbackSelectors = ['.cardLine2', '.searchResult', '.result'];
+              for (const selector of fallbackSelectors) {
+                text = this._getElementAsText(searchDom, selector, TargetType.jwonline);
+                if (text) break;
+              }
+            }
+            if (text) {
+              actualText = this._boldInitialNumber(text);
             }
           }
-          if (text) {
-            actualText = this._boldInitialNumber(text);
-            // Cache the result
-            view?.addToHistory(contentUrl, `WOL Direct: ${displayYear}/${paddedMonth}/${paddedDay}`, [actualText]);
+
+          if (actualText) {
+            view?.addToHistory(searchUrl, title, [actualText]);
           }
         }
       } catch (error) {
@@ -1986,16 +2045,11 @@ class JWLLinkerPlugin extends Plugin {
     view?.addToHistory(jwlibUrl, title, historyContent);
     view?.showHistory();
 
-    // Format citation - show multiple search options
+    // Format citation - always use callout template for publications
     let template = '';
     if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      // For old publications, always use callout format but don't extract text
-      // since WOL doesn't have reliable paragraph-level content for old publications
-      if (isOldPublication) {
-        template = this.settings.pubCalloutTemplate;
-      } else {
-        template = this.settings.pubTemplate;
-      }
+      // Always use callout format for publications (like Russian version)
+      template = this.settings.pubCalloutTemplate;
     } else if (command === Cmd.citeVerseCallout) {
       template = this.settings.pubCalloutTemplate;
     }
@@ -2023,11 +2077,11 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = `No paragraph numbering found on the page. Specify paragraph number to get content. Try search: [${searchQuery2}](${wolUrl2}). ` + textToUse;
     }
 
-    // If using callout template, format text properly for callout
-    if (template.includes('> [!cite]')) {
-      // Format text for callout - each line should start with '>' but avoid double '>'
-      // First remove any existing '>' at the start, then add single '>'
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
+    // If using callout template, format text properly for callout (like Russian version)
+    // Check if template is actually a callout (user editable):
+    // If so all lines need to be part of the callout syntax
+    if (template[0] === '>') {
+      textToUse = textToUse.replace(/^./gm, '>$&').substring(1);
     }
 
     const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
