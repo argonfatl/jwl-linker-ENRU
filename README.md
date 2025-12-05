@@ -11,7 +11,7 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 - 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
 - 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names (English/Russian/Spanish)
 - 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, English/Spanish: 1950+)
-- 🎯 **Dual Mode**: Show publications in multiple languages simultaneously
+- 🎯 **Dual Language Mode**: Show Bible verses and publications in two languages simultaneously with separate toggles
 - 💬 **Smart Citations**: Extract paragraph text with callout formatting
 - 📝 **Text Quoting**: Convert selected text to citation callouts
 
@@ -99,7 +99,10 @@ To access the commands:
 ## Language Detection
 - **Automatic**: Detects Cyrillic characters for Russian, Spanish Bible book names, defaults to English
 - **Manual**: Set preferred language in plugin settings (English/Russian/Spanish)
-- **Dual Mode**: Show publications in multiple languages simultaneously
+- **Dual Language Mode**: Show content in two languages simultaneously
+  - Separate toggles for Bible verses and publications
+  - Configurable first and second language (ru, en, es)
+  - Language-specific headers: PUB. (English), ПУБЛ. (Russian), PUBL. (Spanish)
 
 ## Publication Availability
 - **Russian Watchtower**: Available from 1986 onwards (`w86.01` and later)
@@ -139,16 +142,42 @@ od 15 párr. 3
 > **3** La mayoría de las personas hoy no reconocen el principio de la jefatura...
 ```
 
-## Dual Mode Output
+## Dual Language Mode Output
+
+### Bible Verses (Dual Mode)
+```markdown
+Рим 1:20
+**English:**
+> [!verse] BIBLE — [Romans 1:20](jwlibrary://...)
+> **20** For his invisible qualities are clearly seen from the world's creation onward...
+
+**Russian:**
+> [!verse] БИБЛИЯ — [Римлянам 1:20](jwlibrary://...)
+> **20** Его невидимые качества ясно видны от сотворения мира...
+```
+
+### Publications (Dual Mode)
+```markdown
+w25.3 с. 8 абз. 2
+**English:**
+> [!cite] PUB. — [The Watchtower 2025 March p. 8 par. 2](https://wol.jw.org/...)
+> **2** Jesus loved Jehovah with his whole mind...
+
+**Russian:**
+> [!cite] ПУБЛ. — [Сторожевая башня 2025 Март с. 8 абз. 2](https://wol.jw.org/...)
+> **2** Иисус любил Иегову всем разумом...
+```
+
+### English + Spanish (Dual Mode)
 ```markdown
 od 15 par. 3
 **English:**
 > [!cite] PUB. — [Organized to Do Jehovah's Will chap. 15 par. 3](https://wol.jw.org/...)
 > **3** Most people today do not recognize the principle of headship...
 
-**Russian:**
-> [!cite] ПУБЛ. — [Организованы исполнять волю Иеговы глава 15 абз. 3](https://wol.jw.org/...)
-> **3** Большинство людей сегодня не признают принцип главенства...
+**Spanish:**
+> [!cite] PUBL. — [Organizados para hacer la voluntad de Jehová cap. 15 párr. 3](https://wol.jw.org/...)
+> **3** La mayoría de las personas hoy no reconocen el principio de la jefatura...
 ```
 
 ## Text Citation Examples
@@ -172,7 +201,13 @@ Spanish: "Esta es información importante"
 - **Verse Template**: Customize format for Bible verse citations
 - **Callout Templates**: Customize format for callout-style citations  
 - **Language Settings**: Interface language (Russian/English/Spanish) and citation language
-- **Dual Mode**: Enable simultaneous multi-language publication display
+
+## Dual Language Mode Settings
+- **Dual Mode for Verses**: Toggle dual language output for Bible verses
+- **Dual Mode for Publications**: Toggle dual language output for Watchtower and other publications
+- **First Language**: Select primary output language (Auto/Russian/English/Spanish)
+- **Second Language**: Select secondary output language (Russian/English/Spanish)
+- Language validation prevents selecting the same language for both
 
 ## Advanced Options
 - **History Size**: Number of recent citations to keep in sidebar
@@ -213,5 +248,5 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-**Version**: 0.6.4 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.6.6 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
 
