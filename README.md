@@ -91,6 +91,7 @@ To access the commands:
 | **Convert scriptures to JW Library** | Scripture reference             | Converts to JW Library markdown link                                                 | Replaces       | 
 | **Convert jw.org url to JW Library** | WOL/JW.org URL                  | Converts to JW Library URL                                                           | Replaces       | 
 | **Open scripture in JW Library**     | Scripture reference             | Opens scripture directly in JW Library app                                           | Opens app      | 
+| **Cite all references**              | Entire document                 | Adds callout citations with full text for all scriptures and publications           | Adds below each|
 
 
 
@@ -248,5 +249,5 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-**Version**: 0.6.6 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.6.7 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
 

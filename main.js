@@ -121,6 +121,10 @@ const InterfaceStrings = {
     menuConvertJworg: 'Преобразовать ссылку jw.org в JW Library',
     menuOpenJWLibrary: 'Открыть стих в JW Library',
     menuOpenSidebar: 'Открыть боковую панель',
+    menuBatchConvert: 'Цитировать все ссылки в документе',
+    batchProcessing: 'Загрузка цитат...',
+    batchComplete: 'Добавлено цитат: {count}',
+    batchNoLinks: 'Ссылки не найдены в документе',
     menuParaCount: 'Количество абзацев для цитирования?',
     menuCitationLink: 'Ссылка на цитируемые стихи?',
   },
@@ -203,6 +207,10 @@ const InterfaceStrings = {
     menuConvertJworg: 'Convert jw.org url to JW Library',
     menuOpenJWLibrary: 'Open scripture at caret in JW Library',
     menuOpenSidebar: 'Open sidebar',
+    menuBatchConvert: 'Cite all references in document',
+    batchProcessing: 'Loading citations...',
+    batchComplete: 'Citations added: {count}',
+    batchNoLinks: 'No references found in document',
     menuParaCount: 'No. of paragraphs to cite?',
     menuCitationLink: 'Link cited scripture?',
   },
@@ -285,6 +293,10 @@ const InterfaceStrings = {
     menuConvertJworg: 'Convertir URL de jw.org a JW Library',
     menuOpenJWLibrary: 'Abrir escritura en JW Library',
     menuOpenSidebar: 'Abrir barra lateral',
+    menuBatchConvert: 'Citar todas las referencias del documento',
+    batchProcessing: 'Cargando citas...',
+    batchComplete: 'Citas añadidas: {count}',
+    batchNoLinks: 'No se encontraron referencias en el documento',
     menuParaCount: '¿Número de párrafos a citar?',
     menuCitationLink: '¿Enlazar escritura citada?',
   }
@@ -466,6 +478,7 @@ const Cmd = {
   convertScriptureToJWLibrary: 'convertScriptureToJWLibrary',
   convertWebToJWLibrary: 'convertWebToJWLibrary',
   openScriptureInJWLibrary: 'openScriptureInJWLibrary',
+  batchConvertAll: 'batchConvertAll',
 };
 
 const JWL_LINKER_VIEW = 'jwl-linker-view';
@@ -1180,6 +1193,227 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
+   * Batch cite all scripture and publication references in the document
+   * Adds callout citations with full text for each reference
+   * @param {Editor} editor
+   */
+  async batchConvertAllLinks(editor) {
+    const activeEditor = this.confirmEditor(editor);
+    if (!activeEditor) return;
+
+    // Get the view for history
+    const view = this.app.workspace.getActiveViewOfType(ItemView);
+    const jwlView = this.app.workspace.getLeavesOfType(JWL_LINKER_VIEW)[0]?.view;
+
+    // Get entire document content
+    const content = activeEditor.getValue();
+    const lines = content.split('\n');
+    let processedCount = 0;
+    const citations = [];
+
+    // Show processing notice
+    const loadingNotice = new Notice(Lang.batchProcessing, 0);
+
+    try {
+      // Collect all references to process
+      const allReferences = [];
+
+      // 1. Find scripture references (e.g., "Rom 1:20", "Рим 1:20")
+      const scriptureRegex = new RegExp(Config.scriptureRegex.source, 'gimu');
+      let match;
+      while ((match = scriptureRegex.exec(content)) !== null) {
+        // Skip if already a link (has ] or </a> at the end) or inside callout
+        if (!match[5] && !this._isInsideCallout(content, match.index)) {
+          allReferences.push({
+            type: 'scripture',
+            full: match[0],
+            text: match[1],
+            index: match.index,
+            line: this._getLineNumber(content, match.index)
+          });
+        }
+      }
+
+      // 2. Find Russian publication references (w25.01 28, абз. 11)
+      const ruPubRegex = new RegExp(Config.russianPubRegex.source, 'gi');
+      while ((match = ruPubRegex.exec(content)) !== null) {
+        if (!this._isInsideCallout(content, match.index)) {
+          allReferences.push({
+            type: 'publication',
+            full: match[0],
+            text: match[0],
+            index: match.index,
+            line: this._getLineNumber(content, match.index)
+          });
+        }
+      }
+
+      // 3. Find English publication references (w65 6/1 p. 329 par. 6)
+      const enPubRegex = new RegExp(Config.englishPubRegex.source, 'gi');
+      while ((match = enPubRegex.exec(content)) !== null) {
+        if (!this._isInsideCallout(content, match.index)) {
+          allReferences.push({
+            type: 'publication',
+            full: match[0],
+            text: match[0],
+            index: match.index,
+            line: this._getLineNumber(content, match.index)
+          });
+        }
+      }
+
+      // 4. Find other publication references (od 15 par. 3, it-1 332)
+      const otherPubRegex = new RegExp(Config.otherPubRegex.source, 'gi');
+      while ((match = otherPubRegex.exec(content)) !== null) {
+        if (!this._isInsideCallout(content, match.index)) {
+          allReferences.push({
+            type: 'publication',
+            full: match[0],
+            text: match[0],
+            index: match.index,
+            line: this._getLineNumber(content, match.index)
+          });
+        }
+      }
+
+      // Sort by line number (process from end to beginning to preserve indices)
+      allReferences.sort((a, b) => b.line - a.line);
+
+      // Remove duplicates (same line)
+      const uniqueRefs = [];
+      const seenLines = new Set();
+      for (const ref of allReferences) {
+        const key = `${ref.line}-${ref.text}`;
+        if (!seenLines.has(key)) {
+          seenLines.add(key);
+          uniqueRefs.push(ref);
+        }
+      }
+
+      // Process each reference
+      for (const ref of uniqueRefs) {
+        try {
+          let citation = '';
+
+          if (ref.type === 'scripture') {
+            // Cite verse as callout
+            citation = await this._fetchBibleCitation(ref.text, jwlView || view, 0, Cmd.citeVerseCallout);
+          } else {
+            // Cite publication lookup
+            // Auto-format the reference first
+            let formattedText = ref.text;
+            formattedText = autoFormatRussianWatchtower(formattedText);
+            formattedText = autoFormatEnglishWatchtower(formattedText);
+            formattedText = autoFormatSpanishWatchtower(formattedText);
+
+            citation = await this._fetchPublicationCitation(formattedText, jwlView || view, Cmd.citePublicationLookup);
+          }
+
+          if (citation && citation !== ref.text) {
+            // Remove the first line (original reference) from citation since it's already in the document
+            const citationLines = citation.split('\n');
+            if (citationLines.length > 1) {
+              // Skip first line which is the original reference
+              citation = citationLines.slice(1).join('\n');
+            }
+
+            // Insert citation after the line containing the reference
+            const lineIndex = ref.line;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+              // Add citation after the current line
+              lines[lineIndex] = lines[lineIndex] + '\n' + citation;
+              processedCount++;
+            }
+          }
+        } catch (err) {
+          console.error(`Error processing reference "${ref.text}":`, err);
+        }
+      }
+
+      loadingNotice.hide();
+
+      // Apply changes if any
+      if (processedCount > 0) {
+        const newContent = lines.join('\n');
+        const lastLine = activeEditor.lastLine();
+        const lastLineLength = activeEditor.getLine(lastLine).length;
+        activeEditor.replaceRange(
+          newContent,
+          { line: 0, ch: 0 },
+          { line: lastLine, ch: lastLineLength }
+        );
+        new Notice(Lang.batchComplete.replace('{count}', processedCount), 3000);
+      } else {
+        new Notice(Lang.batchNoLinks, 3000);
+      }
+
+    } catch (error) {
+      loadingNotice.hide();
+      console.error('Batch convert error:', error);
+      new Notice(`Error: ${error.message}`, 5000);
+    }
+  }
+
+  /**
+   * Check if position is inside a callout block
+   * @param {string} content - Full document content
+   * @param {number} index - Position to check
+   * @returns {boolean}
+   */
+  _isInsideCallout(content, index) {
+    // Find the start of the line containing this index
+    let lineStart = content.lastIndexOf('\n', index - 1) + 1;
+    let lineEnd = content.indexOf('\n', index);
+    if (lineEnd === -1) lineEnd = content.length;
+
+    const line = content.substring(lineStart, lineEnd);
+
+    // Check if line starts with callout marker or is part of callout
+    return line.trimStart().startsWith('>') || line.trimStart().startsWith('[!');
+  }
+
+  /**
+   * Get line number for a given index in content
+   * @param {string} content - Full document content
+   * @param {number} index - Position in content
+   * @returns {number} - Line number (0-indexed)
+   */
+  _getLineNumber(content, index) {
+    const substring = content.substring(0, index);
+    return (substring.match(/\n/g) || []).length;
+  }
+
+  /**
+   * Fetch publication citation - unified method for batch processing
+   * @param {string} input - Publication reference
+   * @param {Object} view - View for history
+   * @param {Cmd} command - Command type
+   * @returns {Promise<string>} - Citation text
+   */
+  async _fetchPublicationCitation(input, view, command) {
+    // Check if it's a Russian publication reference first (only абз. format)
+    Config.russianPubRegex.lastIndex = 0;
+    if (Config.russianPubRegex.test(input)) {
+      return await this._fetchRussianPublicationCitation(input, view, command);
+    }
+
+    // Check if it's an English publication reference
+    Config.englishPubRegex.lastIndex = 0;
+    if (Config.englishPubRegex.test(input)) {
+      return await this._fetchEnglishPublicationCitation(input, view, command);
+    }
+
+    // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
+    Config.otherPubRegex.lastIndex = 0;
+    if (Config.otherPubRegex.test(input)) {
+      return await this._fetchOtherPublicationCitation(input, view, command);
+    }
+
+    // Fallback to lookup citation
+    return await this._fetchLookupCitation(input, view);
+  }
+
+  /**
    * KEY FEATURE
    * Editing/Preview View only:
    * Cite publication lookup reference, returns all pages in the reference, below
@@ -1490,6 +1724,12 @@ class JWLLinkerPlugin extends Plugin {
         icon: 'external-link',
         fn: (editor) => this.openInJWLibrary(editor),
         sep: true,
+      },
+      {
+        id: Cmd.batchConvertAll,
+        text: Lang.menuBatchConvert,
+        icon: 'layers',
+        fn: (editor) => this.batchConvertAllLinks(editor),
       },
     ];
   }
