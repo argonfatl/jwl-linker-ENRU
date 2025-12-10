@@ -441,23 +441,23 @@ const Config = {
   wolLinkRegex: /(\[([^\[\]]*)\]\()?(https\:\/\/wol\.jw\.org[^\s\)]{2,})(\))?/gim,
   jworgLinkRegex: /(\[([^\[\]]*)\]\()?(https[^\s\)]+jw\.org[^\s\)]{2,})(\))?/gim,
   // Russian publication reference regex (only Russian format with абз.)
-  // Russian: w25.01 28, абз. 11 OR w25.3 с. 8 абз. 2
-  russianPubRegex: /w(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/g,
-  // Russian publication with month names regex (w25 Март с. 8 абз. 2)
-  russianPubMonthRegex: /w(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
-  // Russian publication with day and month names regex (w10 15 Января с. 3 абз. 1)
-  russianPubDayMonthRegex: /w(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
-  // English publication reference regex (formats like w65 6/1 p. 329 par. 6)
-  // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3
-  englishPubRegex: /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
-  // English publication with month names regex (w25 March p. 8 par. 2)
-  englishPubMonthRegex: /w(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
-  // English publication with day and month names regex (w10 15 January p. 3 par. 1)
-  englishPubDayMonthRegex: /w(\d{2})\s+(1|15)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
-  // Spanish publication with month names regex (w25 Marzo pág. 8 párr. 2)
-  spanishPubMonthRegex: /w(\d{2})\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
-  // Spanish publication with day and month names regex (w10 15 Enero pág. 3 párr. 1)
-  spanishPubDayMonthRegex: /w(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
+  // Russian: w25.01 28, абз. 11 OR w25.3 с. 8 абз. 2 OR ws12.02 15 абз. 2
+  russianPubRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/g,
+  // Russian publication with month names regex (w25 Март с. 8 абз. 2, ws12 Февраль с. 15 абз. 2)
+  russianPubMonthRegex: /w[s]?(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
+  // Russian publication with day and month names regex (w10 15 Января с. 3 абз. 1, ws10 15 Января с. 3 абз. 1)
+  russianPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
+  // English publication reference regex (formats like w65 6/1 p. 329 par. 6, ws12 2/15 15 par. 2)
+  // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3, ws12 2/15 15 par. 2
+  englishPubRegex: /w[s]?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
+  // English publication with month names regex (w25 March p. 8 par. 2, ws12 February p. 15 par. 2)
+  englishPubMonthRegex: /w[s]?(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
+  // English publication with day and month names regex (w10 15 January p. 3 par. 1, ws10 15 January p. 3 par. 1)
+  englishPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
+  // Spanish publication with month names regex (w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2)
+  spanishPubMonthRegex: /w[s]?(\d{2})\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
+  // Spanish publication with day and month names regex (w10 15 Enero pág. 3 párr. 1, ws10 15 Enero pág. 3 párr. 1)
+  spanishPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
   otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
@@ -621,43 +621,45 @@ const SpanishMonths = {
  * @returns {string} - Formatted text or original if no match
  */
 function autoFormatRussianWatchtower(input) {
-  // First check for day + month format (w10 15 Января с. 3 абз. 1)
+  // First check for day + month format (w10 15 Января с. 3 абз. 1, ws10 15 Января с. 3 абз. 1)
   const dayMonthRegex = Config.russianPubDayMonthRegex;
   dayMonthRegex.lastIndex = 0;
   const dayMonthMatch = dayMonthRegex.exec(input);
 
   if (dayMonthMatch) {
-    const [fullMatch, year, day, monthName, page, paragraph] = dayMonthMatch;
+    const [fullMatch, isStudy, year, day, monthName, page, paragraph] = dayMonthMatch;
     const monthNumber = RussianMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
       const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
 
       if (publicationYear < 2016) {
         // Pre-2016: Use day/month format (w10 15/1 с. 3 абз. 1)
-        const formatted = `w${year} ${monthNumber}/${day} с. ${page} абз. ${paragraph}`;
+        const formatted = `${pubCode}${year} ${monthNumber}/${day} с. ${page} абз. ${paragraph}`;
         console.log('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use .month format (w16.01 3, абз. 1)
-        const formatted = `w${year}.${monthNumber} ${page}, абз. ${paragraph}`;
+        const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
         console.log('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
   }
 
-  // Then check for month-only format (w25 Март с. 8 абз. 2)
+  // Then check for month-only format (w25 Март с. 8 абз. 2, ws25 Март с. 8 абз. 2)
   const monthRegex = Config.russianPubMonthRegex;
   monthRegex.lastIndex = 0;
   const monthMatch = monthRegex.exec(input);
 
   if (monthMatch) {
-    const [fullMatch, year, monthName, page, paragraph] = monthMatch;
+    const [fullMatch, isStudy, year, monthName, page, paragraph] = monthMatch;
     const monthNumber = RussianMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
-      const formatted = `w${year}.${monthNumber} ${page}, абз. ${paragraph}`;
+      const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
       console.log('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
@@ -672,21 +674,22 @@ function autoFormatRussianWatchtower(input) {
  * @returns {string} - Formatted text or original if no match
  */
 function autoFormatEnglishWatchtower(input) {
-  // First check for day + month format (w10 15 January p. 3 par. 1)
+  // First check for day + month format (w10 15 January p. 3 par. 1, ws10 15 January p. 3 par. 1)
   const dayMonthRegex = Config.englishPubDayMonthRegex;
   dayMonthRegex.lastIndex = 0;
   const dayMonthMatch = dayMonthRegex.exec(input);
 
   if (dayMonthMatch) {
-    const [fullMatch, year, day, monthName, page, paragraph] = dayMonthMatch;
+    const [fullMatch, isStudy, year, day, monthName, page, paragraph] = dayMonthMatch;
     const monthNumber = EnglishMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
       const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
 
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 p. 3 par. 1)
-        const formatted = `w${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
+        const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
         console.log('Auto-formatted English Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
@@ -694,27 +697,28 @@ function autoFormatEnglishWatchtower(input) {
         const defaultDay = monthNumber === '01' || monthNumber === '03' || monthNumber === '05' ||
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
-        const formatted = `w${year} ${monthNumber}/${defaultDay} p. ${page} par. ${paragraph}`;
+        const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} p. ${page} par. ${paragraph}`;
         console.log('Auto-formatted English Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
   }
 
-  // Then check for month-only format (w25 March p. 8 par. 2)
+  // Then check for month-only format (w25 March p. 8 par. 2, ws25 March p. 8 par. 2)
   const monthRegex = Config.englishPubMonthRegex;
   monthRegex.lastIndex = 0;
   const monthMatch = monthRegex.exec(input);
 
   if (monthMatch) {
-    const [fullMatch, year, monthName, page, paragraph] = monthMatch;
+    const [fullMatch, isStudy, year, monthName, page, paragraph] = monthMatch;
     const monthNumber = EnglishMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
       const day = monthNumber === '01' || monthNumber === '03' || monthNumber === '05' ||
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
-      const formatted = `w${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
+      const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
       console.log('Auto-formatted English Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
@@ -729,21 +733,22 @@ function autoFormatEnglishWatchtower(input) {
  * @returns {string} - Formatted text or original if no match
  */
 function autoFormatSpanishWatchtower(input) {
-  // First check for day + month format (w10 15 Enero pág. 3 párr. 1)
+  // First check for day + month format (w10 15 Enero pág. 3 párr. 1, ws10 15 Enero pág. 3 párr. 1)
   const dayMonthRegex = Config.spanishPubDayMonthRegex;
   dayMonthRegex.lastIndex = 0;
   const dayMonthMatch = dayMonthRegex.exec(input);
 
   if (dayMonthMatch) {
-    const [fullMatch, year, day, monthName, page, paragraph] = dayMonthMatch;
+    const [fullMatch, isStudy, year, day, monthName, page, paragraph] = dayMonthMatch;
     const monthNumber = SpanishMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
       const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
 
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 pág. 3 párr. 1)
-        const formatted = `w${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
+        const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
         console.log('Auto-formatted Spanish Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
@@ -751,27 +756,28 @@ function autoFormatSpanishWatchtower(input) {
         const defaultDay = monthNumber === '01' || monthNumber === '03' || monthNumber === '05' ||
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
-        const formatted = `w${year} ${monthNumber}/${defaultDay} pág. ${page} párr. ${paragraph}`;
+        const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} pág. ${page} párr. ${paragraph}`;
         console.log('Auto-formatted Spanish Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
   }
 
-  // Then check for month-only format (w25 Marzo pág. 8 párr. 2)
+  // Then check for month-only format (w25 Marzo pág. 8 párr. 2, ws25 Marzo pág. 8 párr. 2)
   const monthRegex = Config.spanishPubMonthRegex;
   monthRegex.lastIndex = 0;
   const monthMatch = monthRegex.exec(input);
 
   if (monthMatch) {
-    const [fullMatch, year, monthName, page, paragraph] = monthMatch;
+    const [fullMatch, isStudy, year, monthName, page, paragraph] = monthMatch;
     const monthNumber = SpanishMonths[monthName.toLowerCase()];
+    const pubCode = isStudy ? 'ws' : 'w';
 
     if (monthNumber) {
       const day = monthNumber === '01' || monthNumber === '03' || monthNumber === '05' ||
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
-      const formatted = `w${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
+      const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
       console.log('Auto-formatted Spanish Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
@@ -2092,7 +2098,8 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Trying to parse Russian publication:', input);
 
     // Use exec for proper group extraction - Russian format only
-    const regex = /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
+    // Supports both w (Watchtower) and ws (Watchtower Study)
+    const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -2102,7 +2109,7 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     console.log('Match found:', match);
-    const [fullMatch, year, monthNum, page, paragraph] = match;
+    const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
     console.log('Parsed:', { fullMatch, year, monthNum, page, paragraph });
 
     // Check if Watchtower year is available online
@@ -2128,10 +2135,12 @@ class JWLLinkerPlugin extends Plugin {
     const monthName = monthNames[parseInt(monthNum)];
     // Calculate full year correctly (90 = 1990, 25 = 2025)
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-    const title = `Сторожевая башня ${fullYear} ${monthName} с. ${page} абз. ${paragraph}`;
+    const pubName = isStudy ? 'Сторожевая башня (выпуск для изучения)' : 'Сторожевая башня';
+    const pubCode = isStudy ? 'ws' : 'w';
+    const title = `${pubName} ${fullYear} ${monthName} с. ${page} абз. ${paragraph}`;
 
     // Create JW Library search URL for Russian
-    const jwlibUrl = `jwlibrary:///finder?wtlocale=RU&q=${encodeURIComponent(`w${year}.${monthNum}`)}`;
+    const jwlibUrl = `jwlibrary:///finder?wtlocale=RU&q=${encodeURIComponent(`${pubCode}${year}.${monthNum}`)}`;
 
     const output = [];
     output.push(input); // keep original input on first line
@@ -2186,7 +2195,8 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Trying to parse Russian publication for callout:', input);
 
     // Use exec for proper group extraction - Russian format only
-    const regex = /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
+    // Supports both w (Watchtower) and ws (Watchtower Study)
+    const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -2195,8 +2205,8 @@ class JWLLinkerPlugin extends Plugin {
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    const [fullMatch, year, monthNum, page, paragraph] = match;
-    console.log('Russian callout parsed:', { fullMatch, year, monthNum, page, paragraph });
+    const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
+    console.log('Russian callout parsed:', { fullMatch, isStudy, year, monthNum, page, paragraph });
 
     // Convert month number to Russian month name for display
     const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -2205,14 +2215,16 @@ class JWLLinkerPlugin extends Plugin {
     const monthName = monthNames[parseInt(monthNum)];
     // Calculate full year correctly (90 = 1990, 25 = 2025)
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-    const title = `Сторожевая башня ${fullYear} ${monthName} с. ${page} абз. ${paragraph}`;
+    const pubName = isStudy ? 'Сторожевая башня (выпуск для изучения)' : 'Сторожевая башня';
+    const pubCode = isStudy ? 'ws' : 'w';
+    const title = `${pubName} ${fullYear} ${monthName} с. ${page} абз. ${paragraph}`;
 
     // Use Russian WOL search (same approach as English but with Russian locale)
-    const russianInput = `w${year}.${monthNum} ${page} абз. ${paragraph}`;
+    const russianInput = `${pubCode}${year}.${monthNum} ${page} абз. ${paragraph}`;
     const russianLookupUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(russianInput)}`;
 
     // Create JW Library search URL for Russian
-    const jwlibUrl = `jwlibrary:///finder?wtlocale=RU&q=${encodeURIComponent(`w${year}.${monthNum}`)}`;
+    const jwlibUrl = `jwlibrary:///finder?wtlocale=RU&q=${encodeURIComponent(`${pubCode}${year}.${monthNum}`)}`;
 
     // Create link title with WOL search link (like English version)
     let citationTitle = title;
@@ -2298,7 +2310,8 @@ class JWLLinkerPlugin extends Plugin {
     console.log('Trying to parse English publication:', input);
 
     // Use exec for proper group extraction - English format (paragraph optional)
-    const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/g;
+    // Supports both w (Watchtower) and ws (Watchtower Study)
+    const regex = /w(s)?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/g;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -2308,7 +2321,7 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     console.log('English publication match found:', match);
-    const [fullMatch, year, monthDay, page, paragraph] = match;
+    const [fullMatch, isStudy, year, monthDay, page, paragraph] = match;
     console.log('Parsed:', { fullMatch, year, monthDay, page, paragraph });
 
     // Check if Watchtower year is available online
@@ -2331,7 +2344,8 @@ class JWLLinkerPlugin extends Plugin {
     // For years like 65, it should be 1965; for years like 24, it could be 1924 or 2024
     // Since w65 is clearly 1965, we'll assume years < 50 are 20xx, >= 50 are 19xx
     const displayYear = parseInt(year) >= 50 ? `19${year}` : `20${year}`;
-    const title = `The Watchtower ${displayYear} ${englishMonth} ${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`;
+    const pubName = isStudy ? 'The Watchtower (Study Edition)' : 'The Watchtower';
+    const title = `${pubName} ${displayYear} ${englishMonth} ${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`;
 
     // Create better search URLs for English publications
     const paddedMonth = month.toString().padStart(2, '0');
@@ -2352,12 +2366,13 @@ class JWLLinkerPlugin extends Plugin {
 
     // For old publications, try different search strategies and direct links
     // Try direct WOL publication links for old magazines
+    const pubCode = isStudy ? 'ws' : 'w';
     const directWolUrl = `${langConfig.wolPublications}${displayYear}/${paddedMonth}/${paddedDay}`;
 
     // Fallback search URLs - include paragraph number for better content matching
-    const searchQuery1 = `w${year} ${month}/${day} p. ${page} par. ${paragraph}`;
-    const searchQuery2 = `w${year} ${month}/${day}`;
-    const searchQuery3 = `"The Watchtower" ${displayYear} ${englishMonth} ${day}`;
+    const searchQuery1 = `${pubCode}${year} ${month}/${day} p. ${page} par. ${paragraph}`;
+    const searchQuery2 = `${pubCode}${year} ${month}/${day}`;
+    const searchQuery3 = `"${pubName}" ${displayYear} ${englishMonth} ${day}`;
 
     const wolUrl1 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery1)}`;
     const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
@@ -2650,8 +2665,9 @@ class JWLLinkerPlugin extends Plugin {
   async _fetchSpanishMonthPublicationCitation(input, view, command) {
     console.log('Trying to parse Spanish month publication:', input);
 
-    // Parse month name format: w25 Marzo pág. 8 párr. 2
-    const regex = /w(\d{2})\s+(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Setiembre|Octubre|Noviembre|Diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi;
+    // Parse month name format: w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2
+    // Supports both w (Watchtower) and ws (Watchtower Study)
+    const regex = /w(s)?(\d{2})\s+(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Setiembre|Octubre|Noviembre|Diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -2660,14 +2676,15 @@ class JWLLinkerPlugin extends Plugin {
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    const [fullMatch, year, monthName, page, paragraph] = match;
-    console.log('Spanish month publication parsed:', { fullMatch, year, monthName, page, paragraph });
+    const [fullMatch, isStudy, year, monthName, page, paragraph] = match;
+    console.log('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
 
     // Calculate full year
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
 
     // Create title
-    const title = `La Atalaya ${fullYear} ${monthName} pág. ${page} párr. ${paragraph}`;
+    const pubName = isStudy ? 'La Atalaya (edición de estudio)' : 'La Atalaya';
+    const title = `${pubName} ${fullYear} ${monthName} pág. ${page} párr. ${paragraph}`;
 
     // Create WOL search URL
     const wolUrl = `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(input)}`;

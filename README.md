@@ -35,6 +35,11 @@ Restart Obsidian and go to the *Community Plugins Settings* page to enable the p
 - **Russian**: `w86.01 28, абз. 11`, `w24.12 15, абз. 5`
 - **Spanish**: `w65 6/1 pág. 329 párr. 6`, `w24 1/15 pág. 12 párr. 3`
 
+## Watchtower Study Edition (ws)
+- **English**: `ws12 2/15 15 par. 2`, `ws25 March p. 8 par. 2`
+- **Russian**: `ws12.02 15 абз. 2`, `ws25 Март с. 8 абз. 2`
+- **Spanish**: `ws12 2/15 15 párr. 2`, `ws25 Marzo pág. 8 párr. 2`
+
 ## Other Publications
 - **English**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
 - **Russian**: `od 15 абз. 3`, `cl глава 8 с. 77 абз. 2`
@@ -117,6 +122,7 @@ To access the commands:
   - Spanish: `párr.` ↔ `cap.` ↔ `pág.`
 - **Publication Titles**: Displays in appropriate language
   - "The Watchtower" / "Сторожевая башня" / "La Atalaya"
+  - "The Watchtower (Study Edition)" / "Сторожевая башня (выпуск для изучения)" / "La Atalaya (edición de estudio)"
   - "Awake!" / "Пробудитесь!" / "¡Despertad!"
 - **Interface**: Menu items and messages in selected interface language
 
@@ -244,10 +250,10 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ## Supported Publication Codes
 - **Books**: `od`, `it-1`, `it-2`, `si`, `cl`, `jv`, `dp`, `ip-1`, `ip-2`, `be`, `th`
-- **Periodicals**: `w` (Watchtower), `g` (Awake!), `km`, `mwb`
+- **Periodicals**: `w` (Watchtower), `ws` (Watchtower Study Edition), `g` (Awake!), `km`, `mwb`
 - **Study Aids**: `lff`, `rr`, `rs`
 
 ---
 
-**Version**: 0.6.7 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.6.8 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
 
