@@ -21,6 +21,8 @@ const DEFAULT_SETTINGS = {
   citationLink: true,
   spaceAfterPunct: true,
   paraCount: 1,
+  openSidebarOnStartup: false,
+  debug: false,
   lang: 'Auto', // Auto-detect language
   fallbackLang: 'Russian', // Fallback if detection fails
   interfaceLang: 'Russian', // Interface language
@@ -104,6 +106,10 @@ const InterfaceStrings = {
     },
     settingsReset: 'Сброс',
     settingsResetDesc: 'Это действие нельзя отменить.',
+    settingsOpenSidebarOnStartup: 'Открывать боковую панель при запуске',
+    settingsOpenSidebarOnStartupDesc: 'Если включено, боковая панель JWL Linker будет открываться автоматически при запуске Obsidian.',
+    settingsDebug: 'Режим отладки',
+    settingsDebugDesc: 'Если включено, будут доступны отладочные функции в консоли (window.test*).',
     settingsResetDefault: 'Сбросить к настройкам по умолчанию',
     settingsResetDefaultDesc: 'Вернуть все настройки к исходным значениям по умолчанию.',
     settingsClearHistory: 'Очистить историю',
@@ -194,6 +200,10 @@ const InterfaceStrings = {
     settingsResetDefaultDesc: 'Return all settings to their original defaults.',
     settingsClearHistory: 'Clear history',
     settingsClearHistoryDesc: 'Clear the list of items in the history sidebar.',
+    settingsOpenSidebarOnStartup: 'Open sidebar on startup',
+    settingsOpenSidebarOnStartupDesc: 'If enabled, the JWL Linker sidebar will open automatically when Obsidian starts.',
+    settingsDebug: 'Debug mode',
+    settingsDebugDesc: 'If enabled, debug helpers will be exposed in the console (window.test*).',
     // Menu commands
     menuCiteVerses: 'Cite verses',
     menuCiteVersesCallout: 'Cite verses as callout',
@@ -280,6 +290,10 @@ const InterfaceStrings = {
     settingsResetDefaultDesc: 'Devolver todas las configuraciones a sus valores predeterminados originales.',
     settingsClearHistory: 'Limpiar historial',
     settingsClearHistoryDesc: 'Limpiar la lista de elementos en la barra lateral del historial.',
+    settingsOpenSidebarOnStartup: 'Abrir panel lateral al iniciar',
+    settingsOpenSidebarOnStartupDesc: 'Si se activa, el panel lateral de JWL Linker se abrirá automáticamente al iniciar Obsidian.',
+    settingsDebug: 'Modo de depuración',
+    settingsDebugDesc: 'Si se activa, se expondrán funciones de depuración en la consola (window.test*).',
     // Menu commands
     menuCiteVerses: 'Citar versículos',
     menuCiteVersesCallout: 'Citar versículos como destacado',
@@ -449,11 +463,15 @@ const Config = {
   russianPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
   // English publication reference regex (formats like w65 6/1 p. 329 par. 6, ws12 2/15 15 par. 2)
   // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3, ws12 2/15 15 par. 2
-  englishPubRegex: /w[s]?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/g,
+  englishPubRegex: /w[s]?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi,
+  // English publication with month number format (w23.12 20 par. 7, ws23.12 p. 20 par. 7)
+  // Used to support post-2016 style month-only references (YY.MM) in English.
+  englishPubMonthNumberRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi,
   // English publication with month names regex (w25 March p. 8 par. 2, ws12 February p. 15 par. 2)
   englishPubMonthRegex: /w[s]?(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
   // English publication with day and month names regex (w10 15 January p. 3 par. 1, ws10 15 January p. 3 par. 1)
-  englishPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
+  // Supports day month format and month day format
+  englishPubDayMonthRegex: /w[s]?(\d{2})\s+(?:(\d{1,2})\s+)?(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
   // Spanish publication with month names regex (w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2)
   spanishPubMonthRegex: /w[s]?(\d{2})\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Spanish publication with day and month names regex (w10 15 Enero pág. 3 párr. 1, ws10 15 Enero pág. 3 párr. 1)
@@ -995,7 +1013,7 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     // Cache the populated menu
-    this.menu = this.buildMenu();
+    this.menu = null;
 
     // Add the global Open JWL Menu command (for Mobile toolbar)
     this.addCommand({
@@ -1030,7 +1048,9 @@ class JWLLinkerPlugin extends Plugin {
       context.addChild(new ScripturePostProcessor(element, this));
     });
 
-    this.app.workspace.onLayoutReady(this.activateView.bind(this));
+    if (this.settings.openSidebarOnStartup) {
+      this.app.workspace.onLayoutReady(this.activateView.bind(this));
+    }
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
 
@@ -1040,37 +1060,38 @@ class JWLLinkerPlugin extends Plugin {
       'background-color: purple; padding:4px; border-radius:4px',
     );
 
-    // Make test functions globally available for debugging
-    window.testRussianPubRegex = testRussianPubRegex;
-    window.testEnglishPubRegex = testEnglishPubRegex;
-    window.testLanguageDetection = (input) => {
-      console.log('=== Testing Language Detection ===');
-      console.log('Input:', input);
-      const detected = detectLanguage(input);
-      console.log('Detected language:', detected);
-      return detected;
-    };
-    window.testAutoFormatting = (input) => {
-      console.log('=== Testing Auto-formatting ===');
-      console.log('Original:', input);
-      let formatted = autoFormatRussianWatchtower(input);
-      if (formatted !== input) {
-        console.log('Russian formatted:', formatted);
-        return formatted;
-      }
-      formatted = autoFormatEnglishWatchtower(input);
-      if (formatted !== input) {
-        console.log('English formatted:', formatted);
-        return formatted;
-      }
-      formatted = autoFormatSpanishWatchtower(input);
-      if (formatted !== input) {
-        console.log('Spanish formatted:', formatted);
-        return formatted;
-      }
-      console.log('No formatting applied');
-      return input;
-    };
+    if (this.settings.debug) {
+      window.testRussianPubRegex = testRussianPubRegex;
+      window.testEnglishPubRegex = testEnglishPubRegex;
+      window.testLanguageDetection = (input) => {
+        console.log('=== Testing Language Detection ===');
+        console.log('Input:', input);
+        const detected = detectLanguage(input);
+        console.log('Detected language:', detected);
+        return detected;
+      };
+      window.testAutoFormatting = (input) => {
+        console.log('=== Testing Auto-formatting ===');
+        console.log('Original:', input);
+        let formatted = autoFormatRussianWatchtower(input);
+        if (formatted !== input) {
+          console.log('Russian formatted:', formatted);
+          return formatted;
+        }
+        formatted = autoFormatEnglishWatchtower(input);
+        if (formatted !== input) {
+          console.log('English formatted:', formatted);
+          return formatted;
+        }
+        formatted = autoFormatSpanishWatchtower(input);
+        if (formatted !== input) {
+          console.log('Spanish formatted:', formatted);
+          return formatted;
+        }
+        console.log('No formatting applied');
+        return input;
+      };
+    }
   }
 
   onunload() { }
@@ -1208,8 +1229,8 @@ class JWLLinkerPlugin extends Plugin {
     if (!activeEditor) return;
 
     // Get the view for history
-    const view = this.app.workspace.getActiveViewOfType(ItemView);
-    const jwlView = this.app.workspace.getLeavesOfType(JWL_LINKER_VIEW)[0]?.view;
+    const jwlView = await this.getView();
+    const historyView = (jwlView && typeof jwlView.getFromHistory === 'function') ? jwlView : null;
 
     // Get entire document content
     const content = activeEditor.getValue();
@@ -1223,6 +1244,10 @@ class JWLLinkerPlugin extends Plugin {
     try {
       // Collect all references to process
       const allReferences = [];
+      // We first collect scripture ranges so we can ignore any publication matches
+      // that are actually just substrings inside a scripture reference.
+      // Example: "1 Tim 1:2" can accidentally produce a publication match "Tim 1".
+      const scriptureRanges = [];
 
       // 1. Find scripture references (e.g., "Rom 1:20", "Рим 1:20")
       const scriptureRegex = new RegExp(Config.scriptureRegex.source, 'gimu');
@@ -1230,6 +1255,7 @@ class JWLLinkerPlugin extends Plugin {
       while ((match = scriptureRegex.exec(content)) !== null) {
         // Skip if already a link (has ] or </a> at the end) or inside callout
         if (!match[5] && !this._isInsideCallout(content, match.index)) {
+          scriptureRanges.push({ start: match.index, end: match.index + match[0].length });
           allReferences.push({
             type: 'scripture',
             full: match[0],
@@ -1240,10 +1266,15 @@ class JWLLinkerPlugin extends Plugin {
         }
       }
 
+      // Overlap test: [start,end) intersects any scripture range.
+      const overlapsScripture = (start, end) => scriptureRanges.some((r) => start < r.end && end > r.start);
+
       // 2. Find Russian publication references (w25.01 28, абз. 11)
       const ruPubRegex = new RegExp(Config.russianPubRegex.source, 'gi');
       while ((match = ruPubRegex.exec(content)) !== null) {
-        if (!this._isInsideCallout(content, match.index)) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
           allReferences.push({
             type: 'publication',
             full: match[0],
@@ -1257,7 +1288,25 @@ class JWLLinkerPlugin extends Plugin {
       // 3. Find English publication references (w65 6/1 p. 329 par. 6)
       const enPubRegex = new RegExp(Config.englishPubRegex.source, 'gi');
       while ((match = enPubRegex.exec(content)) !== null) {
-        if (!this._isInsideCallout(content, match.index)) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
+          allReferences.push({
+            type: 'publication',
+            full: match[0],
+            text: match[0],
+            index: match.index,
+            line: this._getLineNumber(content, match.index)
+          });
+        }
+      }
+
+      // 3b. Find English publication references with month number (w23.12 20 par. 7)
+      const enPubMonthNumberRegex = new RegExp(Config.englishPubMonthNumberRegex.source, 'gi');
+      while ((match = enPubMonthNumberRegex.exec(content)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
           allReferences.push({
             type: 'publication',
             full: match[0],
@@ -1271,7 +1320,9 @@ class JWLLinkerPlugin extends Plugin {
       // 4. Find other publication references (od 15 par. 3, it-1 332)
       const otherPubRegex = new RegExp(Config.otherPubRegex.source, 'gi');
       while ((match = otherPubRegex.exec(content)) !== null) {
-        if (!this._isInsideCallout(content, match.index)) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
           allReferences.push({
             type: 'publication',
             full: match[0],
@@ -1303,7 +1354,7 @@ class JWLLinkerPlugin extends Plugin {
 
           if (ref.type === 'scripture') {
             // Cite verse as callout
-            citation = await this._fetchBibleCitation(ref.text, jwlView || view, 0, Cmd.citeVerseCallout);
+            citation = await this._fetchBibleCitation(ref.text, historyView, 0, Cmd.citeVerseCallout);
           } else {
             // Cite publication lookup
             // Auto-format the reference first
@@ -1312,7 +1363,9 @@ class JWLLinkerPlugin extends Plugin {
             formattedText = autoFormatEnglishWatchtower(formattedText);
             formattedText = autoFormatSpanishWatchtower(formattedText);
 
-            citation = await this._fetchPublicationCitation(formattedText, jwlView || view, Cmd.citePublicationLookup);
+            // In batch mode we always insert callout citations (both verses and publications)
+            // so the output is consistent and easy to scan.
+            citation = await this._fetchPublicationCitation(formattedText, historyView, Cmd.citeVerseCallout);
           }
 
           if (citation && citation !== ref.text) {
@@ -1409,6 +1462,12 @@ class JWLLinkerPlugin extends Plugin {
       return await this._fetchEnglishPublicationCitation(input, view, command);
     }
 
+    // Check if it's an English publication reference with month number (w23.12 20 par. 7)
+    Config.englishPubMonthNumberRegex.lastIndex = 0;
+    if (Config.englishPubMonthNumberRegex.test(input)) {
+      return await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
+    }
+
     // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
     Config.otherPubRegex.lastIndex = 0;
     if (Config.otherPubRegex.test(input)) {
@@ -1467,8 +1526,11 @@ class JWLLinkerPlugin extends Plugin {
           } else {
             // Check if it's an English publication reference
             Config.englishPubRegex.lastIndex = 0; // Reset regex
+            Config.englishPubMonthNumberRegex.lastIndex = 0;
             if (Config.englishPubRegex.test(selection)) {
               this._fetchEnglishPublicationCitation(selection, view, command).then(replaceEditorSelection);
+            } else if (Config.englishPubMonthNumberRegex.test(selection)) {
+              this._fetchEnglishMonthNumberPublicationCitation(selection, view, command).then(replaceEditorSelection);
             } else {
               // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
               Config.otherPubRegex.lastIndex = 0; // Reset regex
@@ -1504,8 +1566,11 @@ class JWLLinkerPlugin extends Plugin {
             } else {
               // Check if it's an English publication reference
               Config.englishPubRegex.lastIndex = 0; // Reset regex
+              Config.englishPubMonthNumberRegex.lastIndex = 0;
               if (Config.englishPubRegex.test(selection)) {
                 this._fetchEnglishPublicationCitation(selection, view, command).then(replaceEditorSelection);
+              } else if (Config.englishPubMonthNumberRegex.test(selection)) {
+                this._fetchEnglishMonthNumberPublicationCitation(selection, view, command).then(replaceEditorSelection);
               } else {
                 // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
                 Config.otherPubRegex.lastIndex = 0; // Reset regex
@@ -1578,6 +1643,10 @@ class JWLLinkerPlugin extends Plugin {
   showMenu(editor) {
     // Is the menu already active?
     if (document.querySelector(`.menu${this.menuClass}`)) return;
+
+    if (!this.menu) {
+      this.menu = this.buildMenu();
+    }
 
     if (!editor || !editor.hasFocus()) {
       new Notice(Lang.noEditor, Config.delay);
@@ -1883,7 +1952,7 @@ class JWLLinkerPlugin extends Plugin {
             title = `[${title}](${passage.link.jwlib})`;
           }
           let verses = [];
-          const cache = view.getFromHistory(passage.link.jwlib); // try the cache first
+          const cache = view?.getFromHistory?.(passage.link.jwlib); // try the cache first
           if (cache) {
             verses = cache.content;
           } else {
@@ -1900,8 +1969,8 @@ class JWLLinkerPlugin extends Plugin {
             }
           }
           if (verses) {
-            view.addToHistory(passage.link.jwlib, title, verses);
-            view.showHistory();
+            view?.addToHistory?.(passage.link.jwlib, title, verses);
+            view?.showHistory?.();
             const text = verses.join('');
             let template = '';
             if (command === Cmd.citeVerse) {
@@ -2060,8 +2129,8 @@ class JWLLinkerPlugin extends Plugin {
       }
 
       // Add to history
-      view.addToHistory(`${jwlibUrl}_${langCode}`, title, verses);
-      view.showHistory();
+      view?.addToHistory?.(`${jwlibUrl}_${langCode}`, title, verses);
+      view?.showHistory?.();
 
       const text = verses.join('');
       let template = '';
@@ -2167,8 +2236,8 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     // Add to history
-    view?.addToHistory(jwlibUrl, title, [`Варианты поиска: ${webLink}`]);
-    view?.showHistory();
+    view?.addToHistory?.(jwlibUrl, title, [`Варианты поиска: ${webLink}`]);
+    view?.showHistory?.();
 
     // Format citation - show multiple search options
     let template = '';
@@ -2235,7 +2304,7 @@ class JWLLinkerPlugin extends Plugin {
     // Try to fetch real content from Russian WOL search
     let content = [];
     let text = '';
-    const cache = view.getFromHistory(russianLookupUrl); // try the cache first
+    const cache = view?.getFromHistory?.(russianLookupUrl); // try the cache first
     if (cache) {
       content = cache.content;
     } else {
@@ -2272,8 +2341,8 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     if (content.length > 0) {
-      view?.addToHistory(russianLookupUrl, citationTitle, content);
-      view?.showHistory();
+      view?.addToHistory?.(russianLookupUrl, citationTitle, content);
+      view?.showHistory?.();
       text = content.join('');
       text = this._boldInitialNumber(text);
 
@@ -2311,7 +2380,7 @@ class JWLLinkerPlugin extends Plugin {
 
     // Use exec for proper group extraction - English format (paragraph optional)
     // Supports both w (Watchtower) and ws (Watchtower Study)
-    const regex = /w(s)?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/g;
+    const regex = /w(s)?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/gi;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
@@ -2481,7 +2550,7 @@ class JWLLinkerPlugin extends Plugin {
     // Use search URL like modern publications do, not direct links
     const contentUrl = wolUrl1; // Use search URL: w90 1/1
 
-    const cache = view?.getFromHistory(contentUrl);
+    const cache = view?.getFromHistory?.(contentUrl);
     if (cache) {
       actualText = cache.content.join('');
     } else {
@@ -2509,7 +2578,7 @@ class JWLLinkerPlugin extends Plugin {
           if (text) {
             actualText = this._boldInitialNumber(text);
             // Cache the result
-            view?.addToHistory(contentUrl, `WOL Direct: ${displayYear}/${paddedMonth}/${paddedDay}`, [actualText]);
+            view?.addToHistory?.(contentUrl, `WOL Direct: ${displayYear}/${paddedMonth}/${paddedDay}`, [actualText]);
           }
         }
       } catch (error) {
@@ -2519,8 +2588,8 @@ class JWLLinkerPlugin extends Plugin {
 
     // Add to history
     const historyContent = actualText ? [actualText, `Search options: ${webLink}`] : [`Search options: ${webLink}`];
-    view?.addToHistory(jwlibUrl, title, historyContent);
-    view?.showHistory();
+    view?.addToHistory?.(jwlibUrl, title, historyContent);
+    view?.showHistory?.();
 
     // Format citation - show multiple search options
     let template = '';
@@ -2573,6 +2642,117 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
+   * Fetch English publication citation with month number format (w23.12 20 par. 7)
+   * @param {string} input - English publication reference with month number
+   * @param {View} view - View for history
+   * @param {Cmd} command - Command type
+   * @returns {string} - Formatted citation
+   */
+  async _fetchEnglishMonthNumberPublicationCitation(input, view, command) {
+    console.log('Trying to parse English month-number publication:', input);
+
+    const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi;
+    regex.lastIndex = 0;
+    const match = regex.exec(input);
+
+    if (!match) {
+      console.log('No match found for English month-number publication:', input);
+      return `${input} | ${Lang.invalidScripture}`;
+    }
+
+    const [, isStudy, year, monthNum, page, paragraph] = match;
+    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+    const availability = checkPublicationAvailability('w', 'EN', publicationYear);
+    if (availability.isOffline) {
+      console.log('English Watchtower not available for year:', publicationYear);
+      return `${input}\n${availability.message}`;
+    }
+
+    const month = parseInt(monthNum);
+    const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+    const englishMonth = englishMonths[month] || monthNum;
+
+    const displayYear = publicationYear.toString();
+    const pubName = isStudy ? 'The Watchtower (Study Edition)' : 'The Watchtower';
+    const title = `${pubName} ${displayYear} ${englishMonth} p. ${page} par. ${paragraph}`;
+
+    // Detect language and get appropriate config
+    let lang = this.settings?.lang || 'Auto';
+    if (lang === 'Auto') {
+      lang = detectLanguage(input);
+    } else {
+      lang = Languages[lang] || 'EN';
+    }
+
+    const langConfig = getConfigForLanguage(lang);
+    const pubCode = isStudy ? 'ws' : 'w';
+
+    // Use WOL lookup/search URL (monthly issues don't have a stable /YYYY/MM/DD path)
+    const query = `${pubCode}${year}.${month} p. ${page} par. ${paragraph}`;
+    const wolUrl = `${langConfig.wolLookup}${encodeURIComponent(query)}`;
+
+    const output = [];
+    output.push(input);
+
+    let citationTitle = title;
+    if (this.settings.citationLink) {
+      citationTitle = `[${title}](${wolUrl})`;
+    }
+
+    // Try to fetch content
+    let actualText = '';
+    const cache = view?.getFromHistory?.(wolUrl);
+    if (cache) {
+      actualText = cache.content.join('');
+    } else {
+      try {
+        const dom = await this._fetchDOM(wolUrl);
+        if (dom) {
+          let text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
+          if (text) {
+            text = this._boldInitialNumber(text);
+          }
+          if (!text) {
+            const selectors = ['.resultItems', '.docSubContent', '.bodyTxt', '.searchResult', '.cardLine2', '.result', '.pub-content'];
+            for (const selector of selectors) {
+              text = this._getElementAsText(dom, selector, TargetType.jwonline);
+              if (text) break;
+            }
+          }
+          if (text) {
+            actualText = text;
+            view?.addToHistory?.(wolUrl, title, [text]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching English month-number publication:', error);
+      }
+    }
+
+    let template = '';
+    if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
+      template = this.settings.pubTemplate;
+    } else if (command === Cmd.citeVerseCallout) {
+      template = this.settings.pubCalloutTemplate;
+    }
+    template = template.replace('ПУБЛ.', 'PUB.');
+
+    let textToUse = actualText || `*Content not available. Try search:* [${query}](${wolUrl})`;
+    if (actualText) {
+      textToUse = this._boldInitialNumber(textToUse);
+    }
+
+    if (template.includes('> [!cite]')) {
+      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
+    }
+
+    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    output.push(citation);
+    return output.join('\n');
+  }
+
+  /**
    * Fetch English publication citation with month name format (w25 March p. 8 par. 2)
    * @param {string} input - English publication reference with month name
    * @param {View} view - View for history
@@ -2615,7 +2795,7 @@ class JWLLinkerPlugin extends Plugin {
 
     // Try to fetch content from WOL
     let actualText = '';
-    const cache = view?.getFromHistory(wolUrl);
+    const cache = view?.getFromHistory?.(wolUrl);
     if (cache) {
       actualText = cache.content.join('');
     } else {
@@ -2632,7 +2812,7 @@ class JWLLinkerPlugin extends Plugin {
           }
           if (text) {
             actualText = text;
-            view?.addToHistory(wolUrl, title, [text]);
+            view?.addToHistory?.(wolUrl, title, [text]);
           }
         }
       } catch (error) {
@@ -2700,7 +2880,7 @@ class JWLLinkerPlugin extends Plugin {
 
     // Try to fetch content from WOL
     let actualText = '';
-    const cache = view?.getFromHistory(wolUrl);
+    const cache = view?.getFromHistory?.(wolUrl);
     if (cache) {
       actualText = cache.content.join('');
     } else {
@@ -2717,7 +2897,7 @@ class JWLLinkerPlugin extends Plugin {
           }
           if (text) {
             actualText = text;
-            view?.addToHistory(wolUrl, title, [text]);
+            view?.addToHistory?.(wolUrl, title, [text]);
           }
         }
       } catch (error) {
@@ -2951,7 +3131,7 @@ class JWLLinkerPlugin extends Plugin {
     let actualText = '';
     const contentUrl = wolUrl1;
 
-    const cache = view?.getFromHistory(contentUrl);
+    const cache = view?.getFromHistory?.(contentUrl);
     if (cache) {
       actualText = cache.content.join('');
     } else {
@@ -2980,7 +3160,7 @@ class JWLLinkerPlugin extends Plugin {
             actualText = this._boldInitialNumber(text);
             console.log('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
             // Cache the result
-            view?.addToHistory(contentUrl, `WOL Search: ${input}`, [actualText]);
+            view?.addToHistory?.(contentUrl, `WOL Search: ${input}`, [actualText]);
           } else {
             console.log('No text found for other publication:', input, 'URL:', contentUrl);
           }
@@ -2992,8 +3172,8 @@ class JWLLinkerPlugin extends Plugin {
 
     // Add to history
     const historyContent = actualText ? [actualText, `Search options: ${webLink}`] : [`Search options: ${webLink}`];
-    view?.addToHistory(wolUrl1, title, historyContent);
-    view?.showHistory();
+    view?.addToHistory?.(wolUrl1, title, historyContent);
+    view?.showHistory?.();
 
     // Format citation
     let template = '';
@@ -3138,6 +3318,20 @@ class JWLLinkerPlugin extends Plugin {
       if (match) {
         console.log('English publication format detected:', input);
         const englishCitation = await this._fetchEnglishPublicationCitation(input, view, command);
+        const output = [];
+        output.push(input);
+        output.push(this._getLanguageLabel('en'));
+        output.push(englishCitation.split('\n').slice(1).join('\n'));
+        return output.join('\n');
+      }
+
+      // Try English publication month-number format: w23.12 20 par. 7
+      Config.englishPubMonthNumberRegex.lastIndex = 0;
+      match = Config.englishPubMonthNumberRegex.exec(input);
+
+      if (match) {
+        console.log('English month-number publication format detected:', input);
+        const englishCitation = await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
         const output = [];
         output.push(input);
         output.push(this._getLanguageLabel('en'));
@@ -3347,8 +3541,8 @@ class JWLLinkerPlugin extends Plugin {
       return `${input}\n[${langCode}] ${Lang.invalidScripture}`;
     }
 
-    const [, pubCode, chapter, paragraph] = match;
-    const chapterNum = parseInt(chapter);
+    const [, pubCode, issueOrPage, paragraph] = match;
+    const issueOrPageNum = parseInt(issueOrPage);
 
     // Document IDs for publications (same IDs work for all languages)
     const publicationDocIds = {
@@ -3375,44 +3569,48 @@ class JWLLinkerPlugin extends Plugin {
         'od': 'Organized to Do Jehovah\'s Will',
         'it-1': 'Insight on the Scriptures, Volume 1',
         'it-2': 'Insight on the Scriptures, Volume 2',
-        'cl': 'Draw Close to Jehovah'
+        'cl': 'Draw Close to Jehovah',
+        'si': 'All Scripture Is Inspired of God and Beneficial'
       },
       'ru': {
         'od': 'Организованы исполнять волю Иеговы',
         'it-1': 'Понимание Писания, том 1',
         'it-2': 'Понимание Писания, том 2',
-        'cl': 'Приближайтесь к Иегове'
+        'cl': 'Приближайтесь к Иегове',
+        'si': '«Всё Писание вдохновлено Богом и полезно»'
       },
       'es': {
         'od': 'Organizados para hacer la voluntad de Jehová',
         'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
         'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2',
-        'cl': 'Acerquémonos a Jehová'
+        'cl': 'Acerquémonos a Jehová',
+        'si': 'Toda Escritura es inspirada por Dios y provechosa'
       }
     };
 
     const pubTitle = publicationTitles[langCode]?.[pubCode.toLowerCase()] || `Publication ${pubCode.toUpperCase()}`;
 
     // Build terms based on language
+    const isPageBased = pubCode.toLowerCase() === 'si' || pubCode.toLowerCase().startsWith('it-');
     const terms = {
-      'en': { chap: 'chap.', par: 'par.' },
-      'ru': { chap: 'глава', par: 'абз.' },
-      'es': { chap: 'cap.', par: 'párr.' }
+      'en': isPageBased ? { unit: 'p.', par: 'par.' } : { unit: 'chap.', par: 'par.' },
+      'ru': isPageBased ? { unit: 'с.', par: 'абз.' } : { unit: 'глава', par: 'абз.' },
+      'es': isPageBased ? { unit: 'pág.', par: 'párr.' } : { unit: 'cap.', par: 'párr.' }
     };
     const term = terms[langCode];
 
     // Build title
     const title = paragraph
-      ? `${pubTitle} ${term.chap} ${chapter} ${term.par} ${paragraph}`
-      : `${pubTitle} ${term.chap} ${chapter}`;
+      ? `${pubTitle} ${term.unit} ${issueOrPage} ${term.par} ${paragraph}`
+      : `${pubTitle} ${term.unit} ${issueOrPage}`;
 
     // Get direct document URL if available
     const pubDocIds = publicationDocIds[pubCode.toLowerCase()];
     let directUrl = '';
     let wolUrl = '';
 
-    if (pubDocIds && pubDocIds[chapterNum]) {
-      const docId = pubDocIds[chapterNum];
+    if (pubDocIds && pubDocIds[issueOrPageNum]) {
+      const docId = pubDocIds[issueOrPageNum];
       directUrl = `${config.wolBase}${docId}`;
       wolUrl = paragraph ? `${directUrl}#p${paragraph}` : directUrl;
     } else {
@@ -3433,6 +3631,26 @@ class JWLLinkerPlugin extends Plugin {
           text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
           if (text) {
             text = this._boldInitialNumber(text);
+          }
+        }
+      }
+
+      if (!text) {
+        const dom = await this._fetchDOM(wolUrl);
+        if (dom) {
+          if (paragraph) {
+            text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
+            if (text) {
+              text = this._boldInitialNumber(text);
+            }
+          }
+
+          if (!text) {
+            const selectors = ['.resultItems', '.docSubContent', '.bodyTxt', '.searchResult', '.cardLine2', '.result', '.pub-content'];
+            for (const selector of selectors) {
+              text = this._getElementAsText(dom, selector, TargetType.jwonline);
+              if (text) break;
+            }
           }
         }
       }
@@ -3493,7 +3711,7 @@ class JWLLinkerPlugin extends Plugin {
     }
     let link = '';
     let content = [];
-    const cache = view.getFromHistory(match.url, pars);
+    const cache = view?.getFromHistory?.(match.url, pars);
     if (cache) {
       link = cache.link;
       content = cache.content;
@@ -3518,8 +3736,8 @@ class JWLLinkerPlugin extends Plugin {
       }
     }
     if (link) {
-      view.addToHistory(match.url, link, content);
-      view.showHistory();
+      view?.addToHistory?.(match.url, link, content);
+      view?.showHistory?.();
       let output = '';
       // replace the raw url to a full MD link
       if (command === Cmd.addLinkTitle) {
@@ -3556,7 +3774,7 @@ class JWLLinkerPlugin extends Plugin {
     let link = '';
     let content = [];
     let text = '';
-    const cache = view.getFromHistory(lookupUrl); // try the cache first
+    const cache = view?.getFromHistory?.(lookupUrl); // try the cache first
     if (cache) {
       link = cache.link;
       content = cache.content;
@@ -3571,8 +3789,8 @@ class JWLLinkerPlugin extends Plugin {
       }
     }
     if (link) {
-      view.addToHistory(lookupUrl, link, content);
-      view.showHistory();
+      view?.addToHistory?.(lookupUrl, link, content);
+      view?.showHistory?.();
       text = content.join('');
       text = this._boldInitialNumber(text);
       let template = this.settings.pubCalloutTemplate;
@@ -4329,7 +4547,9 @@ class ScripturePostProcessor extends MarkdownRenderChild {
   }
 
   onload() {
-    const html = this.containerEl.innerHTML.replaceAll('&nbsp;', '\u00A0');
+    const rawHtml = this.containerEl.innerHTML;
+    if (!/\d/.test(rawHtml) && !/wol\.jw\.org|jw\.org\/finder|jwlibrary:\/\//i.test(rawHtml)) return;
+    const html = rawHtml.replaceAll('&nbsp;', '\u00A0');
     const { output, changed } = this.plugin._convertScriptureToJWLibrary(html, DisplayType.href);
     if (changed) {
       this.containerEl.innerHTML = output;
@@ -4380,6 +4600,26 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .setHeading();
 
     new Setting(containerEl)
+      .setName(Lang.settingsOpenSidebarOnStartup)
+      .setDesc(Lang.settingsOpenSidebarOnStartupDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.openSidebarOnStartup).onChange(async (value) => {
+          this.plugin.settings.openSidebarOnStartup = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(Lang.settingsDebug)
+      .setDesc(Lang.settingsDebugDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.debug).onChange(async (value) => {
+          this.plugin.settings.debug = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
       .setName(Lang.settingsVerseTemplate)
       .setDesc(Lang.settingsVerseTemplateDesc)
       .addTextArea((text) => {
@@ -4413,7 +4653,7 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           .setPlaceholder(defaultTemplate)
           .setValue(this.plugin.settings.pubTemplate)
           .onChange(async (value) => {
-            this.plugin.settings.lookupTemplate = value;
+            this.plugin.settings.pubTemplate = value;
             await this.plugin.saveSettings();
           });
       });
