@@ -1942,11 +1942,33 @@ class JWLLinkerPlugin extends Plugin {
       for (const reference of references) {
         let dom = ''; // cache the dom if possible
         let prevChapter = '';
+        // In callout mode we want to keep comma-separated verses from the same chapter
+        // inside a single callout block (e.g. "Пс 143:5, 10"), instead of producing
+        // multiple separate callouts.
+        let calloutBlock = null;
+        let calloutChapter = '';
+        const flushCalloutBlock = () => {
+          if (!calloutBlock) return;
+          const combinedText = calloutBlock.texts.join('');
+          const citation = calloutBlock.template
+            .replace('{title}', calloutBlock.title)
+            .replace('{text}', combinedText);
+          output.push(citation);
+          calloutBlock = null;
+          calloutChapter = '';
+        };
         for (const passage of reference.passages) {
           if (passage.error === OutputError.invalidScripture) {
+            flushCalloutBlock();
             output.push(`${passage.displayFull} | ${Lang[OutputError.invalidScripture]}`);
             continue;
           }
+
+          // If we are in callout mode and chapter changes, flush previous block.
+          if (command === Cmd.citeVerseCallout && calloutBlock && passage.chapter !== calloutChapter) {
+            flushCalloutBlock();
+          }
+
           let title = passage.displayFull; // default
           if (this.settings.citationLink) {
             title = `[${title}](${passage.link.jwlib})`;
@@ -1975,6 +1997,8 @@ class JWLLinkerPlugin extends Plugin {
             let template = '';
             if (command === Cmd.citeVerse) {
               template = this.settings.verseTemplate;
+              const citation = template.replace('{title}', title).replace('{text}', text);
+              output.push(citation);
             } else if (command === Cmd.citeVerseCallout) {
               template = this.settings.verseCalloutTemplate;
 
@@ -1994,13 +2018,22 @@ class JWLLinkerPlugin extends Plugin {
               } else {
                 template = template.replace(/БИБЛИЯ|BIBLIA/g, 'BIBLE');
               }
+
+              // Start or extend a combined callout for the same chapter
+              if (!calloutBlock) {
+                calloutChapter = passage.chapter;
+                calloutBlock = { template, title, texts: [text] };
+              } else {
+                calloutBlock.texts.push(text);
+              }
             }
-            const citation = template.replace('{title}', title).replace('{text}', text);
-            output.push(citation);
           } else {
+            flushCalloutBlock();
             output.push(`${passage.displayFull} | ${Lang[OutputError.onlineLookupFailed]}`);
           }
         }
+
+        flushCalloutBlock();
       }
       return output.join('\n');
     }
