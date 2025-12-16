@@ -686,6 +686,39 @@ function autoFormatRussianWatchtower(input) {
   return input;
 }
 
+function normalizeInput(input) {
+  if (typeof input !== 'string') return input;
+
+  // Don't touch URLs / app links
+  if (/\bhttps?:\/\//i.test(input) || /\bjwlibrary:\/\//i.test(input) || /\bjw\.org\//i.test(input) || /\bwol\.jw\.org\//i.test(input)) {
+    return input;
+  }
+
+  // Normalize basic whitespace
+  let s = input.replaceAll('\u00A0', ' ');
+  s = s.replace(/[ \t]+/g, ' ').trim();
+
+  // Normalize separators
+  s = s.replace(/\s*([,;])\s*/g, '$1 ');
+  s = s.replace(/\s*\/\s*/g, '/');
+
+  // Normalize Watchtower shorthand like w20 .08 -> w20.08 and ws20 .08 -> ws20.08
+  s = s.replace(/\b(ws?)\s*(\d{2})\s*\.\s*(\d{1,2})\b/gi, '$1$2.$3');
+
+  // Normalize common unit markers with optional spaces (EN/RU/ES)
+  // Pages: p., pp., с., сс., pág., págs.
+  s = s.replace(/\b(págs?\.|pág\.|pp?\.|сс?\.)\s*(\d)/gi, '$1 $2');
+  // Paragraph markers: par., абз., párr.
+  s = s.replace(/\b(par\.|абз\.|párr\.)\s*(\d)/gi, '$1 $2');
+  // Chapter markers: chap., глава, cap.
+  s = s.replace(/\b(chap\.|глава|cap\.)\s*(\d)/gi, '$1 $2');
+
+  // Final cleanup for multiple spaces introduced by rules
+  s = s.replace(/[ \t]+/g, ' ').trim();
+
+  return s;
+}
+
 /**
  * Auto-format English Watchtower publications with month names
  * @param {string} input - Input text to check and format
@@ -1358,7 +1391,7 @@ class JWLLinkerPlugin extends Plugin {
           } else {
             // Cite publication lookup
             // Auto-format the reference first
-            let formattedText = ref.text;
+            let formattedText = normalizeInput(ref.text);
             formattedText = autoFormatRussianWatchtower(formattedText);
             formattedText = autoFormatEnglishWatchtower(formattedText);
             formattedText = autoFormatSpanishWatchtower(formattedText);
@@ -1450,6 +1483,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {Promise<string>} - Citation text
    */
   async _fetchPublicationCitation(input, view, command) {
+    input = normalizeInput(input);
     // Check if it's a Russian publication reference first (only абз. format)
     Config.russianPubRegex.lastIndex = 0;
     if (Config.russianPubRegex.test(input)) {
@@ -1498,6 +1532,9 @@ class JWLLinkerPlugin extends Plugin {
     let { selection, caret, line } = this._getEditorSelection(activeEditor);
     if (selection) {
       selection = selection.trim();
+
+      // Normalize common spacing/punctuation variants before any parsing/auto-formatting
+      selection = normalizeInput(selection);
 
       // Auto-format Watchtower publications with month names
       const originalSelection = selection;
@@ -3314,6 +3351,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted dual citation
    */
   async _fetchDualPublicationCitation(input, view, command) {
+    input = normalizeInput(input);
     console.log('Trying dual mode for publication:', input);
 
     // Get configured languages
