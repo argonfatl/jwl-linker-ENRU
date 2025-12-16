@@ -31,6 +31,7 @@ Restart Obsidian and go to the *Community Plugins Settings* page to enable the p
 - **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`
 
 ## Watchtower Publications
+![Plugin in action](RunW.gif)
 - **English**: `w65 6/1 p. 329 par. 6`, `w24 1/15 p. 12 par. 3`
 - **Russian**: `w86.01 28, абз. 11`, `w24.12 15, абз. 5`
 - **Spanish**: `w65 6/1 pág. 329 párr. 6`, `w24 1/15 pág. 12 párr. 3`
@@ -134,7 +135,7 @@ Rom 1:20
 > [!verse] BIBLE — [Romans 1:20](jwlibrary://...)
 > **20** For his invisible qualities are clearly seen from the world's creation onward...
 ```
-
+![Plugin in actionB](Run.gif)
 ## Publication Citation (Russian)
 ```markdown
 w86.01 28, абз. 11
