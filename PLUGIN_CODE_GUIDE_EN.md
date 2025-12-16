@@ -328,9 +328,4 @@ If you need to follow the code “top to bottom”, these are the main entry poi
 - **Reading View**: `ScripturePostProcessor`
 - **Settings**: `JWLLinkerSettingTab`
 
----
 
-If you want, I can generate an extended version:
-
-- a table: “method → inputs → outputs → side effects (network/editor/history)”
-- or a 1:1 reference for every `JWLLinkerPlugin` method in file order (very long).
