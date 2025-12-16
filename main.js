@@ -2392,7 +2392,15 @@ class JWLLinkerPlugin extends Plugin {
     // Keep "ПУБЛ." for Russian
     // Check if template is actually a callout (user editable):
     // If so all lines need to be part of the callout syntax
-    if (template[0] === '>') {
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      const trimmed = template.trimStart();
+      const leadingWs = template.slice(0, template.length - trimmed.length);
+      template = `${leadingWs}> ${trimmed}`;
+    }
+
+    if (template.includes('[!cite]')) {
+      text = text.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
+    } else if (template[0] === '>') {
       text = text.replace(/^./gm, '>$&').substring(1);
     }
     const citation = template.replace('{title}', citationTitle).replace('{text}', text);
@@ -2776,7 +2784,13 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = this._boldInitialNumber(textToUse);
     }
 
-    if (template.includes('> [!cite]')) {
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      const trimmed = template.trimStart();
+      const leadingWs = template.slice(0, template.length - trimmed.length);
+      template = `${leadingWs}> ${trimmed}`;
+    }
+
+    if (template.includes('[!cite]')) {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
@@ -2862,6 +2876,16 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = this._boldInitialNumber(textToUse);
     }
 
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      const trimmed = template.trimStart();
+      const leadingWs = template.slice(0, template.length - trimmed.length);
+      template = `${leadingWs}> ${trimmed}`;
+    }
+
+    if (template.includes('[!cite]')) {
+      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
+    }
+
     const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
     output.push(citation);
 
@@ -2945,6 +2969,16 @@ class JWLLinkerPlugin extends Plugin {
     let textToUse = actualText || `*Contenido no disponible. Pruebe la búsqueda:* [${input}](${wolUrl})`;
     if (actualText) {
       textToUse = this._boldInitialNumber(textToUse);
+    }
+
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      const trimmed = template.trimStart();
+      const leadingWs = template.slice(0, template.length - trimmed.length);
+      template = `${leadingWs}> ${trimmed}`;
+    }
+
+    if (template.includes('[!cite]')) {
+      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
     const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
@@ -3254,7 +3288,13 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     // If using callout template, format text properly for callout
-    if (template.includes('> [!cite]')) {
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      const trimmed = template.trimStart();
+      const leadingWs = template.slice(0, template.length - trimmed.length);
+      template = `${leadingWs}> ${trimmed}`;
+    }
+
+    if (template.includes('[!cite]')) {
       // Format text for callout - each line should start with '>' but avoid double '>'
       // First remove any existing '>' at the start, then add single '>'
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>').replace(/^> > /gm, '> ');
@@ -3284,7 +3324,7 @@ class JWLLinkerPlugin extends Plugin {
     let regex, match;
 
     // Try Watchtower format first: w23.12 20, абз. 8, 9 OR w25.3 с. 8 абз. 2
-    regex = /w(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+)(?:[,\s]*(?:par\.|абз\.|párr\.)\s*(\d+)(?:[,\s]*\d+)*)?/g;
+    regex = /w(\d{2})\.(\d{1,2})\s+(?:(?:с\.|p\.|pág\.)\s*)?(\d+)(?:[,\s]*(?:par\.|абз\.|párr\.)\s*(\d+)(?:[,\s]*\d+)*)?/g;
     regex.lastIndex = 0;
     match = regex.exec(input);
 
