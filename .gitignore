@@ -1,3 +1,7 @@
 .DS_Store
 jwl-linker-main.code-workspace
 *.code-workspace
+
+# local/ephemeral files
+FETCH_HEAD
+*.backup*

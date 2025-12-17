@@ -17,11 +17,19 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 
 # How to Install
 
-Download the [latest version](https://github.com/argonfatl/jwl-linker-ENRU/archive/refs/heads/main.zip) from this link, and unzip it.  
-You see a folder called `jwl-linker-main`; rename this folder as `jwl-linker` and then add it into your `{Obsidian Vault}/.obsidian/plugins` folder.  
-Restart Obsidian and go to the *Community Plugins Settings* page to enable the plugin.
+## Community Plugins (recommended)
 
-*Note: you can also click the `<>Code` button above and choose `Download.zip`*
+Once this plugin is published to the Obsidian Community Plugins directory, install it from:
+`Settings` → `Community plugins` → `Browse`.
+
+## Manual install (GitHub Releases)
+
+1. Download the latest release from GitHub Releases.
+2. Extract it into your `{Obsidian Vault}/.obsidian/plugins/` folder so you end up with:
+   `{Obsidian Vault}/.obsidian/plugins/jwl-linker/`.
+3. Ensure the plugin folder contains:
+   `manifest.json`, `main.js`, `styles.css`, `versions.json`.
+4. Restart Obsidian and enable the plugin in `Settings` → `Community plugins`.
 
 # 📖 Supported Publication Formats
 
