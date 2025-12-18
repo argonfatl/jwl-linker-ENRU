@@ -1484,6 +1484,16 @@ class JWLLinkerPlugin extends Plugin {
    */
   async _fetchPublicationCitation(input, view, command) {
     input = normalizeInput(input);
+
+    // If user provided a specific paragraph, prefer callout format even in single-mode
+    // so the extracted text is grouped under a [!cite] block.
+    if (command === Cmd.citePublicationLookup) {
+      const hasParagraph = /(?:\bpar\.\s*\d+|\bабз\.\s*\d+|\bpárr\.\s*\d+)/i.test(input);
+      if (hasParagraph) {
+        command = Cmd.citeVerseCallout;
+      }
+    }
+
     // Check if it's a Russian publication reference first (only абз. format)
     Config.russianPubRegex.lastIndex = 0;
     if (Config.russianPubRegex.test(input)) {
@@ -2312,7 +2322,9 @@ class JWLLinkerPlugin extends Plugin {
     // Format citation - show multiple search options
     let template = '';
     if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      template = this.settings.pubTemplate;
+      template = command === Cmd.citePublicationLookup
+        ? this.settings.pubCalloutTemplate
+        : this.settings.pubTemplate;
     } else if (command === Cmd.citeVerseCallout) {
       template = this.settings.pubCalloutTemplate;
     }
@@ -2677,7 +2689,9 @@ class JWLLinkerPlugin extends Plugin {
       if (isOldPublication) {
         template = this.settings.pubCalloutTemplate;
       } else {
-        template = this.settings.pubTemplate;
+        template = (command === Cmd.citePublicationLookup && paragraph)
+          ? this.settings.pubCalloutTemplate
+          : this.settings.pubTemplate;
       }
     } else if (command === Cmd.citeVerseCallout) {
       template = this.settings.pubCalloutTemplate;
@@ -2810,7 +2824,9 @@ class JWLLinkerPlugin extends Plugin {
 
     let template = '';
     if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      template = this.settings.pubTemplate;
+      template = command === Cmd.citePublicationLookup
+        ? this.settings.pubCalloutTemplate
+        : this.settings.pubTemplate;
     } else if (command === Cmd.citeVerseCallout) {
       template = this.settings.pubCalloutTemplate;
     }
@@ -3354,6 +3370,8 @@ class JWLLinkerPlugin extends Plugin {
     input = normalizeInput(input);
     console.log('Trying dual mode for publication:', input);
 
+    const citationCommand = command === Cmd.citePublicationLookup ? Cmd.citeVerseCallout : command;
+
     // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
     console.log('Dual mode languages:', { firstLang, secondLang });
@@ -3398,10 +3416,10 @@ class JWLLinkerPlugin extends Plugin {
 
         try {
           // Fetch citation for first language
-          const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, command, paragraph, wolUrls[firstLang]);
+          const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, citationCommand, paragraph, wolUrls[firstLang]);
 
           // Fetch citation for second language
-          const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, command, paragraph, wolUrls[secondLang]);
+          const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, citationCommand, paragraph, wolUrls[secondLang]);
 
           // Format dual output with configured language order
           output.push(this._getLanguageLabel(firstLang));
@@ -3548,10 +3566,10 @@ class JWLLinkerPlugin extends Plugin {
 
     try {
       // Fetch citation for first language
-      const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, command, paragraph, wolUrls[firstLang]);
+      const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, citationCommand, paragraph, wolUrls[firstLang]);
 
       // Fetch citation for second language
-      const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, command, paragraph, wolUrls[secondLang]);
+      const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, citationCommand, paragraph, wolUrls[secondLang]);
 
       // Format dual output with configured language order
       output.push(this._getLanguageLabel(firstLang));
