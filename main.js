@@ -6551,7 +6551,7 @@ const BibleDimensions = {
   '40 15': 39,  // Matthew
   '40 16': 28,  // Matthew
   '40 17': 26,  // Matthew
-  '40 18': 34,  // Matthew
+  '40 18': 35,  // Matthew
   '40 19': 30,  // Matthew
   '40 20': 34,  // Matthew
   '40 21': 46,  // Matthew
