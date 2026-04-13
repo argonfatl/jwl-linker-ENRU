@@ -34,6 +34,10 @@ const DEFAULT_SETTINGS = {
   dualLangSecond: 'en', // Second language: ru, en, es
 };
 
+// Debug logging — updated from plugin settings, silent in production
+let debugMode = false;
+const debugLog = (...args) => { if (debugMode) console.log(...args); }; // eslint-disable-line no-console
+
 // Supported languages for dual mode
 const DualModeLanguages = {
   Auto: 'Auto',
@@ -507,21 +511,21 @@ const JWL_LINKER_VIEW = 'jwl-linker-view';
  * @returns {string} - Language key (RU, EN, etc.)
  */
 function detectLanguage(text) {
-  console.log('detectLanguage called with:', text);
+  debugLog('detectLanguage called with:', text);
   if (!text) {
-    console.log('detectLanguage returning: EN (no text)');
+    debugLog('detectLanguage returning: EN (no text)');
     return 'EN';
   }
 
   // Check for Cyrillic characters (Russian)
   if (/[\u0400-\u04FF]/.test(text)) {
-    console.log('detectLanguage returning: RU (Cyrillic detected)');
+    debugLog('detectLanguage returning: RU (Cyrillic detected)');
     return 'RU';
   }
 
   // Check for Spanish terms and patterns (check before other languages)
   if (/párr\.|cap\.|pág\.|págs\.|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro|^(1|2|3)\s*(Samuel|Reyes|Crónicas)/.test(text)) {
-    console.log('detectLanguage returning: ES (Spanish terms detected)');
+    debugLog('detectLanguage returning: ES (Spanish terms detected)');
     return 'ES';
   }
 
@@ -541,7 +545,7 @@ function detectLanguage(text) {
   }
 
   // Default to English
-  console.log('detectLanguage returning: EN (default)');
+  debugLog('detectLanguage returning: EN (default)');
   return 'EN';
 }
 
@@ -655,12 +659,12 @@ function autoFormatRussianWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use day/month format (w10 15/1 с. 3 абз. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} с. ${page} абз. ${paragraph}`;
-        console.log('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
+        debugLog('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use .month format (w16.01 3, абз. 1)
         const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
-        console.log('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
+        debugLog('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -678,7 +682,7 @@ function autoFormatRussianWatchtower(input) {
 
     if (monthNumber) {
       const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
-      console.log('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
+      debugLog('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -741,7 +745,7 @@ function autoFormatEnglishWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 p. 3 par. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
-        console.log('Auto-formatted English Watchtower (pre-2016):', input, '→', formatted);
+        debugLog('Auto-formatted English Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use month/day format but with current logic
@@ -749,7 +753,7 @@ function autoFormatEnglishWatchtower(input) {
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
         const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} p. ${page} par. ${paragraph}`;
-        console.log('Auto-formatted English Watchtower (post-2016):', input, '→', formatted);
+        debugLog('Auto-formatted English Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -770,7 +774,7 @@ function autoFormatEnglishWatchtower(input) {
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
       const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
-      console.log('Auto-formatted English Watchtower (month-only):', input, '→', formatted);
+      debugLog('Auto-formatted English Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -800,7 +804,7 @@ function autoFormatSpanishWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 pág. 3 párr. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
-        console.log('Auto-formatted Spanish Watchtower (pre-2016):', input, '→', formatted);
+        debugLog('Auto-formatted Spanish Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use month/day format but with current logic
@@ -808,7 +812,7 @@ function autoFormatSpanishWatchtower(input) {
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
         const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} pág. ${page} párr. ${paragraph}`;
-        console.log('Auto-formatted Spanish Watchtower (post-2016):', input, '→', formatted);
+        debugLog('Auto-formatted Spanish Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -829,7 +833,7 @@ function autoFormatSpanishWatchtower(input) {
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
       const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
-      console.log('Auto-formatted Spanish Watchtower (month-only):', input, '→', formatted);
+      debugLog('Auto-formatted Spanish Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -850,39 +854,39 @@ function updateInterfaceLanguage(interfaceLang) {
  * @param {string} input - Test input
  */
 function testRussianPubRegex(input) {
-  console.log('=== Testing Russian Publication Regex ===');
-  console.log('Input:', JSON.stringify(input));
-  console.log('Input length:', input.length);
-  console.log('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
+  debugLog('=== Testing Russian Publication Regex ===');
+  debugLog('Input:', JSON.stringify(input));
+  debugLog('Input length:', input.length);
+  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
 
   // Test the regex directly
   const regex = /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  console.log('Regex pattern:', regex.source);
-  console.log('Match result:', match);
+  debugLog('Regex pattern:', regex.source);
+  debugLog('Match result:', match);
 
   if (match) {
     const [fullMatch, year, month, page, paragraph] = match;
-    console.log('Parsed components:', { fullMatch, year, month, page, paragraph });
+    debugLog('Parsed components:', { fullMatch, year, month, page, paragraph });
 
     // Test month lookup
     if (month) {
       const monthLower = month.toLowerCase();
-      console.log('Month (lowercase):', monthLower);
-      console.log('Month found in mapping:', RussianMonths[monthLower]);
+      debugLog('Month (lowercase):', monthLower);
+      debugLog('Month found in mapping:', RussianMonths[monthLower]);
     }
 
     // Test function - no URL generation needed
   } else {
-    console.log('No match found');
+    debugLog('No match found');
     // Try simpler patterns
-    console.log('Testing simpler patterns:');
-    console.log('w24 match:', /w24/.test(input));
-    console.log('Cyrillic match:', /[а-яёА-ЯЁ]/.test(input));
-    console.log('с. match:', /с\./.test(input));
-    console.log('Numbers match:', /\d+/.test(input));
+    debugLog('Testing simpler patterns:');
+    debugLog('w24 match:', /w24/.test(input));
+    debugLog('Cyrillic match:', /[а-яёА-ЯЁ]/.test(input));
+    debugLog('с. match:', /с\./.test(input));
+    debugLog('Numbers match:', /\d+/.test(input));
   }
 
   return match;
@@ -893,65 +897,65 @@ function testRussianPubRegex(input) {
  * @param {string} input - Test input
  */
 function testEnglishPubRegex(input) {
-  console.log('=== Testing English Publication Regex ===');
-  console.log('Input:', JSON.stringify(input));
-  console.log('Input length:', input.length);
-  console.log('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
+  debugLog('=== Testing English Publication Regex ===');
+  debugLog('Input:', JSON.stringify(input));
+  debugLog('Input length:', input.length);
+  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
 
   // Test the regex directly
   const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+p\.\s*(\d+)\s+par\.\s*(\d+)/g;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  console.log('Regex pattern:', regex.source);
-  console.log('Match result:', match);
+  debugLog('Regex pattern:', regex.source);
+  debugLog('Match result:', match);
 
   if (match) {
     const [fullMatch, year, monthDay, page, paragraph] = match;
-    console.log('Parsed components:', { fullMatch, year, monthDay, page, paragraph });
+    debugLog('Parsed components:', { fullMatch, year, monthDay, page, paragraph });
 
     // Test month/day parsing
     if (monthDay) {
       const [month, day] = monthDay.split('/').map(n => parseInt(n));
-      console.log('Parsed month/day:', { month, day });
+      debugLog('Parsed month/day:', { month, day });
 
       // Test month lookup
       const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
       const englishMonth = englishMonths[month];
-      console.log('English month:', englishMonth);
+      debugLog('English month:', englishMonth);
     }
   } else {
-    console.log('No match found');
+    debugLog('No match found');
     // Try simpler patterns
-    console.log('Testing simpler patterns:');
-    console.log('w65 match:', /w65/.test(input));
-    console.log('p. match:', /p\./.test(input));
-    console.log('par. match:', /par\./.test(input));
-    console.log('Numbers match:', /\d+/.test(input));
+    debugLog('Testing simpler patterns:');
+    debugLog('w65 match:', /w65/.test(input));
+    debugLog('p. match:', /p\./.test(input));
+    debugLog('par. match:', /par\./.test(input));
+    debugLog('Numbers match:', /\d+/.test(input));
   }
 
   return match;
 }
 
 function testScriptureRegex(input) {
-  console.log('=== Testing Scripture Regex ===');
-  console.log('Input:', JSON.stringify(input));
+  debugLog('=== Testing Scripture Regex ===');
+  debugLog('Input:', JSON.stringify(input));
 
   const regex = /(('?)((?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона))((?: ?(?:\d{1,3})[:\u003A\u0437](?:\d{1,3})(?:[-,\u2013\u2014] ?\d{1,3})*;?)+))(\]|<\/a>)?/gimu;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  console.log('Scripture regex match:', match);
+  debugLog('Scripture regex match:', match);
 
   if (match) {
     const [fullMatch, , , bookName, chapterVerse] = match;
-    console.log('Parsed scripture:', { fullMatch, bookName, chapterVerse });
+    debugLog('Parsed scripture:', { fullMatch, bookName, chapterVerse });
   } else {
-    console.log('No scripture match found');
+    debugLog('No scripture match found');
     // Test individual parts
-    console.log('Book name test:', /(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона)/giu.exec(input));
-    console.log('Numbers test:', /\d{1,3}[:\u003A\u0437]\d{1,3}/g.exec(input));
+    debugLog('Book name test:', /(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона)/giu.exec(input));
+    debugLog('Numbers test:', /\d{1,3}[:\u003A\u0437]\d{1,3}/g.exec(input));
   }
 
   return match;
@@ -1087,8 +1091,7 @@ class JWLLinkerPlugin extends Plugin {
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
 
-    // biome-ignore lint: ⚠️
-    console.log(
+    debugLog(
       `%c${this.manifest.name} ${this.manifest.version} loaded`,
       'background-color: purple; padding:4px; border-radius:4px',
     );
@@ -1097,31 +1100,31 @@ class JWLLinkerPlugin extends Plugin {
       window.testRussianPubRegex = testRussianPubRegex;
       window.testEnglishPubRegex = testEnglishPubRegex;
       window.testLanguageDetection = (input) => {
-        console.log('=== Testing Language Detection ===');
-        console.log('Input:', input);
+        debugLog('=== Testing Language Detection ===');
+        debugLog('Input:', input);
         const detected = detectLanguage(input);
-        console.log('Detected language:', detected);
+        debugLog('Detected language:', detected);
         return detected;
       };
       window.testAutoFormatting = (input) => {
-        console.log('=== Testing Auto-formatting ===');
-        console.log('Original:', input);
+        debugLog('=== Testing Auto-formatting ===');
+        debugLog('Original:', input);
         let formatted = autoFormatRussianWatchtower(input);
         if (formatted !== input) {
-          console.log('Russian formatted:', formatted);
+          debugLog('Russian formatted:', formatted);
           return formatted;
         }
         formatted = autoFormatEnglishWatchtower(input);
         if (formatted !== input) {
-          console.log('English formatted:', formatted);
+          debugLog('English formatted:', formatted);
           return formatted;
         }
         formatted = autoFormatSpanishWatchtower(input);
         if (formatted !== input) {
-          console.log('Spanish formatted:', formatted);
+          debugLog('Spanish formatted:', formatted);
           return formatted;
         }
-        console.log('No formatting applied');
+        debugLog('No formatting applied');
         return input;
       };
     }
@@ -1133,6 +1136,8 @@ class JWLLinkerPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     // Update interface language based on settings
     updateInterfaceLanguage(this.settings.interfaceLang);
+    // Sync module-level debug flag
+    debugMode = this.settings.debug;
   }
 
   async saveSettings() {
@@ -1553,7 +1558,7 @@ class JWLLinkerPlugin extends Plugin {
       selection = autoFormatSpanishWatchtower(selection);
 
       if (selection !== originalSelection) {
-        console.log('Auto-formatted Watchtower publication:', originalSelection, '→', selection);
+        debugLog('Auto-formatted Watchtower publication:', originalSelection, '→', selection);
         // Update the editor with the formatted text
         activeEditor.replaceSelection(selection);
         // Update the selection for further processing
@@ -2096,11 +2101,11 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string}
    */
   async _fetchDualBibleCitation(input, view, caret, command) {
-    console.log('Fetching dual Bible citation for:', input);
+    debugLog('Fetching dual Bible citation for:', input);
 
     // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
-    console.log('Dual mode languages for Bible:', { firstLang, secondLang });
+    debugLog('Dual mode languages for Bible:', { firstLang, secondLang });
 
     // Language code to WOL language mapping
     const langToWol = {
@@ -2178,7 +2183,7 @@ class JWLLinkerPlugin extends Plugin {
     const jwlLocale = getJWLibraryLocale(upperLang);
     const jwlibUrl = `${Config.jwlFinder}${Config.urlParam}${id}${jwlLocale}`;
 
-    console.log(`Fetching Bible verse for ${langCode}:`, jworgUrl);
+    debugLog(`Fetching Bible verse for ${langCode}:`, jworgUrl);
 
     try {
       const dom = await this._fetchDOM(jworgUrl);
@@ -2244,7 +2249,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchRussianPublicationCitation(input, view, command) {
-    console.log('Trying to parse Russian publication:', input);
+    debugLog('Trying to parse Russian publication:', input);
 
     // Use exec for proper group extraction - Russian format only
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2253,19 +2258,19 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for:', input);
+      debugLog('No match found for:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    console.log('Match found:', match);
+    debugLog('Match found:', match);
     const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
-    console.log('Parsed:', { fullMatch, year, monthNum, page, paragraph });
+    debugLog('Parsed:', { fullMatch, year, monthNum, page, paragraph });
 
     // Check if Watchtower year is available online
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'RU', publicationYear);
     if (availability.isOffline) {
-      console.log('Russian Watchtower not available for year:', publicationYear);
+      debugLog('Russian Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2275,7 +2280,7 @@ class JWLLinkerPlugin extends Plugin {
     const englishMonth = englishMonths[parseInt(monthNum)];
     const searchQuery = `w${year} ${englishMonth}`;
     const wolUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(searchQuery)}`;
-    console.log('Generated WOL URL:', wolUrl);
+    debugLog('Generated WOL URL:', wolUrl);
 
     // Convert month number to Russian month name for display
     const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -2343,7 +2348,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation in callout format
    */
   async _fetchRussianPublicationCitationCallout(input, view, command) {
-    console.log('Trying to parse Russian publication for callout:', input);
+    debugLog('Trying to parse Russian publication for callout:', input);
 
     // Use exec for proper group extraction - Russian format only
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2352,12 +2357,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for Russian callout:', input);
+      debugLog('No match found for Russian callout:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
-    console.log('Russian callout parsed:', { fullMatch, isStudy, year, monthNum, page, paragraph });
+    debugLog('Russian callout parsed:', { fullMatch, isStudy, year, monthNum, page, paragraph });
 
     // Convert month number to Russian month name for display
     const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -2466,7 +2471,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishPublicationCitation(input, view, command) {
-    console.log('Trying to parse English publication:', input);
+    debugLog('Trying to parse English publication:', input);
 
     // Use exec for proper group extraction - English format (paragraph optional)
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2475,19 +2480,19 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for English publication:', input);
+      debugLog('No match found for English publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    console.log('English publication match found:', match);
+    debugLog('English publication match found:', match);
     const [fullMatch, isStudy, year, monthDay, page, paragraph] = match;
-    console.log('Parsed:', { fullMatch, year, monthDay, page, paragraph });
+    debugLog('Parsed:', { fullMatch, year, monthDay, page, paragraph });
 
     // Check if Watchtower year is available online
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'EN', publicationYear);
     if (availability.isOffline) {
-      console.log('English Watchtower not available for year:', publicationYear);
+      debugLog('English Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2521,7 +2526,7 @@ class JWLLinkerPlugin extends Plugin {
     const isRussian = lang === 'RU';
     const langConfig = getConfigForLanguage(lang);
 
-    console.log('Detected language for English publication:', lang, 'isRussian:', isRussian);
+    debugLog('Detected language for English publication:', lang, 'isRussian:', isRussian);
 
     // For old publications, try different search strategies and direct links
     // Try direct WOL publication links for old magazines
@@ -2537,7 +2542,7 @@ class JWLLinkerPlugin extends Plugin {
     const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
     const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
 
-    console.log('Generated English WOL URLs:', { directWolUrl, wolUrl1, wolUrl2, wolUrl3 });
+    debugLog('Generated English WOL URLs:', { directWolUrl, wolUrl1, wolUrl2, wolUrl3 });
 
     // For old publications (pre-2000), use JW.org finder format with docid
     const isOldPublication = parseInt(displayYear) < 2000;
@@ -2595,11 +2600,11 @@ class JWLLinkerPlugin extends Plugin {
 
       const docid = `${displayYear}${issueNumber}`;
       jwlibUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&docid=${docid}&par=${adjustedParagraph}`;
-      console.log('Old publication - calculated docid:', docid, 'for', `w${year} ${month}/${day}`);
+      debugLog('Old publication - calculated docid:', docid, 'for', `w${year} ${month}/${day}`);
     } else {
       // For newer publications, try direct link
       jwlibUrl = `jwlibrary:///publication/w/${displayYear}/${paddedMonth}/${paddedDay}`;
-      console.log('Modern publication - using direct JW Library link:', jwlibUrl);
+      debugLog('Modern publication - using direct JW Library link:', jwlibUrl);
     }
 
     const output = [];
@@ -2672,7 +2677,7 @@ class JWLLinkerPlugin extends Plugin {
           }
         }
       } catch (error) {
-        console.log('Failed to fetch content from WOL:', error);
+        debugLog('Failed to fetch content from WOL:', error);
       }
     }
 
@@ -2741,14 +2746,14 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishMonthNumberPublicationCitation(input, view, command) {
-    console.log('Trying to parse English month-number publication:', input);
+    debugLog('Trying to parse English month-number publication:', input);
 
     const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for English month-number publication:', input);
+      debugLog('No match found for English month-number publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
@@ -2756,7 +2761,7 @@ class JWLLinkerPlugin extends Plugin {
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'EN', publicationYear);
     if (availability.isOffline) {
-      console.log('English Watchtower not available for year:', publicationYear);
+      debugLog('English Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2860,7 +2865,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishMonthPublicationCitation(input, view, command) {
-    console.log('Trying to parse English month publication:', input);
+    debugLog('Trying to parse English month publication:', input);
 
     // Parse month name format: w25 March p. 8 par. 2
     const regex = /w(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi;
@@ -2868,12 +2873,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for English month publication:', input);
+      debugLog('No match found for English month publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, year, monthName, page, paragraph] = match;
-    console.log('English month publication parsed:', { fullMatch, year, monthName, page, paragraph });
+    debugLog('English month publication parsed:', { fullMatch, year, monthName, page, paragraph });
 
     // Calculate full year
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
@@ -2953,7 +2958,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchSpanishMonthPublicationCitation(input, view, command) {
-    console.log('Trying to parse Spanish month publication:', input);
+    debugLog('Trying to parse Spanish month publication:', input);
 
     // Parse month name format: w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2962,12 +2967,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for Spanish month publication:', input);
+      debugLog('No match found for Spanish month publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, isStudy, year, monthName, page, paragraph] = match;
-    console.log('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
+    debugLog('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
 
     // Calculate full year
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
@@ -3048,7 +3053,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchOtherPublicationCitation(input, view, command) {
-    console.log('Trying to parse other publication:', input);
+    debugLog('Trying to parse other publication:', input);
 
     // Use exec for proper group extraction
     const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g;
@@ -3056,13 +3061,13 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      console.log('No match found for other publication:', input);
+      debugLog('No match found for other publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    console.log('Other publication match found:', match);
+    debugLog('Other publication match found:', match);
     const [fullMatch, pubCode, issueOrPage, page, paragraph] = match;
-    console.log('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
+    debugLog('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
 
     // Check if publication is available online
     let lang = this.settings?.lang || 'Auto';
@@ -3074,7 +3079,7 @@ class JWLLinkerPlugin extends Plugin {
 
     const availability = checkPublicationAvailability(pubCode, lang);
     if (availability.isOffline) {
-      console.log('Publication not available online:', pubCode);
+      debugLog('Publication not available online:', pubCode);
       return `${input}\n${availability.message}`;
     }
 
@@ -3098,7 +3103,7 @@ class JWLLinkerPlugin extends Plugin {
         // English format: od 15 par. 3 → od chap. 15 par. 3
         formattedInput = `${pubCode} chap. ${issueOrPage} par. ${paragraph}`;
       }
-      console.log('Auto-formatted reference:', input, '→', formattedInput);
+      debugLog('Auto-formatted reference:', input, '→', formattedInput);
     }
 
     // Use already detected language from availability check above
@@ -3216,7 +3221,7 @@ class JWLLinkerPlugin extends Plugin {
 
     const langConfig = getConfigForLanguage(lang);
 
-    console.log('Detected language for other publication:', lang, 'isRussian:', isRussian);
+    debugLog('Detected language for other publication:', lang, 'isRussian:', isRussian);
 
     // Create search URLs with appropriate language
     const searchQuery1 = formattedInput; // Use formatted input for better search results
@@ -3227,7 +3232,7 @@ class JWLLinkerPlugin extends Plugin {
     const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
     const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
 
-    console.log('Generated other publication WOL URLs:', { wolUrl1, wolUrl2, wolUrl3 });
+    debugLog('Generated other publication WOL URLs:', { wolUrl1, wolUrl2, wolUrl3 });
 
     const output = [];
     output.push(input); // keep original input on first line
@@ -3278,15 +3283,15 @@ class JWLLinkerPlugin extends Plugin {
           }
           if (text) {
             actualText = this._boldInitialNumber(text);
-            console.log('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
+            debugLog('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
             // Cache the result
             view?.addToHistory?.(contentUrl, `WOL Search: ${input}`, [actualText]);
           } else {
-            console.log('No text found for other publication:', input, 'URL:', contentUrl);
+            debugLog('No text found for other publication:', input, 'URL:', contentUrl);
           }
         }
       } catch (error) {
-        console.log('Failed to fetch content from WOL:', error);
+        debugLog('Failed to fetch content from WOL:', error);
       }
     }
 
@@ -3368,13 +3373,13 @@ class JWLLinkerPlugin extends Plugin {
    */
   async _fetchDualPublicationCitation(input, view, command) {
     input = normalizeInput(input);
-    console.log('Trying dual mode for publication:', input);
+    debugLog('Trying dual mode for publication:', input);
 
     const citationCommand = command === Cmd.citePublicationLookup ? Cmd.citeVerseCallout : command;
 
     // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
-    console.log('Dual mode languages:', { firstLang, secondLang });
+    debugLog('Dual mode languages:', { firstLang, secondLang });
 
     // Parse the input to extract components - support multiple publication types
     let regex, match;
@@ -3392,7 +3397,7 @@ class JWLLinkerPlugin extends Plugin {
 
       if (match) {
         const [fullMatch, year, month, day, page, paragraph] = match;
-        console.log('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
+        debugLog('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
 
         // Convert to standard format for processing
         const paddedMonth = month.padStart(2, '0');
@@ -3445,7 +3450,7 @@ class JWLLinkerPlugin extends Plugin {
       match = Config.englishPubRegex.exec(input);
 
       if (match) {
-        console.log('English publication format detected:', input);
+        debugLog('English publication format detected:', input);
         const englishCitation = await this._fetchEnglishPublicationCitation(input, view, command);
         const output = [];
         output.push(input);
@@ -3459,7 +3464,7 @@ class JWLLinkerPlugin extends Plugin {
       match = Config.englishPubMonthNumberRegex.exec(input);
 
       if (match) {
-        console.log('English month-number publication format detected:', input);
+        debugLog('English month-number publication format detected:', input);
         const englishCitation = await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
         const output = [];
         output.push(input);
@@ -3474,7 +3479,7 @@ class JWLLinkerPlugin extends Plugin {
 
       if (match) {
         // For other JW publications, fetch in both configured languages
-        console.log('Other JW publication detected in dual mode:', input);
+        debugLog('Other JW publication detected in dual mode:', input);
 
         // Parse the input to extract components
         const otherPubMatch = input.match(/^([a-z]{1,3}(?:-\d)?)\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/i);
@@ -3493,11 +3498,11 @@ class JWLLinkerPlugin extends Plugin {
 
           try {
             // Fetch citation for first language
-            console.log(`Fetching ${firstLang} citation for other pub:`, langInputs[firstLang]);
+            debugLog(`Fetching ${firstLang} citation for other pub:`, langInputs[firstLang]);
             const firstCitation = await this._fetchOtherPublicationCitationForLang(langInputs[firstLang], firstLang, view, command);
 
             // Fetch citation for second language
-            console.log(`Fetching ${secondLang} citation for other pub:`, langInputs[secondLang]);
+            debugLog(`Fetching ${secondLang} citation for other pub:`, langInputs[secondLang]);
             const secondCitation = await this._fetchOtherPublicationCitationForLang(langInputs[secondLang], secondLang, view, command);
 
             // Format dual output with configured language order
@@ -3528,12 +3533,12 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     if (!match) {
-      console.log('No match found for dual mode:', input);
+      debugLog('No match found for dual mode:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, year, monthNum, page, paragraph] = match;
-    console.log('Dual mode parsed:', { fullMatch, year, monthNum, page, paragraph });
+    debugLog('Dual mode parsed:', { fullMatch, year, monthNum, page, paragraph });
 
     // Month names for each language
     const monthNames = {
@@ -3599,7 +3604,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Citation text
    */
   async _fetchCitationByLanguage(input, langCode, view, command, paragraph, wolUrl) {
-    console.log(`Fetching ${langCode} citation for:`, input);
+    debugLog(`Fetching ${langCode} citation for:`, input);
 
     if (langCode === 'en') {
       // Check if input matches month name format (w25 March p. 8 par. 2)
@@ -3641,7 +3646,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Citation text
    */
   async _fetchOtherPublicationCitationForLang(input, langCode, view, command) {
-    console.log(`Fetching other publication for ${langCode}:`, input);
+    debugLog(`Fetching other publication for ${langCode}:`, input);
 
     // Language configurations with direct document URLs
     const langConfigs = {
@@ -3747,7 +3752,7 @@ class JWLLinkerPlugin extends Plugin {
       wolUrl = `${config.wolLookup}${encodeURIComponent(input)}`;
     }
 
-    console.log(`Direct URL for ${langCode}:`, directUrl || wolUrl);
+    debugLog(`Direct URL for ${langCode}:`, directUrl || wolUrl);
 
     try {
       let text = '';
@@ -3951,7 +3956,7 @@ class JWLLinkerPlugin extends Plugin {
       }
     } catch (error) {
       //// biome-ignore lint/suspicious/noConsoleLog: ⚠️
-      console.log(error);
+      debugLog(error);
     }
     return null;
   }
@@ -3987,7 +3992,7 @@ class JWLLinkerPlugin extends Plugin {
     let text = '';
     // Check if dom is valid before trying to use it
     if (!dom || typeof dom.querySelector !== 'function') {
-      console.log('Invalid DOM passed to _getElementAsText:', dom);
+      debugLog('Invalid DOM passed to _getElementAsText:', dom);
       return '';
     }
     const elem = dom.querySelector(selector) ?? null;
@@ -4029,15 +4034,12 @@ class JWLLinkerPlugin extends Plugin {
           }
         } else {
           // Original logic for English/other finder pages
-          let html = elem.innerHTML;
-          const blocks = ['<span class="newblock"></span>', '<span class="parabreak"></span>'].map(
-            (el) => new RegExp(el, 'gm'),
-          );
-          for (const el of blocks) {
-            html = html.replace(el, '\n');
-          }
-          // Now remove html tags
-          text = new DOMParser().parseFromString(html, 'text/html').body.textContent.trim();
+          // Clone the element and replace block-break spans with newline text nodes
+          const clone = elem.cloneNode(true);
+          clone.querySelectorAll('.newblock, .parabreak').forEach(span => {
+            span.replaceWith(document.createTextNode('\n'));
+          });
+          text = clone.textContent.trim();
           // Check for initial chapter numbers (always first element) and replace with 1
           if (elem.querySelector('.chapterNum')) {
             text = text.replace(Config.initialNumRegex, '1 ');
@@ -4334,17 +4336,17 @@ class JWLLinkerPlugin extends Plugin {
     function validateReference(reference, displayType) {
       // Auto-detect language or use setting
       let lang = this.settings?.lang || DEFAULT_SETTINGS.lang;
-      console.log('validateReference - initial lang setting:', lang);
-      console.log('validateReference - reference.book:', reference.book);
+      debugLog('validateReference - initial lang setting:', lang);
+      debugLog('validateReference - reference.book:', reference.book);
       if (lang === 'Auto') {
         lang = detectLanguage(reference.book);
-        console.log('validateReference - detected lang:', lang);
+        debugLog('validateReference - detected lang:', lang);
       } else {
         // Convert setting name to language code
         lang = Languages[lang] || Languages[DEFAULT_SETTINGS.fallbackLang];
-        console.log('validateReference - converted lang:', lang);
+        debugLog('validateReference - converted lang:', lang);
       }
-      console.log('validateReference - final lang:', lang);
+      debugLog('validateReference - final lang:', lang);
 
       // First question: is this a valid bible book?
       // *********************************
@@ -4355,7 +4357,7 @@ class JWLLinkerPlugin extends Plugin {
 
       // Check if Bible data exists for this language, fallback to English if not
       const bibleData = Bible[lang] || Bible['EN'];
-      console.log('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
+      debugLog('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
 
       const bookRgx = new RegExp(`(^| )${reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase()}`, 'm'); // no spaces, &nbsp; or .
       const bookMatch = bibleData.Abbreviation.findIndex((elem) => elem.search(bookRgx) !== -1);
@@ -4425,7 +4427,7 @@ class JWLLinkerPlugin extends Plugin {
               // Use appropriate finder URL based on detected language for all languages
               const finderUrl = getFinderUrl(lang);
               link.jworg = `${finderUrl}${Config.urlParam}${id}`;
-              console.log(`Created jworg link for ${lang}:`, link.jworg);
+              debugLog(`Created jworg link for ${lang}:`, link.jworg);
               for (let i = first; i <= last; i++) {
                 link.parIds.push(bookChapId + i.toString().padStart(3, '0'));
               }
@@ -4582,7 +4584,7 @@ class JWLLinkerView extends ItemView {
     });
     this.contentEl.append(detailsEl);
 
-    this.showHistory;
+    this.showHistory();
 
     this.historyEl.onclick = (event) => {
       if (event.target.tagName === 'P') {
@@ -4635,8 +4637,8 @@ class JWLLinkerView extends ItemView {
     const newItem = { key: url + (pars ?? ''), url, link, content };
     this.history = this.history.filter((item) => item.key !== newItem.key); // no duplicates
     this.history = [newItem, ...this.history]; // add to the top
-    if (this.history.length > this.settings.maxHistory) {
-      this.history = this.history.slice(0, this.settings.maxHistory);
+    if (this.history.length > this.settings.historySize) {
+      this.history = this.history.slice(0, this.settings.historySize);
     }
     this.app.workspace.requestSaveLayout(); // causes a state save via getState
   }
@@ -4676,12 +4678,25 @@ class ScripturePostProcessor extends MarkdownRenderChild {
   }
 
   onload() {
+    // Pre-check using safe DOM properties to avoid unnecessary processing
+    const quickText = this.containerEl.textContent ?? '';
+    const hasJwLinks = !!this.containerEl.querySelector(
+      'a[href*="wol.jw.org"], a[href*="jw.org/finder"], a[href*="jwlibrary://"]'
+    );
+    if (!/\d/.test(quickText) && !hasJwLinks) return;
+
+    // The HTML-aware regex processing requires the raw HTML string;
+    // this read is necessary for _convertScriptureToJWLibrary to detect existing links.
     const rawHtml = this.containerEl.innerHTML;
-    if (!/\d/.test(rawHtml) && !/wol\.jw\.org|jw\.org\/finder|jwlibrary:\/\//i.test(rawHtml)) return;
     const html = rawHtml.replaceAll('&nbsp;', '\u00A0');
     const { output, changed } = this.plugin._convertScriptureToJWLibrary(html, DisplayType.href);
     if (changed) {
-      this.containerEl.innerHTML = output;
+      // Parse output into a safe DOM fragment instead of assigning innerHTML directly
+      const doc = new DOMParser().parseFromString(output, 'text/html');
+      this.containerEl.empty();
+      Array.from(doc.body.childNodes).forEach(node => {
+        this.containerEl.appendChild(document.importNode(node, true));
+      });
     }
   }
 }
@@ -4744,6 +4759,7 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.debug).onChange(async (value) => {
           this.plugin.settings.debug = value;
+          debugMode = value; // sync module-level flag immediately
           await this.plugin.saveSettings();
         });
       });
@@ -5007,7 +5023,8 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .addButton((btn) => {
         btn.setIcon('reset');
         btn.onClick(async () => {
-          this.plugin.view.clearHistory();
+          const view = await this.plugin.getView();
+          view?.clearHistory();
         });
       });
   }
