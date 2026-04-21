@@ -34,10 +34,6 @@ const DEFAULT_SETTINGS = {
   dualLangSecond: 'en', // Second language: ru, en, es
 };
 
-// Debug logging — updated from plugin settings, silent in production
-let debugMode = false;
-const debugLog = (...args) => { if (debugMode) console.log(...args); }; // eslint-disable-line no-console
-
 // Supported languages for dual mode
 const DualModeLanguages = {
   Auto: 'Auto',
@@ -462,9 +458,9 @@ const Config = {
   // Russian: w25.01 28, абз. 11 OR w25.3 с. 8 абз. 2 OR ws12.02 15 абз. 2
   russianPubRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/g,
   // Russian publication with month names regex (w25 Март с. 8 абз. 2, ws12 Февраль с. 15 абз. 2)
-  russianPubMonthRegex: /w[s]?(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
+  russianPubMonthRegex: /w(s)?(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
   // Russian publication with day and month names regex (w10 15 Января с. 3 абз. 1, ws10 15 Января с. 3 абз. 1)
-  russianPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
+  russianPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
   // English publication reference regex (formats like w65 6/1 p. 329 par. 6, ws12 2/15 15 par. 2)
   // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3, ws12 2/15 15 par. 2
   englishPubRegex: /w[s]?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi,
@@ -472,14 +468,14 @@ const Config = {
   // Used to support post-2016 style month-only references (YY.MM) in English.
   englishPubMonthNumberRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi,
   // English publication with month names regex (w25 March p. 8 par. 2, ws12 February p. 15 par. 2)
-  englishPubMonthRegex: /w[s]?(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
+  englishPubMonthRegex: /w(s)?(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
   // English publication with day and month names regex (w10 15 January p. 3 par. 1, ws10 15 January p. 3 par. 1)
   // Supports day month format and month day format
-  englishPubDayMonthRegex: /w[s]?(\d{2})\s+(?:(\d{1,2})\s+)?(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
+  englishPubDayMonthRegex: /w(s)?(\d{2})\s+(?:(\d{1,2})\s+)?(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
   // Spanish publication with month names regex (w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2)
-  spanishPubMonthRegex: /w[s]?(\d{2})\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
+  spanishPubMonthRegex: /w(s)?(\d{2})\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Spanish publication with day and month names regex (w10 15 Enero pág. 3 párr. 1, ws10 15 Enero pág. 3 párr. 1)
-  spanishPubDayMonthRegex: /w[s]?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
+  spanishPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
   otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
@@ -511,21 +507,21 @@ const JWL_LINKER_VIEW = 'jwl-linker-view';
  * @returns {string} - Language key (RU, EN, etc.)
  */
 function detectLanguage(text) {
-  debugLog('detectLanguage called with:', text);
+  console.log('detectLanguage called with:', text);
   if (!text) {
-    debugLog('detectLanguage returning: EN (no text)');
+    console.log('detectLanguage returning: EN (no text)');
     return 'EN';
   }
 
   // Check for Cyrillic characters (Russian)
   if (/[\u0400-\u04FF]/.test(text)) {
-    debugLog('detectLanguage returning: RU (Cyrillic detected)');
+    console.log('detectLanguage returning: RU (Cyrillic detected)');
     return 'RU';
   }
 
   // Check for Spanish terms and patterns (check before other languages)
   if (/párr\.|cap\.|pág\.|págs\.|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro|^(1|2|3)\s*(Samuel|Reyes|Crónicas)/.test(text)) {
-    debugLog('detectLanguage returning: ES (Spanish terms detected)');
+    console.log('detectLanguage returning: ES (Spanish terms detected)');
     return 'ES';
   }
 
@@ -545,7 +541,7 @@ function detectLanguage(text) {
   }
 
   // Default to English
-  debugLog('detectLanguage returning: EN (default)');
+  console.log('detectLanguage returning: EN (default)');
   return 'EN';
 }
 
@@ -659,12 +655,12 @@ function autoFormatRussianWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use day/month format (w10 15/1 с. 3 абз. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} с. ${page} абз. ${paragraph}`;
-        debugLog('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
+        console.log('Auto-formatted Russian Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use .month format (w16.01 3, абз. 1)
         const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
-        debugLog('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
+        console.log('Auto-formatted Russian Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -682,7 +678,7 @@ function autoFormatRussianWatchtower(input) {
 
     if (monthNumber) {
       const formatted = `${pubCode}${year}.${monthNumber} ${page}, абз. ${paragraph}`;
-      debugLog('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
+      console.log('Auto-formatted Russian Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -712,10 +708,12 @@ function normalizeInput(input) {
   // Normalize common unit markers with optional spaces (EN/RU/ES)
   // Pages: p., pp., с., сс., pág., págs.
   s = s.replace(/\b(págs?\.|pág\.|pp?\.|сс?\.)\s*(\d)/gi, '$1 $2');
-  // Paragraph markers: par., абз., párr.
-  s = s.replace(/\b(par\.|абз\.|párr\.)\s*(\d)/gi, '$1 $2');
-  // Chapter markers: chap., глава, cap.
-  s = s.replace(/\b(chap\.|глава|cap\.)\s*(\d)/gi, '$1 $2');
+  // Paragraph markers — \b only works for ASCII; абз. and párr. matched without it
+  s = s.replace(/\b(par\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/(абз\.|párr\.)\s*(\d)/gi, '$1 $2');
+  // Chapter markers — same: глава and cap. don't use \b
+  s = s.replace(/\b(chap\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/(глава|cap\.)\s*(\d)/gi, '$1 $2');
 
   // Final cleanup for multiple spaces introduced by rules
   s = s.replace(/[ \t]+/g, ' ').trim();
@@ -745,7 +743,7 @@ function autoFormatEnglishWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 p. 3 par. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
-        debugLog('Auto-formatted English Watchtower (pre-2016):', input, '→', formatted);
+        console.log('Auto-formatted English Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use month/day format but with current logic
@@ -753,7 +751,7 @@ function autoFormatEnglishWatchtower(input) {
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
         const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} p. ${page} par. ${paragraph}`;
-        debugLog('Auto-formatted English Watchtower (post-2016):', input, '→', formatted);
+        console.log('Auto-formatted English Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -774,7 +772,7 @@ function autoFormatEnglishWatchtower(input) {
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
       const formatted = `${pubCode}${year} ${monthNumber}/${day} p. ${page} par. ${paragraph}`;
-      debugLog('Auto-formatted English Watchtower (month-only):', input, '→', formatted);
+      console.log('Auto-formatted English Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -804,7 +802,7 @@ function autoFormatSpanishWatchtower(input) {
       if (publicationYear < 2016) {
         // Pre-2016: Use month/day format (w10 1/15 pág. 3 párr. 1)
         const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
-        debugLog('Auto-formatted Spanish Watchtower (pre-2016):', input, '→', formatted);
+        console.log('Auto-formatted Spanish Watchtower (pre-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       } else {
         // Post-2016: Use month/day format but with current logic
@@ -812,7 +810,7 @@ function autoFormatSpanishWatchtower(input) {
           monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
           monthNumber === '12' ? '1' : '15';
         const formatted = `${pubCode}${year} ${monthNumber}/${defaultDay} pág. ${page} párr. ${paragraph}`;
-        debugLog('Auto-formatted Spanish Watchtower (post-2016):', input, '→', formatted);
+        console.log('Auto-formatted Spanish Watchtower (post-2016):', input, '→', formatted);
         return input.replace(fullMatch, formatted);
       }
     }
@@ -833,7 +831,7 @@ function autoFormatSpanishWatchtower(input) {
         monthNumber === '07' || monthNumber === '08' || monthNumber === '10' ||
         monthNumber === '12' ? '1' : '15'; // Simplified: 1st for odd months, 15th for even
       const formatted = `${pubCode}${year} ${monthNumber}/${day} pág. ${page} párr. ${paragraph}`;
-      debugLog('Auto-formatted Spanish Watchtower (month-only):', input, '→', formatted);
+      console.log('Auto-formatted Spanish Watchtower (month-only):', input, '→', formatted);
       return input.replace(fullMatch, formatted);
     }
   }
@@ -854,39 +852,39 @@ function updateInterfaceLanguage(interfaceLang) {
  * @param {string} input - Test input
  */
 function testRussianPubRegex(input) {
-  debugLog('=== Testing Russian Publication Regex ===');
-  debugLog('Input:', JSON.stringify(input));
-  debugLog('Input length:', input.length);
-  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
+  console.log('=== Testing Russian Publication Regex ===');
+  console.log('Input:', JSON.stringify(input));
+  console.log('Input length:', input.length);
+  console.log('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
 
   // Test the regex directly
   const regex = /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  debugLog('Regex pattern:', regex.source);
-  debugLog('Match result:', match);
+  console.log('Regex pattern:', regex.source);
+  console.log('Match result:', match);
 
   if (match) {
     const [fullMatch, year, month, page, paragraph] = match;
-    debugLog('Parsed components:', { fullMatch, year, month, page, paragraph });
+    console.log('Parsed components:', { fullMatch, year, month, page, paragraph });
 
     // Test month lookup
     if (month) {
       const monthLower = month.toLowerCase();
-      debugLog('Month (lowercase):', monthLower);
-      debugLog('Month found in mapping:', RussianMonths[monthLower]);
+      console.log('Month (lowercase):', monthLower);
+      console.log('Month found in mapping:', RussianMonths[monthLower]);
     }
 
     // Test function - no URL generation needed
   } else {
-    debugLog('No match found');
+    console.log('No match found');
     // Try simpler patterns
-    debugLog('Testing simpler patterns:');
-    debugLog('w24 match:', /w24/.test(input));
-    debugLog('Cyrillic match:', /[а-яёА-ЯЁ]/.test(input));
-    debugLog('с. match:', /с\./.test(input));
-    debugLog('Numbers match:', /\d+/.test(input));
+    console.log('Testing simpler patterns:');
+    console.log('w24 match:', /w24/.test(input));
+    console.log('Cyrillic match:', /[а-яёА-ЯЁ]/.test(input));
+    console.log('с. match:', /с\./.test(input));
+    console.log('Numbers match:', /\d+/.test(input));
   }
 
   return match;
@@ -897,65 +895,65 @@ function testRussianPubRegex(input) {
  * @param {string} input - Test input
  */
 function testEnglishPubRegex(input) {
-  debugLog('=== Testing English Publication Regex ===');
-  debugLog('Input:', JSON.stringify(input));
-  debugLog('Input length:', input.length);
-  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
+  console.log('=== Testing English Publication Regex ===');
+  console.log('Input:', JSON.stringify(input));
+  console.log('Input length:', input.length);
+  console.log('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
 
   // Test the regex directly
   const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+p\.\s*(\d+)\s+par\.\s*(\d+)/g;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  debugLog('Regex pattern:', regex.source);
-  debugLog('Match result:', match);
+  console.log('Regex pattern:', regex.source);
+  console.log('Match result:', match);
 
   if (match) {
     const [fullMatch, year, monthDay, page, paragraph] = match;
-    debugLog('Parsed components:', { fullMatch, year, monthDay, page, paragraph });
+    console.log('Parsed components:', { fullMatch, year, monthDay, page, paragraph });
 
     // Test month/day parsing
     if (monthDay) {
       const [month, day] = monthDay.split('/').map(n => parseInt(n));
-      debugLog('Parsed month/day:', { month, day });
+      console.log('Parsed month/day:', { month, day });
 
       // Test month lookup
       const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
       const englishMonth = englishMonths[month];
-      debugLog('English month:', englishMonth);
+      console.log('English month:', englishMonth);
     }
   } else {
-    debugLog('No match found');
+    console.log('No match found');
     // Try simpler patterns
-    debugLog('Testing simpler patterns:');
-    debugLog('w65 match:', /w65/.test(input));
-    debugLog('p. match:', /p\./.test(input));
-    debugLog('par. match:', /par\./.test(input));
-    debugLog('Numbers match:', /\d+/.test(input));
+    console.log('Testing simpler patterns:');
+    console.log('w65 match:', /w65/.test(input));
+    console.log('p. match:', /p\./.test(input));
+    console.log('par. match:', /par\./.test(input));
+    console.log('Numbers match:', /\d+/.test(input));
   }
 
   return match;
 }
 
 function testScriptureRegex(input) {
-  debugLog('=== Testing Scripture Regex ===');
-  debugLog('Input:', JSON.stringify(input));
+  console.log('=== Testing Scripture Regex ===');
+  console.log('Input:', JSON.stringify(input));
 
   const regex = /(('?)((?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона))((?: ?(?:\d{1,3})[:\u003A\u0437](?:\d{1,3})(?:[-,\u2013\u2014] ?\d{1,3})*;?)+))(\]|<\/a>)?/gimu;
   regex.lastIndex = 0;
   const match = regex.exec(input);
 
-  debugLog('Scripture regex match:', match);
+  console.log('Scripture regex match:', match);
 
   if (match) {
     const [fullMatch, , , bookName, chapterVerse] = match;
-    debugLog('Parsed scripture:', { fullMatch, bookName, chapterVerse });
+    console.log('Parsed scripture:', { fullMatch, bookName, chapterVerse });
   } else {
-    debugLog('No scripture match found');
+    console.log('No scripture match found');
     // Test individual parts
-    debugLog('Book name test:', /(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона)/giu.exec(input));
-    debugLog('Numbers test:', /\d{1,3}[:\u003A\u0437]\d{1,3}/g.exec(input));
+    console.log('Book name test:', /(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона)/giu.exec(input));
+    console.log('Numbers test:', /\d{1,3}[:\u003A\u0437]\d{1,3}/g.exec(input));
   }
 
   return match;
@@ -1091,7 +1089,8 @@ class JWLLinkerPlugin extends Plugin {
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
 
-    debugLog(
+    // biome-ignore lint: ⚠️
+    console.log(
       `%c${this.manifest.name} ${this.manifest.version} loaded`,
       'background-color: purple; padding:4px; border-radius:4px',
     );
@@ -1100,31 +1099,31 @@ class JWLLinkerPlugin extends Plugin {
       window.testRussianPubRegex = testRussianPubRegex;
       window.testEnglishPubRegex = testEnglishPubRegex;
       window.testLanguageDetection = (input) => {
-        debugLog('=== Testing Language Detection ===');
-        debugLog('Input:', input);
+        console.log('=== Testing Language Detection ===');
+        console.log('Input:', input);
         const detected = detectLanguage(input);
-        debugLog('Detected language:', detected);
+        console.log('Detected language:', detected);
         return detected;
       };
       window.testAutoFormatting = (input) => {
-        debugLog('=== Testing Auto-formatting ===');
-        debugLog('Original:', input);
+        console.log('=== Testing Auto-formatting ===');
+        console.log('Original:', input);
         let formatted = autoFormatRussianWatchtower(input);
         if (formatted !== input) {
-          debugLog('Russian formatted:', formatted);
+          console.log('Russian formatted:', formatted);
           return formatted;
         }
         formatted = autoFormatEnglishWatchtower(input);
         if (formatted !== input) {
-          debugLog('English formatted:', formatted);
+          console.log('English formatted:', formatted);
           return formatted;
         }
         formatted = autoFormatSpanishWatchtower(input);
         if (formatted !== input) {
-          debugLog('Spanish formatted:', formatted);
+          console.log('Spanish formatted:', formatted);
           return formatted;
         }
-        debugLog('No formatting applied');
+        console.log('No formatting applied');
         return input;
       };
     }
@@ -1136,8 +1135,6 @@ class JWLLinkerPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     // Update interface language based on settings
     updateInterfaceLanguage(this.settings.interfaceLang);
-    // Sync module-level debug flag
-    debugMode = this.settings.debug;
   }
 
   async saveSettings() {
@@ -1558,7 +1555,7 @@ class JWLLinkerPlugin extends Plugin {
       selection = autoFormatSpanishWatchtower(selection);
 
       if (selection !== originalSelection) {
-        debugLog('Auto-formatted Watchtower publication:', originalSelection, '→', selection);
+        console.log('Auto-formatted Watchtower publication:', originalSelection, '→', selection);
         // Update the editor with the formatted text
         activeEditor.replaceSelection(selection);
         // Update the selection for further processing
@@ -2101,11 +2098,11 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string}
    */
   async _fetchDualBibleCitation(input, view, caret, command) {
-    debugLog('Fetching dual Bible citation for:', input);
+    console.log('Fetching dual Bible citation for:', input);
 
     // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
-    debugLog('Dual mode languages for Bible:', { firstLang, secondLang });
+    console.log('Dual mode languages for Bible:', { firstLang, secondLang });
 
     // Language code to WOL language mapping
     const langToWol = {
@@ -2183,7 +2180,7 @@ class JWLLinkerPlugin extends Plugin {
     const jwlLocale = getJWLibraryLocale(upperLang);
     const jwlibUrl = `${Config.jwlFinder}${Config.urlParam}${id}${jwlLocale}`;
 
-    debugLog(`Fetching Bible verse for ${langCode}:`, jworgUrl);
+    console.log(`Fetching Bible verse for ${langCode}:`, jworgUrl);
 
     try {
       const dom = await this._fetchDOM(jworgUrl);
@@ -2249,7 +2246,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchRussianPublicationCitation(input, view, command) {
-    debugLog('Trying to parse Russian publication:', input);
+    console.log('Trying to parse Russian publication:', input);
 
     // Use exec for proper group extraction - Russian format only
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2258,19 +2255,19 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for:', input);
+      console.log('No match found for:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    debugLog('Match found:', match);
+    console.log('Match found:', match);
     const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
-    debugLog('Parsed:', { fullMatch, year, monthNum, page, paragraph });
+    console.log('Parsed:', { fullMatch, year, monthNum, page, paragraph });
 
     // Check if Watchtower year is available online
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'RU', publicationYear);
     if (availability.isOffline) {
-      debugLog('Russian Watchtower not available for year:', publicationYear);
+      console.log('Russian Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2280,7 +2277,7 @@ class JWLLinkerPlugin extends Plugin {
     const englishMonth = englishMonths[parseInt(monthNum)];
     const searchQuery = `w${year} ${englishMonth}`;
     const wolUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(searchQuery)}`;
-    debugLog('Generated WOL URL:', wolUrl);
+    console.log('Generated WOL URL:', wolUrl);
 
     // Convert month number to Russian month name for display
     const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -2348,7 +2345,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation in callout format
    */
   async _fetchRussianPublicationCitationCallout(input, view, command) {
-    debugLog('Trying to parse Russian publication for callout:', input);
+    console.log('Trying to parse Russian publication for callout:', input);
 
     // Use exec for proper group extraction - Russian format only
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2357,12 +2354,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for Russian callout:', input);
+      console.log('No match found for Russian callout:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, isStudy, year, monthNum, page, paragraph] = match;
-    debugLog('Russian callout parsed:', { fullMatch, isStudy, year, monthNum, page, paragraph });
+    console.log('Russian callout parsed:', { fullMatch, isStudy, year, monthNum, page, paragraph });
 
     // Convert month number to Russian month name for display
     const monthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -2471,7 +2468,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English publication:', input);
+    console.log('Trying to parse English publication:', input);
 
     // Use exec for proper group extraction - English format (paragraph optional)
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2480,19 +2477,19 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for English publication:', input);
+      console.log('No match found for English publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    debugLog('English publication match found:', match);
+    console.log('English publication match found:', match);
     const [fullMatch, isStudy, year, monthDay, page, paragraph] = match;
-    debugLog('Parsed:', { fullMatch, year, monthDay, page, paragraph });
+    console.log('Parsed:', { fullMatch, year, monthDay, page, paragraph });
 
     // Check if Watchtower year is available online
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'EN', publicationYear);
     if (availability.isOffline) {
-      debugLog('English Watchtower not available for year:', publicationYear);
+      console.log('English Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2526,7 +2523,7 @@ class JWLLinkerPlugin extends Plugin {
     const isRussian = lang === 'RU';
     const langConfig = getConfigForLanguage(lang);
 
-    debugLog('Detected language for English publication:', lang, 'isRussian:', isRussian);
+    console.log('Detected language for English publication:', lang, 'isRussian:', isRussian);
 
     // For old publications, try different search strategies and direct links
     // Try direct WOL publication links for old magazines
@@ -2542,7 +2539,7 @@ class JWLLinkerPlugin extends Plugin {
     const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
     const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
 
-    debugLog('Generated English WOL URLs:', { directWolUrl, wolUrl1, wolUrl2, wolUrl3 });
+    console.log('Generated English WOL URLs:', { directWolUrl, wolUrl1, wolUrl2, wolUrl3 });
 
     // For old publications (pre-2000), use JW.org finder format with docid
     const isOldPublication = parseInt(displayYear) < 2000;
@@ -2600,11 +2597,11 @@ class JWLLinkerPlugin extends Plugin {
 
       const docid = `${displayYear}${issueNumber}`;
       jwlibUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&docid=${docid}&par=${adjustedParagraph}`;
-      debugLog('Old publication - calculated docid:', docid, 'for', `w${year} ${month}/${day}`);
+      console.log('Old publication - calculated docid:', docid, 'for', `w${year} ${month}/${day}`);
     } else {
       // For newer publications, try direct link
       jwlibUrl = `jwlibrary:///publication/w/${displayYear}/${paddedMonth}/${paddedDay}`;
-      debugLog('Modern publication - using direct JW Library link:', jwlibUrl);
+      console.log('Modern publication - using direct JW Library link:', jwlibUrl);
     }
 
     const output = [];
@@ -2677,7 +2674,7 @@ class JWLLinkerPlugin extends Plugin {
           }
         }
       } catch (error) {
-        debugLog('Failed to fetch content from WOL:', error);
+        console.log('Failed to fetch content from WOL:', error);
       }
     }
 
@@ -2746,14 +2743,14 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishMonthNumberPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English month-number publication:', input);
+    console.log('Trying to parse English month-number publication:', input);
 
     const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi;
     regex.lastIndex = 0;
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for English month-number publication:', input);
+      console.log('No match found for English month-number publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
@@ -2761,7 +2758,7 @@ class JWLLinkerPlugin extends Plugin {
     const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
     const availability = checkPublicationAvailability('w', 'EN', publicationYear);
     if (availability.isOffline) {
-      debugLog('English Watchtower not available for year:', publicationYear);
+      console.log('English Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
@@ -2865,7 +2862,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchEnglishMonthPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English month publication:', input);
+    console.log('Trying to parse English month publication:', input);
 
     // Parse month name format: w25 March p. 8 par. 2
     const regex = /w(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi;
@@ -2873,12 +2870,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for English month publication:', input);
+      console.log('No match found for English month publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, year, monthName, page, paragraph] = match;
-    debugLog('English month publication parsed:', { fullMatch, year, monthName, page, paragraph });
+    console.log('English month publication parsed:', { fullMatch, year, monthName, page, paragraph });
 
     // Calculate full year
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
@@ -2958,7 +2955,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchSpanishMonthPublicationCitation(input, view, command) {
-    debugLog('Trying to parse Spanish month publication:', input);
+    console.log('Trying to parse Spanish month publication:', input);
 
     // Parse month name format: w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2
     // Supports both w (Watchtower) and ws (Watchtower Study)
@@ -2967,12 +2964,12 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for Spanish month publication:', input);
+      console.log('No match found for Spanish month publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, isStudy, year, monthName, page, paragraph] = match;
-    debugLog('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
+    console.log('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
 
     // Calculate full year
     const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
@@ -3053,7 +3050,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Formatted citation
    */
   async _fetchOtherPublicationCitation(input, view, command) {
-    debugLog('Trying to parse other publication:', input);
+    console.log('Trying to parse other publication:', input);
 
     // Use exec for proper group extraction
     const regex = /([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g;
@@ -3061,13 +3058,13 @@ class JWLLinkerPlugin extends Plugin {
     const match = regex.exec(input);
 
     if (!match) {
-      debugLog('No match found for other publication:', input);
+      console.log('No match found for other publication:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
-    debugLog('Other publication match found:', match);
+    console.log('Other publication match found:', match);
     const [fullMatch, pubCode, issueOrPage, page, paragraph] = match;
-    debugLog('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
+    console.log('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
 
     // Check if publication is available online
     let lang = this.settings?.lang || 'Auto';
@@ -3079,7 +3076,7 @@ class JWLLinkerPlugin extends Plugin {
 
     const availability = checkPublicationAvailability(pubCode, lang);
     if (availability.isOffline) {
-      debugLog('Publication not available online:', pubCode);
+      console.log('Publication not available online:', pubCode);
       return `${input}\n${availability.message}`;
     }
 
@@ -3103,7 +3100,7 @@ class JWLLinkerPlugin extends Plugin {
         // English format: od 15 par. 3 → od chap. 15 par. 3
         formattedInput = `${pubCode} chap. ${issueOrPage} par. ${paragraph}`;
       }
-      debugLog('Auto-formatted reference:', input, '→', formattedInput);
+      console.log('Auto-formatted reference:', input, '→', formattedInput);
     }
 
     // Use already detected language from availability check above
@@ -3221,7 +3218,7 @@ class JWLLinkerPlugin extends Plugin {
 
     const langConfig = getConfigForLanguage(lang);
 
-    debugLog('Detected language for other publication:', lang, 'isRussian:', isRussian);
+    console.log('Detected language for other publication:', lang, 'isRussian:', isRussian);
 
     // Create search URLs with appropriate language
     const searchQuery1 = formattedInput; // Use formatted input for better search results
@@ -3232,7 +3229,7 @@ class JWLLinkerPlugin extends Plugin {
     const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
     const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
 
-    debugLog('Generated other publication WOL URLs:', { wolUrl1, wolUrl2, wolUrl3 });
+    console.log('Generated other publication WOL URLs:', { wolUrl1, wolUrl2, wolUrl3 });
 
     const output = [];
     output.push(input); // keep original input on first line
@@ -3283,15 +3280,15 @@ class JWLLinkerPlugin extends Plugin {
           }
           if (text) {
             actualText = this._boldInitialNumber(text);
-            debugLog('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
+            console.log('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
             // Cache the result
             view?.addToHistory?.(contentUrl, `WOL Search: ${input}`, [actualText]);
           } else {
-            debugLog('No text found for other publication:', input, 'URL:', contentUrl);
+            console.log('No text found for other publication:', input, 'URL:', contentUrl);
           }
         }
       } catch (error) {
-        debugLog('Failed to fetch content from WOL:', error);
+        console.log('Failed to fetch content from WOL:', error);
       }
     }
 
@@ -3373,13 +3370,13 @@ class JWLLinkerPlugin extends Plugin {
    */
   async _fetchDualPublicationCitation(input, view, command) {
     input = normalizeInput(input);
-    debugLog('Trying dual mode for publication:', input);
+    console.log('Trying dual mode for publication:', input);
 
     const citationCommand = command === Cmd.citePublicationLookup ? Cmd.citeVerseCallout : command;
 
     // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
-    debugLog('Dual mode languages:', { firstLang, secondLang });
+    console.log('Dual mode languages:', { firstLang, secondLang });
 
     // Parse the input to extract components - support multiple publication types
     let regex, match;
@@ -3397,7 +3394,7 @@ class JWLLinkerPlugin extends Plugin {
 
       if (match) {
         const [fullMatch, year, month, day, page, paragraph] = match;
-        debugLog('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
+        console.log('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
 
         // Convert to standard format for processing
         const paddedMonth = month.padStart(2, '0');
@@ -3450,7 +3447,7 @@ class JWLLinkerPlugin extends Plugin {
       match = Config.englishPubRegex.exec(input);
 
       if (match) {
-        debugLog('English publication format detected:', input);
+        console.log('English publication format detected:', input);
         const englishCitation = await this._fetchEnglishPublicationCitation(input, view, command);
         const output = [];
         output.push(input);
@@ -3464,7 +3461,7 @@ class JWLLinkerPlugin extends Plugin {
       match = Config.englishPubMonthNumberRegex.exec(input);
 
       if (match) {
-        debugLog('English month-number publication format detected:', input);
+        console.log('English month-number publication format detected:', input);
         const englishCitation = await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
         const output = [];
         output.push(input);
@@ -3479,7 +3476,7 @@ class JWLLinkerPlugin extends Plugin {
 
       if (match) {
         // For other JW publications, fetch in both configured languages
-        debugLog('Other JW publication detected in dual mode:', input);
+        console.log('Other JW publication detected in dual mode:', input);
 
         // Parse the input to extract components
         const otherPubMatch = input.match(/^([a-z]{1,3}(?:-\d)?)\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/i);
@@ -3498,11 +3495,11 @@ class JWLLinkerPlugin extends Plugin {
 
           try {
             // Fetch citation for first language
-            debugLog(`Fetching ${firstLang} citation for other pub:`, langInputs[firstLang]);
+            console.log(`Fetching ${firstLang} citation for other pub:`, langInputs[firstLang]);
             const firstCitation = await this._fetchOtherPublicationCitationForLang(langInputs[firstLang], firstLang, view, command);
 
             // Fetch citation for second language
-            debugLog(`Fetching ${secondLang} citation for other pub:`, langInputs[secondLang]);
+            console.log(`Fetching ${secondLang} citation for other pub:`, langInputs[secondLang]);
             const secondCitation = await this._fetchOtherPublicationCitationForLang(langInputs[secondLang], secondLang, view, command);
 
             // Format dual output with configured language order
@@ -3533,12 +3530,12 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     if (!match) {
-      debugLog('No match found for dual mode:', input);
+      console.log('No match found for dual mode:', input);
       return `${input} | ${Lang.invalidScripture}`;
     }
 
     const [fullMatch, year, monthNum, page, paragraph] = match;
-    debugLog('Dual mode parsed:', { fullMatch, year, monthNum, page, paragraph });
+    console.log('Dual mode parsed:', { fullMatch, year, monthNum, page, paragraph });
 
     // Month names for each language
     const monthNames = {
@@ -3604,7 +3601,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Citation text
    */
   async _fetchCitationByLanguage(input, langCode, view, command, paragraph, wolUrl) {
-    debugLog(`Fetching ${langCode} citation for:`, input);
+    console.log(`Fetching ${langCode} citation for:`, input);
 
     if (langCode === 'en') {
       // Check if input matches month name format (w25 March p. 8 par. 2)
@@ -3646,7 +3643,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} - Citation text
    */
   async _fetchOtherPublicationCitationForLang(input, langCode, view, command) {
-    debugLog(`Fetching other publication for ${langCode}:`, input);
+    console.log(`Fetching other publication for ${langCode}:`, input);
 
     // Language configurations with direct document URLs
     const langConfigs = {
@@ -3752,7 +3749,7 @@ class JWLLinkerPlugin extends Plugin {
       wolUrl = `${config.wolLookup}${encodeURIComponent(input)}`;
     }
 
-    debugLog(`Direct URL for ${langCode}:`, directUrl || wolUrl);
+    console.log(`Direct URL for ${langCode}:`, directUrl || wolUrl);
 
     try {
       let text = '';
@@ -3956,7 +3953,7 @@ class JWLLinkerPlugin extends Plugin {
       }
     } catch (error) {
       //// biome-ignore lint/suspicious/noConsoleLog: ⚠️
-      debugLog(error);
+      console.log(error);
     }
     return null;
   }
@@ -3992,7 +3989,7 @@ class JWLLinkerPlugin extends Plugin {
     let text = '';
     // Check if dom is valid before trying to use it
     if (!dom || typeof dom.querySelector !== 'function') {
-      debugLog('Invalid DOM passed to _getElementAsText:', dom);
+      console.log('Invalid DOM passed to _getElementAsText:', dom);
       return '';
     }
     const elem = dom.querySelector(selector) ?? null;
@@ -4034,12 +4031,15 @@ class JWLLinkerPlugin extends Plugin {
           }
         } else {
           // Original logic for English/other finder pages
-          // Clone the element and replace block-break spans with newline text nodes
-          const clone = elem.cloneNode(true);
-          clone.querySelectorAll('.newblock, .parabreak').forEach(span => {
-            span.replaceWith(document.createTextNode('\n'));
-          });
-          text = clone.textContent.trim();
+          let html = elem.innerHTML;
+          const blocks = ['<span class="newblock"></span>', '<span class="parabreak"></span>'].map(
+            (el) => new RegExp(el, 'gm'),
+          );
+          for (const el of blocks) {
+            html = html.replace(el, '\n');
+          }
+          // Now remove html tags
+          text = new DOMParser().parseFromString(html, 'text/html').body.textContent.trim();
           // Check for initial chapter numbers (always first element) and replace with 1
           if (elem.querySelector('.chapterNum')) {
             text = text.replace(Config.initialNumRegex, '1 ');
@@ -4336,17 +4336,17 @@ class JWLLinkerPlugin extends Plugin {
     function validateReference(reference, displayType) {
       // Auto-detect language or use setting
       let lang = this.settings?.lang || DEFAULT_SETTINGS.lang;
-      debugLog('validateReference - initial lang setting:', lang);
-      debugLog('validateReference - reference.book:', reference.book);
+      console.log('validateReference - initial lang setting:', lang);
+      console.log('validateReference - reference.book:', reference.book);
       if (lang === 'Auto') {
         lang = detectLanguage(reference.book);
-        debugLog('validateReference - detected lang:', lang);
+        console.log('validateReference - detected lang:', lang);
       } else {
         // Convert setting name to language code
         lang = Languages[lang] || Languages[DEFAULT_SETTINGS.fallbackLang];
-        debugLog('validateReference - converted lang:', lang);
+        console.log('validateReference - converted lang:', lang);
       }
-      debugLog('validateReference - final lang:', lang);
+      console.log('validateReference - final lang:', lang);
 
       // First question: is this a valid bible book?
       // *********************************
@@ -4357,7 +4357,7 @@ class JWLLinkerPlugin extends Plugin {
 
       // Check if Bible data exists for this language, fallback to English if not
       const bibleData = Bible[lang] || Bible['EN'];
-      debugLog('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
+      console.log('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
 
       const bookRgx = new RegExp(`(^| )${reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase()}`, 'm'); // no spaces, &nbsp; or .
       const bookMatch = bibleData.Abbreviation.findIndex((elem) => elem.search(bookRgx) !== -1);
@@ -4427,7 +4427,7 @@ class JWLLinkerPlugin extends Plugin {
               // Use appropriate finder URL based on detected language for all languages
               const finderUrl = getFinderUrl(lang);
               link.jworg = `${finderUrl}${Config.urlParam}${id}`;
-              debugLog(`Created jworg link for ${lang}:`, link.jworg);
+              console.log(`Created jworg link for ${lang}:`, link.jworg);
               for (let i = first; i <= last; i++) {
                 link.parIds.push(bookChapId + i.toString().padStart(3, '0'));
               }
@@ -4584,7 +4584,7 @@ class JWLLinkerView extends ItemView {
     });
     this.contentEl.append(detailsEl);
 
-    this.showHistory();
+    this.showHistory;
 
     this.historyEl.onclick = (event) => {
       if (event.target.tagName === 'P') {
@@ -4637,8 +4637,8 @@ class JWLLinkerView extends ItemView {
     const newItem = { key: url + (pars ?? ''), url, link, content };
     this.history = this.history.filter((item) => item.key !== newItem.key); // no duplicates
     this.history = [newItem, ...this.history]; // add to the top
-    if (this.history.length > this.settings.historySize) {
-      this.history = this.history.slice(0, this.settings.historySize);
+    if (this.history.length > this.settings.maxHistory) {
+      this.history = this.history.slice(0, this.settings.maxHistory);
     }
     this.app.workspace.requestSaveLayout(); // causes a state save via getState
   }
@@ -4678,25 +4678,12 @@ class ScripturePostProcessor extends MarkdownRenderChild {
   }
 
   onload() {
-    // Pre-check using safe DOM properties to avoid unnecessary processing
-    const quickText = this.containerEl.textContent ?? '';
-    const hasJwLinks = !!this.containerEl.querySelector(
-      'a[href*="wol.jw.org"], a[href*="jw.org/finder"], a[href*="jwlibrary://"]'
-    );
-    if (!/\d/.test(quickText) && !hasJwLinks) return;
-
-    // The HTML-aware regex processing requires the raw HTML string;
-    // this read is necessary for _convertScriptureToJWLibrary to detect existing links.
     const rawHtml = this.containerEl.innerHTML;
+    if (!/\d/.test(rawHtml) && !/wol\.jw\.org|jw\.org\/finder|jwlibrary:\/\//i.test(rawHtml)) return;
     const html = rawHtml.replaceAll('&nbsp;', '\u00A0');
     const { output, changed } = this.plugin._convertScriptureToJWLibrary(html, DisplayType.href);
     if (changed) {
-      // Parse output into a safe DOM fragment instead of assigning innerHTML directly
-      const doc = new DOMParser().parseFromString(output, 'text/html');
-      this.containerEl.empty();
-      Array.from(doc.body.childNodes).forEach(node => {
-        this.containerEl.appendChild(document.importNode(node, true));
-      });
+      this.containerEl.innerHTML = output;
     }
   }
 }
@@ -4759,7 +4746,6 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.debug).onChange(async (value) => {
           this.plugin.settings.debug = value;
-          debugMode = value; // sync module-level flag immediately
           await this.plugin.saveSettings();
         });
       });
@@ -5023,8 +5009,7 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .addButton((btn) => {
         btn.setIcon('reset');
         btn.onClick(async () => {
-          const view = await this.plugin.getView();
-          view?.clearHistory();
+          this.plugin.view.clearHistory();
         });
       });
   }
@@ -5621,1197 +5606,84 @@ const Bible = {
 };
 
 // metadata for chapter and verse count per bible book
-const BibleDimensions = {
-  '1 1': 31,  // Genesis
-  '1 2': 25,  // Genesis
-  '1 3': 24,  // Genesis
-  '1 4': 26,  // Genesis
-  '1 5': 32,  // Genesis
-  '1 6': 22,  // Genesis
-  '1 7': 24,  // Genesis
-  '1 8': 22,  // Genesis
-  '1 9': 29,  // Genesis
-  '1 10': 32,  // Genesis
-  '1 11': 32,  // Genesis
-  '1 12': 20,  // Genesis
-  '1 13': 18,  // Genesis
-  '1 14': 24,  // Genesis
-  '1 15': 21,  // Genesis
-  '1 16': 16,  // Genesis
-  '1 17': 27,  // Genesis
-  '1 18': 33,  // Genesis
-  '1 19': 38,  // Genesis
-  '1 20': 18,  // Genesis
-  '1 21': 34,  // Genesis
-  '1 22': 24,  // Genesis
-  '1 23': 20,  // Genesis
-  '1 24': 67,  // Genesis
-  '1 25': 34,  // Genesis
-  '1 26': 35,  // Genesis
-  '1 27': 46,  // Genesis
-  '1 28': 22,  // Genesis
-  '1 29': 35,  // Genesis
-  '1 30': 43,  // Genesis
-  '1 31': 55,  // Genesis
-  '1 32': 32,  // Genesis
-  '1 33': 20,  // Genesis
-  '1 34': 31,  // Genesis
-  '1 35': 29,  // Genesis
-  '1 36': 43,  // Genesis
-  '1 37': 36,  // Genesis
-  '1 38': 30,  // Genesis
-  '1 39': 23,  // Genesis
-  '1 40': 23,  // Genesis
-  '1 41': 57,  // Genesis
-  '1 42': 38,  // Genesis
-  '1 43': 34,  // Genesis
-  '1 44': 34,  // Genesis
-  '1 45': 28,  // Genesis
-  '1 46': 34,  // Genesis
-  '1 47': 31,  // Genesis
-  '1 48': 22,  // Genesis
-  '1 49': 33,  // Genesis
-  '1 50': 26,  // Genesis
-  '2 1': 22,  // Exodus
-  '2 2': 25,  // Exodus
-  '2 3': 22,  // Exodus
-  '2 4': 31,  // Exodus
-  '2 5': 23,  // Exodus
-  '2 6': 30,  // Exodus
-  '2 7': 25,  // Exodus
-  '2 8': 32,  // Exodus
-  '2 9': 35,  // Exodus
-  '2 10': 29,  // Exodus
-  '2 11': 10,  // Exodus
-  '2 12': 51,  // Exodus
-  '2 13': 22,  // Exodus
-  '2 14': 31,  // Exodus
-  '2 15': 27,  // Exodus
-  '2 16': 36,  // Exodus
-  '2 17': 16,  // Exodus
-  '2 18': 27,  // Exodus
-  '2 19': 25,  // Exodus
-  '2 20': 26,  // Exodus
-  '2 21': 36,  // Exodus
-  '2 22': 31,  // Exodus
-  '2 23': 33,  // Exodus
-  '2 24': 18,  // Exodus
-  '2 25': 40,  // Exodus
-  '2 26': 37,  // Exodus
-  '2 27': 21,  // Exodus
-  '2 28': 43,  // Exodus
-  '2 29': 46,  // Exodus
-  '2 30': 38,  // Exodus
-  '2 31': 18,  // Exodus
-  '2 32': 35,  // Exodus
-  '2 33': 23,  // Exodus
-  '2 34': 35,  // Exodus
-  '2 35': 35,  // Exodus
-  '2 36': 38,  // Exodus
-  '2 37': 29,  // Exodus
-  '2 38': 31,  // Exodus
-  '2 39': 43,  // Exodus
-  '2 40': 38,  // Exodus
-  '3 1': 17,  // Leviticus
-  '3 2': 16,  // Leviticus
-  '3 3': 17,  // Leviticus
-  '3 4': 35,  // Leviticus
-  '3 5': 19,  // Leviticus
-  '3 6': 30,  // Leviticus
-  '3 7': 38,  // Leviticus
-  '3 8': 36,  // Leviticus
-  '3 9': 24,  // Leviticus
-  '3 10': 20,  // Leviticus
-  '3 11': 47,  // Leviticus
-  '3 12': 8,  // Leviticus
-  '3 13': 59,  // Leviticus
-  '3 14': 57,  // Leviticus
-  '3 15': 33,  // Leviticus
-  '3 16': 34,  // Leviticus
-  '3 17': 16,  // Leviticus
-  '3 18': 30,  // Leviticus
-  '3 19': 37,  // Leviticus
-  '3 20': 27,  // Leviticus
-  '3 21': 24,  // Leviticus
-  '3 22': 33,  // Leviticus
-  '3 23': 44,  // Leviticus
-  '3 24': 23,  // Leviticus
-  '3 25': 55,  // Leviticus
-  '3 26': 46,  // Leviticus
-  '3 27': 34,  // Leviticus
-  '4 1': 54,  // Numbers
-  '4 2': 34,  // Numbers
-  '4 3': 51,  // Numbers
-  '4 4': 49,  // Numbers
-  '4 5': 31,  // Numbers
-  '4 6': 27,  // Numbers
-  '4 7': 89,  // Numbers
-  '4 8': 26,  // Numbers
-  '4 9': 23,  // Numbers
-  '4 10': 36,  // Numbers
-  '4 11': 35,  // Numbers
-  '4 12': 16,  // Numbers
-  '4 13': 33,  // Numbers
-  '4 14': 45,  // Numbers
-  '4 15': 41,  // Numbers
-  '4 16': 50,  // Numbers
-  '4 17': 13,  // Numbers
-  '4 18': 32,  // Numbers
-  '4 19': 22,  // Numbers
-  '4 20': 29,  // Numbers
-  '4 21': 35,  // Numbers
-  '4 22': 41,  // Numbers
-  '4 23': 30,  // Numbers
-  '4 24': 25,  // Numbers
-  '4 25': 18,  // Numbers
-  '4 26': 65,  // Numbers
-  '4 27': 23,  // Numbers
-  '4 28': 31,  // Numbers
-  '4 29': 40,  // Numbers
-  '4 30': 16,  // Numbers
-  '4 31': 54,  // Numbers
-  '4 32': 42,  // Numbers
-  '4 33': 56,  // Numbers
-  '4 34': 29,  // Numbers
-  '4 35': 34,  // Numbers
-  '4 36': 13,  // Numbers
-  '5 1': 46,  // Deuteronomy
-  '5 2': 37,  // Deuteronomy
-  '5 3': 29,  // Deuteronomy
-  '5 4': 49,  // Deuteronomy
-  '5 5': 33,  // Deuteronomy
-  '5 6': 25,  // Deuteronomy
-  '5 7': 26,  // Deuteronomy
-  '5 8': 20,  // Deuteronomy
-  '5 9': 29,  // Deuteronomy
-  '5 10': 22,  // Deuteronomy
-  '5 11': 32,  // Deuteronomy
-  '5 12': 32,  // Deuteronomy
-  '5 13': 18,  // Deuteronomy
-  '5 14': 29,  // Deuteronomy
-  '5 15': 23,  // Deuteronomy
-  '5 16': 22,  // Deuteronomy
-  '5 17': 20,  // Deuteronomy
-  '5 18': 22,  // Deuteronomy
-  '5 19': 21,  // Deuteronomy
-  '5 20': 20,  // Deuteronomy
-  '5 21': 23,  // Deuteronomy
-  '5 22': 30,  // Deuteronomy
-  '5 23': 25,  // Deuteronomy
-  '5 24': 22,  // Deuteronomy
-  '5 25': 19,  // Deuteronomy
-  '5 26': 19,  // Deuteronomy
-  '5 27': 26,  // Deuteronomy
-  '5 28': 68,  // Deuteronomy
-  '5 29': 29,  // Deuteronomy
-  '5 30': 20,  // Deuteronomy
-  '5 31': 30,  // Deuteronomy
-  '5 32': 52,  // Deuteronomy
-  '5 33': 29,  // Deuteronomy
-  '5 34': 12,  // Deuteronomy
-  '6 1': 18,  // Joshua
-  '6 2': 24,  // Joshua
-  '6 3': 17,  // Joshua
-  '6 4': 24,  // Joshua
-  '6 5': 15,  // Joshua
-  '6 6': 27,  // Joshua
-  '6 7': 26,  // Joshua
-  '6 8': 35,  // Joshua
-  '6 9': 27,  // Joshua
-  '6 10': 43,  // Joshua
-  '6 11': 23,  // Joshua
-  '6 12': 24,  // Joshua
-  '6 13': 33,  // Joshua
-  '6 14': 15,  // Joshua
-  '6 15': 63,  // Joshua
-  '6 16': 10,  // Joshua
-  '6 17': 18,  // Joshua
-  '6 18': 28,  // Joshua
-  '6 19': 51,  // Joshua
-  '6 20': 9,  // Joshua
-  '6 21': 45,  // Joshua
-  '6 22': 34,  // Joshua
-  '6 23': 16,  // Joshua
-  '6 24': 33,  // Joshua
-  '7 1': 36,  // Judges
-  '7 2': 23,  // Judges
-  '7 3': 31,  // Judges
-  '7 4': 24,  // Judges
-  '7 5': 31,  // Judges
-  '7 6': 40,  // Judges
-  '7 7': 25,  // Judges
-  '7 8': 35,  // Judges
-  '7 9': 57,  // Judges
-  '7 10': 18,  // Judges
-  '7 11': 40,  // Judges
-  '7 12': 15,  // Judges
-  '7 13': 25,  // Judges
-  '7 14': 20,  // Judges
-  '7 15': 20,  // Judges
-  '7 16': 31,  // Judges
-  '7 17': 13,  // Judges
-  '7 18': 31,  // Judges
-  '7 19': 30,  // Judges
-  '7 20': 48,  // Judges
-  '7 21': 25,  // Judges
-  '8 1': 22,  // Ruth
-  '8 2': 23,  // Ruth
-  '8 3': 18,  // Ruth
-  '8 4': 22,  // Ruth
-  '9 1': 28,  // 1 Samuel
-  '9 2': 36,  // 1 Samuel
-  '9 3': 21,  // 1 Samuel
-  '9 4': 22,  // 1 Samuel
-  '9 5': 12,  // 1 Samuel
-  '9 6': 21,  // 1 Samuel
-  '9 7': 17,  // 1 Samuel
-  '9 8': 22,  // 1 Samuel
-  '9 9': 27,  // 1 Samuel
-  '9 10': 27,  // 1 Samuel
-  '9 11': 15,  // 1 Samuel
-  '9 12': 25,  // 1 Samuel
-  '9 13': 23,  // 1 Samuel
-  '9 14': 52,  // 1 Samuel
-  '9 15': 35,  // 1 Samuel
-  '9 16': 23,  // 1 Samuel
-  '9 17': 58,  // 1 Samuel
-  '9 18': 30,  // 1 Samuel
-  '9 19': 24,  // 1 Samuel
-  '9 20': 42,  // 1 Samuel
-  '9 21': 15,  // 1 Samuel
-  '9 22': 23,  // 1 Samuel
-  '9 23': 29,  // 1 Samuel
-  '9 24': 22,  // 1 Samuel
-  '9 25': 44,  // 1 Samuel
-  '9 26': 25,  // 1 Samuel
-  '9 27': 12,  // 1 Samuel
-  '9 28': 25,  // 1 Samuel
-  '9 29': 11,  // 1 Samuel
-  '9 30': 31,  // 1 Samuel
-  '9 31': 13,  // 1 Samuel
-  '10 1': 27,  // 2 Samuel
-  '10 2': 32,  // 2 Samuel
-  '10 3': 39,  // 2 Samuel
-  '10 4': 12,  // 2 Samuel
-  '10 5': 25,  // 2 Samuel
-  '10 6': 23,  // 2 Samuel
-  '10 7': 29,  // 2 Samuel
-  '10 8': 18,  // 2 Samuel
-  '10 9': 13,  // 2 Samuel
-  '10 10': 19,  // 2 Samuel
-  '10 11': 27,  // 2 Samuel
-  '10 12': 31,  // 2 Samuel
-  '10 13': 39,  // 2 Samuel
-  '10 14': 33,  // 2 Samuel
-  '10 15': 37,  // 2 Samuel
-  '10 16': 23,  // 2 Samuel
-  '10 17': 29,  // 2 Samuel
-  '10 18': 33,  // 2 Samuel
-  '10 19': 43,  // 2 Samuel
-  '10 20': 26,  // 2 Samuel
-  '10 21': 22,  // 2 Samuel
-  '10 22': 51,  // 2 Samuel
-  '10 23': 39,  // 2 Samuel
-  '10 24': 25,  // 2 Samuel
-  '11 1': 53,  // 1 Kings
-  '11 2': 46,  // 1 Kings
-  '11 3': 28,  // 1 Kings
-  '11 4': 34,  // 1 Kings
-  '11 5': 18,  // 1 Kings
-  '11 6': 38,  // 1 Kings
-  '11 7': 51,  // 1 Kings
-  '11 8': 66,  // 1 Kings
-  '11 9': 28,  // 1 Kings
-  '11 10': 29,  // 1 Kings
-  '11 11': 43,  // 1 Kings
-  '11 12': 33,  // 1 Kings
-  '11 13': 34,  // 1 Kings
-  '11 14': 31,  // 1 Kings
-  '11 15': 34,  // 1 Kings
-  '11 16': 34,  // 1 Kings
-  '11 17': 24,  // 1 Kings
-  '11 18': 46,  // 1 Kings
-  '11 19': 21,  // 1 Kings
-  '11 20': 43,  // 1 Kings
-  '11 21': 29,  // 1 Kings
-  '11 22': 53,  // 1 Kings
-  '12 1': 18,  // 2 Kings
-  '12 2': 25,  // 2 Kings
-  '12 3': 27,  // 2 Kings
-  '12 4': 44,  // 2 Kings
-  '12 5': 27,  // 2 Kings
-  '12 6': 33,  // 2 Kings
-  '12 7': 20,  // 2 Kings
-  '12 8': 29,  // 2 Kings
-  '12 9': 37,  // 2 Kings
-  '12 10': 36,  // 2 Kings
-  '12 11': 21,  // 2 Kings
-  '12 12': 21,  // 2 Kings
-  '12 13': 25,  // 2 Kings
-  '12 14': 29,  // 2 Kings
-  '12 15': 38,  // 2 Kings
-  '12 16': 20,  // 2 Kings
-  '12 17': 41,  // 2 Kings
-  '12 18': 37,  // 2 Kings
-  '12 19': 37,  // 2 Kings
-  '12 20': 21,  // 2 Kings
-  '12 21': 26,  // 2 Kings
-  '12 22': 20,  // 2 Kings
-  '12 23': 37,  // 2 Kings
-  '12 24': 20,  // 2 Kings
-  '12 25': 30,  // 2 Kings
-  '13 1': 54,  // 1 Chronicles
-  '13 2': 55,  // 1 Chronicles
-  '13 3': 24,  // 1 Chronicles
-  '13 4': 43,  // 1 Chronicles
-  '13 5': 26,  // 1 Chronicles
-  '13 6': 81,  // 1 Chronicles
-  '13 7': 40,  // 1 Chronicles
-  '13 8': 40,  // 1 Chronicles
-  '13 9': 44,  // 1 Chronicles
-  '13 10': 14,  // 1 Chronicles
-  '13 11': 47,  // 1 Chronicles
-  '13 12': 40,  // 1 Chronicles
-  '13 13': 14,  // 1 Chronicles
-  '13 14': 17,  // 1 Chronicles
-  '13 15': 29,  // 1 Chronicles
-  '13 16': 43,  // 1 Chronicles
-  '13 17': 27,  // 1 Chronicles
-  '13 18': 17,  // 1 Chronicles
-  '13 19': 19,  // 1 Chronicles
-  '13 20': 8,  // 1 Chronicles
-  '13 21': 30,  // 1 Chronicles
-  '13 22': 19,  // 1 Chronicles
-  '13 23': 32,  // 1 Chronicles
-  '13 24': 31,  // 1 Chronicles
-  '13 25': 31,  // 1 Chronicles
-  '13 26': 32,  // 1 Chronicles
-  '13 27': 34,  // 1 Chronicles
-  '13 28': 21,  // 1 Chronicles
-  '13 29': 30,  // 1 Chronicles
-  '14 1': 17,  // 2 Chronicles
-  '14 2': 18,  // 2 Chronicles
-  '14 3': 17,  // 2 Chronicles
-  '14 4': 22,  // 2 Chronicles
-  '14 5': 14,  // 2 Chronicles
-  '14 6': 42,  // 2 Chronicles
-  '14 7': 22,  // 2 Chronicles
-  '14 8': 18,  // 2 Chronicles
-  '14 9': 31,  // 2 Chronicles
-  '14 10': 19,  // 2 Chronicles
-  '14 11': 23,  // 2 Chronicles
-  '14 12': 16,  // 2 Chronicles
-  '14 13': 22,  // 2 Chronicles
-  '14 14': 15,  // 2 Chronicles
-  '14 15': 19,  // 2 Chronicles
-  '14 16': 14,  // 2 Chronicles
-  '14 17': 19,  // 2 Chronicles
-  '14 18': 34,  // 2 Chronicles
-  '14 19': 11,  // 2 Chronicles
-  '14 20': 37,  // 2 Chronicles
-  '14 21': 20,  // 2 Chronicles
-  '14 22': 12,  // 2 Chronicles
-  '14 23': 21,  // 2 Chronicles
-  '14 24': 27,  // 2 Chronicles
-  '14 25': 28,  // 2 Chronicles
-  '14 26': 23,  // 2 Chronicles
-  '14 27': 9,  // 2 Chronicles
-  '14 28': 27,  // 2 Chronicles
-  '14 29': 36,  // 2 Chronicles
-  '14 30': 27,  // 2 Chronicles
-  '14 31': 21,  // 2 Chronicles
-  '14 32': 33,  // 2 Chronicles
-  '14 33': 25,  // 2 Chronicles
-  '14 34': 33,  // 2 Chronicles
-  '14 35': 27,  // 2 Chronicles
-  '14 36': 23,  // 2 Chronicles
-  '15 1': 11,  // Ezra
-  '15 2': 70,  // Ezra
-  '15 3': 13,  // Ezra
-  '15 4': 24,  // Ezra
-  '15 5': 17,  // Ezra
-  '15 6': 22,  // Ezra
-  '15 7': 28,  // Ezra
-  '15 8': 36,  // Ezra
-  '15 9': 15,  // Ezra
-  '15 10': 44,  // Ezra
-  '16 1': 11,  // Nehemiah
-  '16 2': 20,  // Nehemiah
-  '16 3': 32,  // Nehemiah
-  '16 4': 23,  // Nehemiah
-  '16 5': 19,  // Nehemiah
-  '16 6': 19,  // Nehemiah
-  '16 7': 73,  // Nehemiah
-  '16 8': 18,  // Nehemiah
-  '16 9': 38,  // Nehemiah
-  '16 10': 39,  // Nehemiah
-  '16 11': 36,  // Nehemiah
-  '16 12': 47,  // Nehemiah
-  '16 13': 31,  // Nehemiah
-  '17 1': 22,  // Esther
-  '17 2': 23,  // Esther
-  '17 3': 15,  // Esther
-  '17 4': 17,  // Esther
-  '17 5': 14,  // Esther
-  '17 6': 14,  // Esther
-  '17 7': 10,  // Esther
-  '17 8': 17,  // Esther
-  '17 9': 32,  // Esther
-  '17 10': 3,  // Esther
-  '18 1': 22,  // Job
-  '18 2': 13,  // Job
-  '18 3': 26,  // Job
-  '18 4': 21,  // Job
-  '18 5': 27,  // Job
-  '18 6': 30,  // Job
-  '18 7': 21,  // Job
-  '18 8': 22,  // Job
-  '18 9': 35,  // Job
-  '18 10': 22,  // Job
-  '18 11': 20,  // Job
-  '18 12': 25,  // Job
-  '18 13': 28,  // Job
-  '18 14': 22,  // Job
-  '18 15': 35,  // Job
-  '18 16': 22,  // Job
-  '18 17': 16,  // Job
-  '18 18': 21,  // Job
-  '18 19': 29,  // Job
-  '18 20': 29,  // Job
-  '18 21': 34,  // Job
-  '18 22': 30,  // Job
-  '18 23': 17,  // Job
-  '18 24': 25,  // Job
-  '18 25': 6,  // Job
-  '18 26': 14,  // Job
-  '18 27': 23,  // Job
-  '18 28': 28,  // Job
-  '18 29': 25,  // Job
-  '18 30': 31,  // Job
-  '18 31': 40,  // Job
-  '18 32': 22,  // Job
-  '18 33': 33,  // Job
-  '18 34': 37,  // Job
-  '18 35': 16,  // Job
-  '18 36': 33,  // Job
-  '18 37': 24,  // Job
-  '18 38': 41,  // Job
-  '18 39': 30,  // Job
-  '18 40': 24,  // Job
-  '18 41': 34,  // Job
-  '18 42': 17,  // Job
-  '19 1': 6,  // Psalms
-  '19 2': 12,  // Psalms
-  '19 3': 8,  // Psalms
-  '19 4': 8,  // Psalms
-  '19 5': 12,  // Psalms
-  '19 6': 10,  // Psalms
-  '19 7': 17,  // Psalms
-  '19 8': 9,  // Psalms
-  '19 9': 20,  // Psalms
-  '19 10': 18,  // Psalms
-  '19 11': 7,  // Psalms
-  '19 12': 8,  // Psalms
-  '19 13': 6,  // Psalms
-  '19 14': 7,  // Psalms
-  '19 15': 5,  // Psalms
-  '19 16': 11,  // Psalms
-  '19 17': 15,  // Psalms
-  '19 18': 50,  // Psalms
-  '19 19': 14,  // Psalms
-  '19 20': 9,  // Psalms
-  '19 21': 13,  // Psalms
-  '19 22': 31,  // Psalms
-  '19 23': 6,  // Psalms
-  '19 24': 10,  // Psalms
-  '19 25': 22,  // Psalms
-  '19 26': 12,  // Psalms
-  '19 27': 14,  // Psalms
-  '19 28': 9,  // Psalms
-  '19 29': 11,  // Psalms
-  '19 30': 12,  // Psalms
-  '19 31': 24,  // Psalms
-  '19 32': 11,  // Psalms
-  '19 33': 22,  // Psalms
-  '19 34': 22,  // Psalms
-  '19 35': 28,  // Psalms
-  '19 36': 12,  // Psalms
-  '19 37': 40,  // Psalms
-  '19 38': 22,  // Psalms
-  '19 39': 13,  // Psalms
-  '19 40': 17,  // Psalms
-  '19 41': 13,  // Psalms
-  '19 42': 11,  // Psalms
-  '19 43': 5,  // Psalms
-  '19 44': 26,  // Psalms
-  '19 45': 17,  // Psalms
-  '19 46': 11,  // Psalms
-  '19 47': 9,  // Psalms
-  '19 48': 14,  // Psalms
-  '19 49': 20,  // Psalms
-  '19 50': 23,  // Psalms
-  '19 51': 19,  // Psalms
-  '19 52': 9,  // Psalms
-  '19 53': 6,  // Psalms
-  '19 54': 7,  // Psalms
-  '19 55': 23,  // Psalms
-  '19 56': 13,  // Psalms
-  '19 57': 11,  // Psalms
-  '19 58': 11,  // Psalms
-  '19 59': 17,  // Psalms
-  '19 60': 12,  // Psalms
-  '19 61': 8,  // Psalms
-  '19 62': 12,  // Psalms
-  '19 63': 11,  // Psalms
-  '19 64': 10,  // Psalms
-  '19 65': 13,  // Psalms
-  '19 66': 20,  // Psalms
-  '19 67': 7,  // Psalms
-  '19 68': 35,  // Psalms
-  '19 69': 36,  // Psalms
-  '19 70': 5,  // Psalms
-  '19 71': 24,  // Psalms
-  '19 72': 20,  // Psalms
-  '19 73': 28,  // Psalms
-  '19 74': 23,  // Psalms
-  '19 75': 10,  // Psalms
-  '19 76': 12,  // Psalms
-  '19 77': 20,  // Psalms
-  '19 78': 72,  // Psalms
-  '19 79': 13,  // Psalms
-  '19 80': 19,  // Psalms
-  '19 81': 16,  // Psalms
-  '19 82': 8,  // Psalms
-  '19 83': 18,  // Psalms
-  '19 84': 12,  // Psalms
-  '19 85': 13,  // Psalms
-  '19 86': 17,  // Psalms
-  '19 87': 7,  // Psalms
-  '19 88': 18,  // Psalms
-  '19 89': 52,  // Psalms
-  '19 90': 17,  // Psalms
-  '19 91': 16,  // Psalms
-  '19 92': 15,  // Psalms
-  '19 93': 5,  // Psalms
-  '19 94': 23,  // Psalms
-  '19 95': 11,  // Psalms
-  '19 96': 13,  // Psalms
-  '19 97': 12,  // Psalms
-  '19 98': 9,  // Psalms
-  '19 99': 9,  // Psalms
-  '19 100': 5,  // Psalms
-  '19 101': 8,  // Psalms
-  '19 102': 28,  // Psalms
-  '19 103': 22,  // Psalms
-  '19 104': 35,  // Psalms
-  '19 105': 45,  // Psalms
-  '19 106': 48,  // Psalms
-  '19 107': 43,  // Psalms
-  '19 108': 13,  // Psalms
-  '19 109': 31,  // Psalms
-  '19 110': 7,  // Psalms
-  '19 111': 10,  // Psalms
-  '19 112': 10,  // Psalms
-  '19 113': 9,  // Psalms
-  '19 114': 8,  // Psalms
-  '19 115': 18,  // Psalms
-  '19 116': 19,  // Psalms
-  '19 117': 2,  // Psalms
-  '19 118': 29,  // Psalms
-  '19 119': 176,  // Psalms
-  '19 120': 7,  // Psalms
-  '19 121': 8,  // Psalms
-  '19 122': 9,  // Psalms
-  '19 123': 4,  // Psalms
-  '19 124': 8,  // Psalms
-  '19 125': 5,  // Psalms
-  '19 126': 6,  // Psalms
-  '19 127': 5,  // Psalms
-  '19 128': 6,  // Psalms
-  '19 129': 8,  // Psalms
-  '19 130': 8,  // Psalms
-  '19 131': 3,  // Psalms
-  '19 132': 18,  // Psalms
-  '19 133': 3,  // Psalms
-  '19 134': 3,  // Psalms
-  '19 135': 21,  // Psalms
-  '19 136': 26,  // Psalms
-  '19 137': 9,  // Psalms
-  '19 138': 8,  // Psalms
-  '19 139': 24,  // Psalms
-  '19 140': 13,  // Psalms
-  '19 141': 10,  // Psalms
-  '19 142': 7,  // Psalms
-  '19 143': 12,  // Psalms
-  '19 144': 15,  // Psalms
-  '19 145': 21,  // Psalms
-  '19 146': 10,  // Psalms
-  '19 147': 20,  // Psalms
-  '19 148': 14,  // Psalms
-  '19 149': 9,  // Psalms
-  '19 150': 6,  // Psalms
-  '20 1': 33,  // Proverbs
-  '20 2': 22,  // Proverbs
-  '20 3': 35,  // Proverbs
-  '20 4': 27,  // Proverbs
-  '20 5': 23,  // Proverbs
-  '20 6': 35,  // Proverbs
-  '20 7': 27,  // Proverbs
-  '20 8': 36,  // Proverbs
-  '20 9': 18,  // Proverbs
-  '20 10': 32,  // Proverbs
-  '20 11': 31,  // Proverbs
-  '20 12': 28,  // Proverbs
-  '20 13': 25,  // Proverbs
-  '20 14': 35,  // Proverbs
-  '20 15': 33,  // Proverbs
-  '20 16': 33,  // Proverbs
-  '20 17': 28,  // Proverbs
-  '20 18': 24,  // Proverbs
-  '20 19': 29,  // Proverbs
-  '20 20': 30,  // Proverbs
-  '20 21': 31,  // Proverbs
-  '20 22': 29,  // Proverbs
-  '20 23': 35,  // Proverbs
-  '20 24': 34,  // Proverbs
-  '20 25': 28,  // Proverbs
-  '20 26': 28,  // Proverbs
-  '20 27': 27,  // Proverbs
-  '20 28': 28,  // Proverbs
-  '20 29': 27,  // Proverbs
-  '20 30': 33,  // Proverbs
-  '20 31': 31,  // Proverbs
-  '21 1': 18,  // Ecclesiastes
-  '21 2': 26,  // Ecclesiastes
-  '21 3': 22,  // Ecclesiastes
-  '21 4': 16,  // Ecclesiastes
-  '21 5': 20,  // Ecclesiastes
-  '21 6': 12,  // Ecclesiastes
-  '21 7': 29,  // Ecclesiastes
-  '21 8': 17,  // Ecclesiastes
-  '21 9': 18,  // Ecclesiastes
-  '21 10': 20,  // Ecclesiastes
-  '21 11': 10,  // Ecclesiastes
-  '21 12': 14,  // Ecclesiastes
-  '22 1': 17,  // Song of Solomon
-  '22 2': 17,  // Song of Solomon
-  '22 3': 11,  // Song of Solomon
-  '22 4': 16,  // Song of Solomon
-  '22 5': 16,  // Song of Solomon
-  '22 6': 13,  // Song of Solomon
-  '22 7': 13,  // Song of Solomon
-  '22 8': 14,  // Song of Solomon
-  '23 1': 31,  // Isaiah
-  '23 2': 22,  // Isaiah
-  '23 3': 26,  // Isaiah
-  '23 4': 6,  // Isaiah
-  '23 5': 30,  // Isaiah
-  '23 6': 13,  // Isaiah
-  '23 7': 25,  // Isaiah
-  '23 8': 22,  // Isaiah
-  '23 9': 21,  // Isaiah
-  '23 10': 34,  // Isaiah
-  '23 11': 16,  // Isaiah
-  '23 12': 6,  // Isaiah
-  '23 13': 22,  // Isaiah
-  '23 14': 32,  // Isaiah
-  '23 15': 9,  // Isaiah
-  '23 16': 14,  // Isaiah
-  '23 17': 14,  // Isaiah
-  '23 18': 7,  // Isaiah
-  '23 19': 25,  // Isaiah
-  '23 20': 6,  // Isaiah
-  '23 21': 17,  // Isaiah
-  '23 22': 25,  // Isaiah
-  '23 23': 18,  // Isaiah
-  '23 24': 23,  // Isaiah
-  '23 25': 12,  // Isaiah
-  '23 26': 21,  // Isaiah
-  '23 27': 13,  // Isaiah
-  '23 28': 29,  // Isaiah
-  '23 29': 24,  // Isaiah
-  '23 30': 33,  // Isaiah
-  '23 31': 9,  // Isaiah
-  '23 32': 20,  // Isaiah
-  '23 33': 24,  // Isaiah
-  '23 34': 17,  // Isaiah
-  '23 35': 10,  // Isaiah
-  '23 36': 22,  // Isaiah
-  '23 37': 38,  // Isaiah
-  '23 38': 22,  // Isaiah
-  '23 39': 8,  // Isaiah
-  '23 40': 31,  // Isaiah
-  '23 41': 29,  // Isaiah
-  '23 42': 25,  // Isaiah
-  '23 43': 28,  // Isaiah
-  '23 44': 28,  // Isaiah
-  '23 45': 25,  // Isaiah
-  '23 46': 13,  // Isaiah
-  '23 47': 15,  // Isaiah
-  '23 48': 22,  // Isaiah
-  '23 49': 26,  // Isaiah
-  '23 50': 11,  // Isaiah
-  '23 51': 23,  // Isaiah
-  '23 52': 15,  // Isaiah
-  '23 53': 12,  // Isaiah
-  '23 54': 17,  // Isaiah
-  '23 55': 13,  // Isaiah
-  '23 56': 12,  // Isaiah
-  '23 57': 21,  // Isaiah
-  '23 58': 14,  // Isaiah
-  '23 59': 21,  // Isaiah
-  '23 60': 22,  // Isaiah
-  '23 61': 11,  // Isaiah
-  '23 62': 12,  // Isaiah
-  '23 63': 19,  // Isaiah
-  '23 64': 12,  // Isaiah
-  '23 65': 25,  // Isaiah
-  '23 66': 24,  // Isaiah
-  '24 1': 19,  // Jeremiah
-  '24 2': 37,  // Jeremiah
-  '24 3': 25,  // Jeremiah
-  '24 4': 31,  // Jeremiah
-  '24 5': 31,  // Jeremiah
-  '24 6': 30,  // Jeremiah
-  '24 7': 34,  // Jeremiah
-  '24 8': 22,  // Jeremiah
-  '24 9': 26,  // Jeremiah
-  '24 10': 25,  // Jeremiah
-  '24 11': 23,  // Jeremiah
-  '24 12': 17,  // Jeremiah
-  '24 13': 27,  // Jeremiah
-  '24 14': 22,  // Jeremiah
-  '24 15': 21,  // Jeremiah
-  '24 16': 21,  // Jeremiah
-  '24 17': 27,  // Jeremiah
-  '24 18': 23,  // Jeremiah
-  '24 19': 15,  // Jeremiah
-  '24 20': 18,  // Jeremiah
-  '24 21': 14,  // Jeremiah
-  '24 22': 30,  // Jeremiah
-  '24 23': 40,  // Jeremiah
-  '24 24': 10,  // Jeremiah
-  '24 25': 38,  // Jeremiah
-  '24 26': 24,  // Jeremiah
-  '24 27': 22,  // Jeremiah
-  '24 28': 17,  // Jeremiah
-  '24 29': 32,  // Jeremiah
-  '24 30': 24,  // Jeremiah
-  '24 31': 40,  // Jeremiah
-  '24 32': 44,  // Jeremiah
-  '24 33': 26,  // Jeremiah
-  '24 34': 22,  // Jeremiah
-  '24 35': 19,  // Jeremiah
-  '24 36': 32,  // Jeremiah
-  '24 37': 21,  // Jeremiah
-  '24 38': 28,  // Jeremiah
-  '24 39': 18,  // Jeremiah
-  '24 40': 16,  // Jeremiah
-  '24 41': 18,  // Jeremiah
-  '24 42': 22,  // Jeremiah
-  '24 43': 13,  // Jeremiah
-  '24 44': 30,  // Jeremiah
-  '24 45': 5,  // Jeremiah
-  '24 46': 28,  // Jeremiah
-  '24 47': 7,  // Jeremiah
-  '24 48': 47,  // Jeremiah
-  '24 49': 39,  // Jeremiah
-  '24 50': 46,  // Jeremiah
-  '24 51': 64,  // Jeremiah
-  '24 52': 34,  // Jeremiah
-  '25 1': 22,  // Lamentations
-  '25 2': 22,  // Lamentations
-  '25 3': 66,  // Lamentations
-  '25 4': 22,  // Lamentations
-  '25 5': 22,  // Lamentations
-  '26 1': 28,  // Ezekiel
-  '26 2': 10,  // Ezekiel
-  '26 3': 27,  // Ezekiel
-  '26 4': 17,  // Ezekiel
-  '26 5': 17,  // Ezekiel
-  '26 6': 14,  // Ezekiel
-  '26 7': 27,  // Ezekiel
-  '26 8': 18,  // Ezekiel
-  '26 9': 11,  // Ezekiel
-  '26 10': 22,  // Ezekiel
-  '26 11': 25,  // Ezekiel
-  '26 12': 28,  // Ezekiel
-  '26 13': 23,  // Ezekiel
-  '26 14': 23,  // Ezekiel
-  '26 15': 8,  // Ezekiel
-  '26 16': 63,  // Ezekiel
-  '26 17': 24,  // Ezekiel
-  '26 18': 32,  // Ezekiel
-  '26 19': 14,  // Ezekiel
-  '26 20': 49,  // Ezekiel
-  '26 21': 32,  // Ezekiel
-  '26 22': 31,  // Ezekiel
-  '26 23': 49,  // Ezekiel
-  '26 24': 27,  // Ezekiel
-  '26 25': 17,  // Ezekiel
-  '26 26': 21,  // Ezekiel
-  '26 27': 36,  // Ezekiel
-  '26 28': 26,  // Ezekiel
-  '26 29': 21,  // Ezekiel
-  '26 30': 26,  // Ezekiel
-  '26 31': 18,  // Ezekiel
-  '26 32': 32,  // Ezekiel
-  '26 33': 33,  // Ezekiel
-  '26 34': 31,  // Ezekiel
-  '26 35': 15,  // Ezekiel
-  '26 36': 38,  // Ezekiel
-  '26 37': 28,  // Ezekiel
-  '26 38': 23,  // Ezekiel
-  '26 39': 29,  // Ezekiel
-  '26 40': 49,  // Ezekiel
-  '26 41': 26,  // Ezekiel
-  '26 42': 20,  // Ezekiel
-  '26 43': 27,  // Ezekiel
-  '26 44': 31,  // Ezekiel
-  '26 45': 25,  // Ezekiel
-  '26 46': 24,  // Ezekiel
-  '26 47': 23,  // Ezekiel
-  '26 48': 35,  // Ezekiel
-  '27 1': 21,  // Daniel
-  '27 2': 49,  // Daniel
-  '27 3': 30,  // Daniel
-  '27 4': 37,  // Daniel
-  '27 5': 31,  // Daniel
-  '27 6': 28,  // Daniel
-  '27 7': 28,  // Daniel
-  '27 8': 27,  // Daniel
-  '27 9': 27,  // Daniel
-  '27 10': 21,  // Daniel
-  '27 11': 45,  // Daniel
-  '27 12': 13,  // Daniel
-  '28 1': 11,  // Hosea
-  '28 2': 23,  // Hosea
-  '28 3': 5,  // Hosea
-  '28 4': 19,  // Hosea
-  '28 5': 15,  // Hosea
-  '28 6': 11,  // Hosea
-  '28 7': 16,  // Hosea
-  '28 8': 14,  // Hosea
-  '28 9': 17,  // Hosea
-  '28 10': 15,  // Hosea
-  '28 11': 12,  // Hosea
-  '28 12': 14,  // Hosea
-  '28 13': 16,  // Hosea
-  '28 14': 9,  // Hosea
-  '29 1': 20,  // Joel
-  '29 2': 32,  // Joel
-  '29 3': 21,  // Joel
-  '30 1': 15,  // Amos
-  '30 2': 16,  // Amos
-  '30 3': 15,  // Amos
-  '30 4': 13,  // Amos
-  '30 5': 27,  // Amos
-  '30 6': 14,  // Amos
-  '30 7': 17,  // Amos
-  '30 8': 14,  // Amos
-  '30 9': 15,  // Amos
-  '31 1': 21,  // Obadiah
-  '32 1': 17,  // Jonah
-  '32 2': 10,  // Jonah
-  '32 3': 10,  // Jonah
-  '32 4': 11,  // Jonah
-  '33 1': 16,  // Micah
-  '33 2': 13,  // Micah
-  '33 3': 12,  // Micah
-  '33 4': 13,  // Micah
-  '33 5': 15,  // Micah
-  '33 6': 16,  // Micah
-  '33 7': 20,  // Micah
-  '34 1': 15,  // Nahum
-  '34 2': 13,  // Nahum
-  '34 3': 19,  // Nahum
-  '35 1': 17,  // Habakkuk
-  '35 2': 20,  // Habakkuk
-  '35 3': 19,  // Habakkuk
-  '36 1': 18,  // Zephaniah
-  '36 2': 15,  // Zephaniah
-  '36 3': 20,  // Zephaniah
-  '37 1': 15,  // Haggai
-  '37 2': 23,  // Haggai
-  '38 1': 21,  // Zechariah
-  '38 2': 13,  // Zechariah
-  '38 3': 10,  // Zechariah
-  '38 4': 14,  // Zechariah
-  '38 5': 11,  // Zechariah
-  '38 6': 15,  // Zechariah
-  '38 7': 14,  // Zechariah
-  '38 8': 23,  // Zechariah
-  '38 9': 17,  // Zechariah
-  '38 10': 12,  // Zechariah
-  '38 11': 17,  // Zechariah
-  '38 12': 14,  // Zechariah
-  '38 13': 9,  // Zechariah
-  '38 14': 21,  // Zechariah
-  '39 1': 14,  // Malachi
-  '39 2': 17,  // Malachi
-  '39 3': 18,  // Malachi
-  '39 4': 6,  // Malachi
-  '40 1': 25,  // Matthew
-  '40 2': 23,  // Matthew
-  '40 3': 17,  // Matthew
-  '40 4': 25,  // Matthew
-  '40 5': 48,  // Matthew
-  '40 6': 34,  // Matthew
-  '40 7': 29,  // Matthew
-  '40 8': 34,  // Matthew
-  '40 9': 38,  // Matthew
-  '40 10': 42,  // Matthew
-  '40 11': 30,  // Matthew
-  '40 12': 49,  // Matthew
-  '40 13': 58,  // Matthew
-  '40 14': 36,  // Matthew
-  '40 15': 39,  // Matthew
-  '40 16': 28,  // Matthew
-  '40 17': 26,  // Matthew
-  '40 18': 35,  // Matthew
-  '40 19': 30,  // Matthew
-  '40 20': 34,  // Matthew
-  '40 21': 46,  // Matthew
-  '40 22': 46,  // Matthew
-  '40 23': 38,  // Matthew
-  '40 24': 51,  // Matthew
-  '40 25': 46,  // Matthew
-  '40 26': 75,  // Matthew
-  '40 27': 66,  // Matthew
-  '40 28': 20,  // Matthew
-  '41 1': 45,  // Mark
-  '41 2': 28,  // Mark
-  '41 3': 35,  // Mark
-  '41 4': 41,  // Mark
-  '41 5': 43,  // Mark
-  '41 6': 56,  // Mark
-  '41 7': 36,  // Mark
-  '41 8': 38,  // Mark
-  '41 9': 48,  // Mark
-  '41 10': 52,  // Mark
-  '41 11': 32,  // Mark
-  '41 12': 44,  // Mark
-  '41 13': 37,  // Mark
-  '41 14': 72,  // Mark
-  '41 15': 46,  // Mark
-  '41 16': 20,  // Mark
-  '42 1': 80,  // Luke
-  '42 2': 52,  // Luke
-  '42 3': 38,  // Luke
-  '42 4': 44,  // Luke
-  '42 5': 39,  // Luke
-  '42 6': 49,  // Luke
-  '42 7': 50,  // Luke
-  '42 8': 56,  // Luke
-  '42 9': 62,  // Luke
-  '42 10': 42,  // Luke
-  '42 11': 54,  // Luke
-  '42 12': 59,  // Luke
-  '42 13': 35,  // Luke
-  '42 14': 35,  // Luke
-  '42 15': 32,  // Luke
-  '42 16': 31,  // Luke
-  '42 17': 36,  // Luke
-  '42 18': 43,  // Luke
-  '42 19': 48,  // Luke
-  '42 20': 47,  // Luke
-  '42 21': 38,  // Luke
-  '42 22': 71,  // Luke
-  '42 23': 55,  // Luke
-  '42 24': 53,  // Luke
-  '43 1': 51,  // John
-  '43 2': 25,  // John
-  '43 3': 36,  // John
-  '43 4': 54,  // John
-  '43 5': 46,  // John
-  '43 6': 71,  // John
-  '43 7': 52,  // John
-  '43 8': 48,  // John
-  '43 9': 41,  // John
-  '43 10': 42,  // John
-  '43 11': 57,  // John
-  '43 12': 50,  // John
-  '43 13': 38,  // John
-  '43 14': 31,  // John
-  '43 15': 27,  // John
-  '43 16': 33,  // John
-  '43 17': 26,  // John
-  '43 18': 40,  // John
-  '43 19': 42,  // John
-  '43 20': 31,  // John
-  '43 21': 25,  // John
-  '44 1': 26,  // Acts
-  '44 2': 47,  // Acts
-  '44 3': 26,  // Acts
-  '44 4': 37,  // Acts
-  '44 5': 42,  // Acts
-  '44 6': 15,  // Acts
-  '44 7': 60,  // Acts
-  '44 8': 39,  // Acts
-  '44 9': 43,  // Acts
-  '44 10': 48,  // Acts
-  '44 11': 30,  // Acts
-  '44 12': 25,  // Acts
-  '44 13': 52,  // Acts
-  '44 14': 28,  // Acts
-  '44 15': 40,  // Acts
-  '44 16': 40,  // Acts
-  '44 17': 34,  // Acts
-  '44 18': 28,  // Acts
-  '44 19': 41,  // Acts
-  '44 20': 38,  // Acts
-  '44 21': 40,  // Acts
-  '44 22': 30,  // Acts
-  '44 23': 35,  // Acts
-  '44 24': 26,  // Acts
-  '44 25': 27,  // Acts
-  '44 26': 32,  // Acts
-  '44 27': 44,  // Acts
-  '44 28': 30,  // Acts
-  '45 1': 32,  // Romans
-  '45 2': 29,  // Romans
-  '45 3': 31,  // Romans
-  '45 4': 25,  // Romans
-  '45 5': 21,  // Romans
-  '45 6': 23,  // Romans
-  '45 7': 25,  // Romans
-  '45 8': 39,  // Romans
-  '45 9': 33,  // Romans
-  '45 10': 21,  // Romans
-  '45 11': 36,  // Romans
-  '45 12': 21,  // Romans
-  '45 13': 14,  // Romans
-  '45 14': 23,  // Romans
-  '45 15': 33,  // Romans
-  '45 16': 26,  // Romans
-  '46 1': 31,  // 1 Corinthians
-  '46 2': 16,  // 1 Corinthians
-  '46 3': 23,  // 1 Corinthians
-  '46 4': 21,  // 1 Corinthians
-  '46 5': 13,  // 1 Corinthians
-  '46 6': 20,  // 1 Corinthians
-  '46 7': 40,  // 1 Corinthians
-  '46 8': 13,  // 1 Corinthians
-  '46 9': 27,  // 1 Corinthians
-  '46 10': 33,  // 1 Corinthians
-  '46 11': 34,  // 1 Corinthians
-  '46 12': 31,  // 1 Corinthians
-  '46 13': 13,  // 1 Corinthians
-  '46 14': 40,  // 1 Corinthians
-  '46 15': 58,  // 1 Corinthians
-  '46 16': 24,  // 1 Corinthians
-  '47 1': 24,  // 2 Corinthians
-  '47 2': 17,  // 2 Corinthians
-  '47 3': 18,  // 2 Corinthians
-  '47 4': 18,  // 2 Corinthians
-  '47 5': 21,  // 2 Corinthians
-  '47 6': 18,  // 2 Corinthians
-  '47 7': 16,  // 2 Corinthians
-  '47 8': 24,  // 2 Corinthians
-  '47 9': 15,  // 2 Corinthians
-  '47 10': 18,  // 2 Corinthians
-  '47 11': 33,  // 2 Corinthians
-  '47 12': 21,  // 2 Corinthians
-  '47 13': 14,  // 2 Corinthians
-  '48 1': 24,  // Galatians
-  '48 2': 21,  // Galatians
-  '48 3': 29,  // Galatians
-  '48 4': 31,  // Galatians
-  '48 5': 26,  // Galatians
-  '48 6': 18,  // Galatians
-  '49 1': 23,  // Ephesians
-  '49 2': 22,  // Ephesians
-  '49 3': 21,  // Ephesians
-  '49 4': 32,  // Ephesians
-  '49 5': 33,  // Ephesians
-  '49 6': 24,  // Ephesians
-  '50 1': 30,  // Philippians
-  '50 2': 30,  // Philippians
-  '50 3': 21,  // Philippians
-  '50 4': 23,  // Philippians
-  '51 1': 29,  // Colossians
-  '51 2': 23,  // Colossians
-  '51 3': 25,  // Colossians
-  '51 4': 18,  // Colossians
-  '52 1': 10,  // 1 Thessalonians
-  '52 2': 20,  // 1 Thessalonians
-  '52 3': 13,  // 1 Thessalonians
-  '52 4': 18,  // 1 Thessalonians
-  '52 5': 28,  // 1 Thessalonians
-  '53 1': 12,  // 2 Thessalonians
-  '53 2': 17,  // 2 Thessalonians
-  '53 3': 18,  // 2 Thessalonians
-  '54 1': 20,  // 1 Timothy
-  '54 2': 15,  // 1 Timothy
-  '54 3': 16,  // 1 Timothy
-  '54 4': 16,  // 1 Timothy
-  '54 5': 25,  // 1 Timothy
-  '54 6': 21,  // 1 Timothy
-  '55 1': 18,  // 2 Timothy
-  '55 2': 26,  // 2 Timothy
-  '55 3': 17,  // 2 Timothy
-  '55 4': 22,  // 2 Timothy
-  '56 1': 16,  // Titus
-  '56 2': 15,  // Titus
-  '56 3': 15,  // Titus
-  '57 1': 25,  // Philemon
-  '58 1': 14,  // Hebrews
-  '58 2': 18,  // Hebrews
-  '58 3': 19,  // Hebrews
-  '58 4': 16,  // Hebrews
-  '58 5': 14,  // Hebrews
-  '58 6': 20,  // Hebrews
-  '58 7': 28,  // Hebrews
-  '58 8': 13,  // Hebrews
-  '58 9': 28,  // Hebrews
-  '58 10': 39,  // Hebrews
-  '58 11': 40,  // Hebrews
-  '58 12': 29,  // Hebrews
-  '58 13': 25,  // Hebrews
-  '59 1': 27,  // James
-  '59 2': 26,  // James
-  '59 3': 18,  // James
-  '59 4': 17,  // James
-  '59 5': 20,  // James
-  '60 1': 25,  // 1 Peter
-  '60 2': 25,  // 1 Peter
-  '60 3': 22,  // 1 Peter
-  '60 4': 19,  // 1 Peter
-  '60 5': 14,  // 1 Peter
-  '61 1': 21,  // 2 Peter
-  '61 2': 22,  // 2 Peter
-  '61 3': 18,  // 2 Peter
-  '62 1': 10,  // 1 John
-  '62 2': 29,  // 1 John
-  '62 3': 24,  // 1 John
-  '62 4': 21,  // 1 John
-  '62 5': 21,  // 1 John
-  '63 1': 13,  // 2 John
-  '64 1': 15,  // 3 John
-  '65 1': 25,  // Jude
-  '66 1': 20,  // Revelation
-  '66 2': 29,  // Revelation
-  '66 3': 22,  // Revelation
-  '66 4': 11,  // Revelation
-  '66 5': 14,  // Revelation
-  '66 6': 17,  // Revelation
-  '66 7': 17,  // Revelation
-  '66 8': 13,  // Revelation
-  '66 9': 21,  // Revelation
-  '66 10': 11,  // Revelation
-  '66 11': 19,  // Revelation
-  '66 12': 17,  // Revelation
-  '66 13': 18,  // Revelation
-  '66 14': 20,  // Revelation
-  '66 15': 8,  // Revelation
-  '66 16': 21,  // Revelation
-  '66 17': 18,  // Revelation
-  '66 18': 24,  // Revelation
-  '66 19': 21,  // Revelation
-  '66 20': 15,  // Revelation
-  '66 21': 27,  // Revelation
-  '66 22': 21,  // Revelation
-}
+// Compact verse count table — _BibleVerses[book][chapter - 1] = max verse number
+// Book numbers follow JW Library numbering (1 = Genesis … 66 = Revelation)
+const _BibleVerses = [
+  null, // index 0 unused — books start at 1
+  [31, 25, 24, 26, 32, 22, 24, 22, 29, 32, 32, 20, 18, 24, 21, 16, 27, 33, 38, 18, 34, 24, 20, 67, 34, 35, 46, 22, 35, 43, 55, 32, 20, 31, 29, 43, 36, 30, 23, 23, 57, 38, 34, 34, 28, 34, 31, 22, 33, 26], // 1. Genesis
+  [22, 25, 22, 31, 23, 30, 25, 32, 35, 29, 10, 51, 22, 31, 27, 36, 16, 27, 25, 26, 36, 31, 33, 18, 40, 37, 21, 43, 46, 38, 18, 35, 23, 35, 35, 38, 29, 31, 43, 38], // 2. Exodus
+  [17, 16, 17, 35, 19, 30, 38, 36, 24, 20, 47, 8, 59, 57, 33, 34, 16, 30, 37, 27, 24, 33, 44, 23, 55, 46, 34], // 3. Leviticus
+  [54, 34, 51, 49, 31, 27, 89, 26, 23, 36, 35, 16, 33, 45, 41, 50, 13, 32, 22, 29, 35, 41, 30, 25, 18, 65, 23, 31, 40, 16, 54, 42, 56, 29, 34, 13], // 4. Numbers
+  [46, 37, 29, 49, 33, 25, 26, 20, 29, 22, 32, 32, 18, 29, 23, 22, 20, 22, 21, 20, 23, 30, 25, 22, 19, 19, 26, 68, 29, 20, 30, 52, 29, 12], // 5. Deuteronomy
+  [18, 24, 17, 24, 15, 27, 26, 35, 27, 43, 23, 24, 33, 15, 63, 10, 18, 28, 51, 9, 45, 34, 16, 33], // 6. Joshua
+  [36, 23, 31, 24, 31, 40, 25, 35, 57, 18, 40, 15, 25, 20, 20, 31, 13, 31, 30, 48, 25], // 7. Judges
+  [22, 23, 18, 22], // 8. Ruth
+  [28, 36, 21, 22, 12, 21, 17, 22, 27, 27, 15, 25, 23, 52, 35, 23, 58, 30, 24, 42, 15, 23, 29, 22, 44, 25, 12, 25, 11, 31, 13], // 9. 1
+  [27, 32, 39, 12, 25, 23, 29, 18, 13, 19, 27, 31, 39, 33, 37, 23, 29, 33, 43, 26, 22, 51, 39, 25], // 10. 2
+  [53, 46, 28, 34, 18, 38, 51, 66, 28, 29, 43, 33, 34, 31, 34, 34, 24, 46, 21, 43, 29, 53], // 11. 1
+  [18, 25, 27, 44, 27, 33, 20, 29, 37, 36, 21, 21, 25, 29, 38, 20, 41, 37, 37, 21, 26, 20, 37, 20, 30], // 12. 2
+  [54, 55, 24, 43, 26, 81, 40, 40, 44, 14, 47, 40, 14, 17, 29, 43, 27, 17, 19, 8, 30, 19, 32, 31, 31, 32, 34, 21, 30], // 13. 1
+  [17, 18, 17, 22, 14, 42, 22, 18, 31, 19, 23, 16, 22, 15, 19, 14, 19, 34, 11, 37, 20, 12, 21, 27, 28, 23, 9, 27, 36, 27, 21, 33, 25, 33, 27, 23], // 14. 2
+  [11, 70, 13, 24, 17, 22, 28, 36, 15, 44], // 15. Ezra
+  [11, 20, 32, 23, 19, 19, 73, 18, 38, 39, 36, 47, 31], // 16. Nehemiah
+  [22, 23, 15, 17, 14, 14, 10, 17, 32, 3], // 17. Esther
+  [22, 13, 26, 21, 27, 30, 21, 22, 35, 22, 20, 25, 28, 22, 35, 22, 16, 21, 29, 29, 34, 30, 17, 25, 6, 14, 23, 28, 25, 31, 40, 22, 33, 37, 16, 33, 24, 41, 30, 24, 34, 17], // 18. Job
+  [6, 12, 8, 8, 12, 10, 17, 9, 20, 18, 7, 8, 6, 7, 5, 11, 15, 50, 14, 9, 13, 31, 6, 10, 22, 12, 14, 9, 11, 12, 24, 11, 22, 22, 28, 12, 40, 22, 13, 17, 13, 11, 5, 26, 17, 11, 9, 14, 20, 23, 19, 9, 6, 7, 23, 13, 11, 11, 17, 12, 8, 12, 11, 10, 13, 20, 7, 35, 36, 5, 24, 20, 28, 23, 10, 12, 20, 72, 13, 19, 16, 8, 18, 12, 13, 17, 7, 18, 52, 17, 16, 15, 5, 23, 11, 13, 12, 9, 9, 5, 8, 28, 22, 35, 45, 48, 43, 13, 31, 7, 10, 10, 9, 8, 18, 19, 2, 29, 176, 7, 8, 9, 4, 8, 5, 6, 5, 6, 8, 8, 3, 18, 3, 3, 21, 26, 9, 8, 24, 13, 10, 7, 12, 15, 21, 10, 20, 14, 9, 6], // 19. Psalms
+  [33, 22, 35, 27, 23, 35, 27, 36, 18, 32, 31, 28, 25, 35, 33, 33, 28, 24, 29, 30, 31, 29, 35, 34, 28, 28, 27, 28, 27, 33, 31], // 20. Proverbs
+  [18, 26, 22, 16, 20, 12, 29, 17, 18, 20, 10, 14], // 21. Ecclesiastes
+  [17, 17, 11, 16, 16, 13, 13, 14], // 22. Song
+  [31, 22, 26, 6, 30, 13, 25, 22, 21, 34, 16, 6, 22, 32, 9, 14, 14, 7, 25, 6, 17, 25, 18, 23, 12, 21, 13, 29, 24, 33, 9, 20, 24, 17, 10, 22, 38, 22, 8, 31, 29, 25, 28, 28, 25, 13, 15, 22, 26, 11, 23, 15, 12, 17, 13, 12, 21, 14, 21, 22, 11, 12, 19, 12, 25, 24], // 23. Isaiah
+  [19, 37, 25, 31, 31, 30, 34, 22, 26, 25, 23, 17, 27, 22, 21, 21, 27, 23, 15, 18, 14, 30, 40, 10, 38, 24, 22, 17, 32, 24, 40, 44, 26, 22, 19, 32, 21, 28, 18, 16, 18, 22, 13, 30, 5, 28, 7, 47, 39, 46, 64, 34], // 24. Jeremiah
+  [22, 22, 66, 22, 22], // 25. Lamentations
+  [28, 10, 27, 17, 17, 14, 27, 18, 11, 22, 25, 28, 23, 23, 8, 63, 24, 32, 14, 49, 32, 31, 49, 27, 17, 21, 36, 26, 21, 26, 18, 32, 33, 31, 15, 38, 28, 23, 29, 49, 26, 20, 27, 31, 25, 24, 23, 35], // 26. Ezekiel
+  [21, 49, 30, 37, 31, 28, 28, 27, 27, 21, 45, 13], // 27. Daniel
+  [11, 23, 5, 19, 15, 11, 16, 14, 17, 15, 12, 14, 16, 9], // 28. Hosea
+  [20, 32, 21], // 29. Joel
+  [15, 16, 15, 13, 27, 14, 17, 14, 15], // 30. Amos
+  [21], // 31. Obadiah
+  [17, 10, 10, 11], // 32. Jonah
+  [16, 13, 12, 13, 15, 16, 20], // 33. Micah
+  [15, 13, 19], // 34. Nahum
+  [17, 20, 19], // 35. Habakkuk
+  [18, 15, 20], // 36. Zephaniah
+  [15, 23], // 37. Haggai
+  [21, 13, 10, 14, 11, 15, 14, 23, 17, 12, 17, 14, 9, 21], // 38. Zechariah
+  [14, 17, 18, 6], // 39. Malachi
+  [25, 23, 17, 25, 48, 34, 29, 34, 38, 42, 30, 49, 58, 36, 39, 28, 26, 35, 30, 34, 46, 46, 38, 51, 46, 75, 66, 20], // 40. Matthew
+  [45, 28, 35, 41, 43, 56, 36, 38, 48, 52, 32, 44, 37, 72, 46, 20], // 41. Mark
+  [80, 52, 38, 44, 39, 49, 50, 56, 62, 42, 54, 59, 35, 35, 32, 31, 36, 43, 48, 47, 38, 71, 55, 53], // 42. Luke
+  [51, 25, 36, 54, 46, 71, 52, 48, 41, 42, 57, 50, 38, 31, 27, 33, 26, 40, 42, 31, 25], // 43. John
+  [26, 47, 26, 37, 42, 15, 60, 39, 43, 48, 30, 25, 52, 28, 40, 40, 34, 28, 41, 38, 40, 30, 35, 26, 27, 32, 44, 30], // 44. Acts
+  [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 26], // 45. Romans
+  [31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24], // 46. 1
+  [24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14], // 47. 2
+  [24, 21, 29, 31, 26, 18], // 48. Galatians
+  [23, 22, 21, 32, 33, 24], // 49. Ephesians
+  [30, 30, 21, 23], // 50. Philippians
+  [29, 23, 25, 18], // 51. Colossians
+  [10, 20, 13, 18, 28], // 52. 1
+  [12, 17, 18], // 53. 2
+  [20, 15, 16, 16, 25, 21], // 54. 1
+  [18, 26, 17, 22], // 55. 2
+  [16, 15, 15], // 56. Titus
+  [25], // 57. Philemon
+  [14, 18, 19, 16, 14, 20, 28, 13, 28, 39, 40, 29, 25], // 58. Hebrews
+  [27, 26, 18, 17, 20], // 59. James
+  [25, 25, 22, 19, 14], // 60. 1
+  [21, 22, 18], // 61. 2
+  [10, 29, 24, 21, 21], // 62. 1
+  [13], // 63. 2
+  [15], // 64. 3
+  [25], // 65. Jude
+  [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 17, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21], // 66. Revelation
+];
+
+// Reconstruct the flat lookup used by _parseScriptureLinks
+const BibleDimensions = Object.fromEntries(
+  _BibleVerses.flatMap((chapters, b) =>
+    chapters ? chapters.map((v, i) => [`${b} ${i + 1}`, v]) : []
+  )
+);
 
 module.exports = {
   default: JWLLinkerPlugin,
