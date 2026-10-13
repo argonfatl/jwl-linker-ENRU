@@ -9,6 +9,7 @@ const {
   requestUrl,
   PluginSettingTab,
   Setting,
+  Platform,
 } = require('obsidian');
 
 const DEFAULT_SETTINGS = {
@@ -18,6 +19,7 @@ const DEFAULT_SETTINGS = {
   pubCalloutTemplate: '> [!cite] PUB. — {title}\n> {text}\n',
   historySize: 20,
   boldInitialNum: true,
+  versePreview: true, // show the verse text in a popup when hovering a scripture link (desktop only)
   citationLink: true,
   spaceAfterPunct: true,
   paraCount: 1,
@@ -75,6 +77,10 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'Сколько элементов истории показывать в боковой панели.',
     settingsBoldNumbers: 'Номера стихов жирным шрифтом',
     settingsBoldNumbersDesc: 'Применять жирное форматирование к номерам стихов или абзацев в цитируемом тексте.',
+    settingsVersePreview: 'Текст стиха при наведении',
+    settingsVersePreviewDesc: 'Показывать текст стиха во всплывающем окне при наведении на ссылку в режиме чтения (только на компьютере).',
+    versePreviewLoading: 'Загрузка…',
+    versePreviewMore: '… и ещё стихов: {count}',
     settingsCitationLink: 'Ссылка на цитируемые стихи',
     settingsCitationLinkDesc: 'Создавать ссылку на JW Library при цитировании стихов.',
     settingsDualMode: 'Двойной режим публикаций',
@@ -167,6 +173,10 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'How many history items to show in the sidebar.',
     settingsBoldNumbers: 'Initial numbers in bold',
     settingsBoldNumbersDesc: 'Apply bold markup to initial numbers in verses or paragraphs in the cited text.',
+    settingsVersePreview: 'Verse text on hover',
+    settingsVersePreviewDesc: 'Show the verse text in a popup when you hover over a scripture link in reading view (desktop only).',
+    versePreviewLoading: 'Loading…',
+    versePreviewMore: '… and {count} more verses',
     settingsCitationLink: 'Link cited scripture',
     settingsCitationLinkDesc: 'Link scripture reference to JW Library when citing verses.',
     settingsDualMode: 'Dual publication mode',
@@ -259,6 +269,10 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'Cuántos elementos del historial mostrar en la barra lateral.',
     settingsBoldNumbers: 'Números iniciales en negrita',
     settingsBoldNumbersDesc: 'Aplicar formato en negrita a los números iniciales en versículos o párrafos en el texto citado.',
+    settingsVersePreview: 'Texto del versículo al pasar el cursor',
+    settingsVersePreviewDesc: 'Muestra el texto del versículo en una ventana emergente al pasar el cursor sobre un enlace bíblico en la vista de lectura (solo escritorio).',
+    versePreviewLoading: 'Cargando…',
+    versePreviewMore: '… y {count} versículos más',
     settingsCitationLink: 'Enlazar escritura citada',
     settingsCitationLinkDesc: 'Enlazar referencia bíblica a JW Library al citar versículos.',
     settingsDualMode: 'Modo dual de publicaciones',
@@ -1091,6 +1105,41 @@ function isPublicationReference(input) {
   return Boolean(parseWatchtowerReference(input) || matchOtherPublication(input));
 }
 
+/* ---------------------------------------------------------------------------
+ * Verse preview on hover (desktop only)
+ * ------------------------------------------------------------------------- */
+
+/** Verses shown in the popup; longer ranges end with "… and N more verses" */
+const VersePreviewMaxVerses = 5;
+/** Hover time before the popup opens, so passing over a link loads nothing */
+const VersePreviewDelayMs = 500;
+/** Verse texts kept in memory between hovers */
+const VersePreviewCacheSize = 200;
+
+/**
+ * Bible passage behind a JW Library link, e.g.
+ * jwlibrary:///finder?bible=45001020-45001022&wtlocale=U
+ * @param {string|null} href
+ * @returns {{lang: string, ids: string[], url: string}|null} url = jw.org page with the verse text
+ */
+function parseJwlBibleHref(href) {
+  const prefix = Config.jwlFinder; // jwlibrary:///finder?
+  if (!href || !href.startsWith(prefix)) return null;
+  const params = new URLSearchParams(href.slice(prefix.length));
+  const bible = params.get('bible');
+  const m = /^(\d{7,8})(?:-(\d{7,8}))?$/.exec(bible ?? '');
+  if (!m) return null;
+  const first = Number(m[1]);
+  const last = m[2] ? Number(m[2]) : first;
+  // a passage is always within one chapter: same book + chapter part (all but the last 3 digits)
+  if (last < first || Math.floor(first / 1000) !== Math.floor(last / 1000)) return null;
+  const wtlocale = params.get('wtlocale') ?? 'E';
+  const lang = { U: 'RU', S: 'ES', E: 'EN', X: 'DE', F: 'FR', O: 'NL' }[wtlocale] ?? 'EN';
+  const ids = [];
+  for (let id = first; id <= last; id++) ids.push(String(id));
+  return { lang, ids, url: `${getFinderUrl(lang)}${Config.urlParam}${bible}` };
+}
+
 /**
  * Update interface language
  * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
@@ -1151,6 +1200,97 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     return { firstLang, secondLang };
+  }
+
+  /**
+   * Verse text for the hover popup (first VersePreviewMaxVerses verses of the passage)
+   * Successful results are cached; failures are not, so the next hover retries.
+   * @param {string} href - JW Library link
+   * @returns {Promise<{verses: string[], more: number, failed: boolean}|null>} null if not a Bible link
+   */
+  async _fetchVersePreview(href) {
+    const ref = parseJwlBibleHref(href);
+    if (!ref) return null;
+    this.versePreviewCache ??= new Map();
+    const cached = this.versePreviewCache.get(href);
+    if (cached) return cached;
+
+    const shown = ref.ids.slice(0, VersePreviewMaxVerses);
+    const verses = [];
+    const dom = await this._fetchDOM(ref.url);
+    if (dom) {
+      for (const [i, id] of shown.entries()) {
+        const text = this._getElementAsText(dom, `#v${id}`, TargetType.scripture, i > 0).trim();
+        if (text) verses.push(text);
+      }
+    }
+    if (verses.length === 0) return { verses: [], more: 0, failed: true };
+
+    const result = { verses, more: ref.ids.length - shown.length, failed: false };
+    this.versePreviewCache.set(href, result);
+    if (this.versePreviewCache.size > VersePreviewCacheSize) {
+      this.versePreviewCache.delete(this.versePreviewCache.keys().next().value); // oldest
+    }
+    return result;
+  }
+
+  /**
+   * Show the verse text in a popup when the mouse rests on a JW Library Bible link.
+   * Desktop only: on phones and tablets a tap opens JW Library as before.
+   */
+  _registerVersePreview() {
+    if (Platform.isMobile) return;
+    let openTimer = 0;
+    let closeTimer = 0;
+    let current = null; // link the popup belongs to
+    let popover = null;
+
+    const close = () => {
+      window.clearTimeout(openTimer);
+      window.clearTimeout(closeTimer);
+      popover?.remove();
+      popover = null;
+      current = null;
+    };
+    const closeSoon = () => {
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(close, 300); // time to move the mouse onto the popup
+    };
+    this.register(close);
+
+    this.registerDomEvent(document, 'mouseover', (evt) => {
+      if (!this.settings.versePreview) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      if (popover?.contains(target)) {
+        window.clearTimeout(closeTimer);
+        return;
+      }
+      const link = target?.closest('a');
+      const href = link?.getAttribute('href');
+      if (!link || !parseJwlBibleHref(href)) {
+        if (current) closeSoon();
+        return;
+      }
+      if (link === current) {
+        window.clearTimeout(closeTimer);
+        return;
+      }
+      close();
+      current = link;
+      openTimer = window.setTimeout(async () => {
+        if (current !== link) return;
+        popover = createVersePopover(link);
+        const data = await this._fetchVersePreview(href);
+        if (current === link && popover) fillVersePopover(popover, data);
+      }, VersePreviewDelayMs);
+    });
+    this.registerDomEvent(document, 'mousedown', (evt) => {
+      if (!popover?.contains(evt.target)) close();
+    });
+    this.registerDomEvent(document, 'keydown', (evt) => {
+      if (evt.key === 'Escape') close();
+    });
+    this.registerDomEvent(window, 'scroll', close, { capture: true });
   }
 
   /**
@@ -1234,6 +1374,9 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
+
+    // Desktop: verse text in a popup when hovering a scripture link
+    this._registerVersePreview();
 
     debugLog(`${this.manifest.name} ${this.manifest.version} loaded`);
   }
@@ -3254,6 +3397,62 @@ function linkScripturesInTextNode(plugin, node) {
   return true;
 }
 
+/**
+ * Create the (still empty) verse popup next to a link
+ * @param {HTMLElement} link
+ * @returns {HTMLElement}
+ */
+function createVersePopover(link) {
+  const doc = link.ownerDocument;
+  const popover = doc.body.createDiv({ cls: 'jwl-verse-popover' });
+  popover.createDiv({ cls: 'jwl-verse-popover-title', text: link.textContent ?? '' });
+  popover.createDiv({ cls: 'jwl-verse-popover-status', text: Lang.versePreviewLoading });
+
+  // Below the link, or above it when the link is in the lower part of the window
+  const rect = link.getBoundingClientRect();
+  const win = doc.defaultView ?? window;
+  const left = Math.max(8, Math.min(rect.left, win.innerWidth - 416));
+  const above = rect.bottom > win.innerHeight * 0.6;
+  popover.toggleClass('is-above', above);
+  popover.setCssProps({
+    '--jwl-popover-left': `${left}px`,
+    '--jwl-popover-top': `${rect.bottom + 6}px`,
+    '--jwl-popover-bottom': `${win.innerHeight - rect.top + 6}px`,
+  });
+  return popover;
+}
+
+/**
+ * Put the fetched verses into the popup (DOM API only)
+ * @param {HTMLElement} popover
+ * @param {{verses: string[], more: number, failed: boolean}|null} data
+ */
+function fillVersePopover(popover, data) {
+  popover.querySelector('.jwl-verse-popover-status')?.remove();
+  if (!data || data.failed) {
+    popover.createDiv({ cls: 'jwl-verse-popover-status', text: Lang.onlineLookupFailed });
+    return;
+  }
+  const body = popover.createDiv({ cls: 'jwl-verse-popover-body' });
+  for (const verse of data.verses) {
+    const lines = verse.split('\n').filter((line) => line.trim() !== '');
+    lines.forEach((line, i) => {
+      const p = body.createEl('p');
+      const num = i === 0 ? /^(\d{1,3})\s+(.*)$/s.exec(line.trim()) : null;
+      if (num) {
+        p.createEl('strong', { text: num[1] });
+        p.appendText(` ${num[2]}`);
+      } else {
+        p.setText(line.trim());
+        if (i > 0) p.addClass('jwl-verse-popover-cont');
+      }
+    });
+  }
+  if (data.more > 0) {
+    popover.createDiv({ cls: 'jwl-verse-popover-more', text: Lang.versePreviewMore.replace('{count}', data.more) });
+  }
+}
+
 class JWLLinkerSettingTab extends PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -3441,6 +3640,18 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    if (!Platform.isMobile) {
+      new Setting(containerEl)
+        .setName(Lang.settingsVersePreview)
+        .setDesc(Lang.settingsVersePreviewDesc)
+        .addToggle((tog) => {
+          tog.setValue(this.plugin.settings.versePreview).onChange(async (value) => {
+            this.plugin.settings.versePreview = value;
+            await this.plugin.saveSettings();
+          });
+        });
+    }
 
     new Setting(containerEl)
       .setName(Lang.settingsCitationLink)

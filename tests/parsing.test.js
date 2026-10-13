@@ -230,3 +230,35 @@ test('callout templates keep every line inside the callout without doubling ">"'
   // plain templates are left as they are
   assert.equal(jwl.fillCitationTemplate('{title}\n“*{text}*”', 'T', 'a\nb'), 'T\n“*a\nb*”');
 });
+
+test('JW Library Bible links are parsed for the verse preview', () => {
+  const ru = jwl.parseJwlBibleHref('jwlibrary:///finder?bible=45001020-45001022&wtlocale=U');
+  assert.deepEqual(ru.ids, ['45001020', '45001021', '45001022']);
+  assert.equal(ru.lang, 'RU');
+  assert.equal(ru.url, 'https://www.jw.org/finder?wtlocale=U&bible=45001020-45001022');
+  assert.deepEqual(jwl.parseJwlBibleHref('jwlibrary:///finder?bible=1001001&wtlocale=E').ids, ['1001001']); // Genesis
+  assert.equal(jwl.parseJwlBibleHref('jwlibrary:///finder?wtlocale=E&docid=2024560&par=5'), null); // publication link
+  assert.equal(jwl.parseJwlBibleHref('https://www.jw.org/finder?bible=45001020'), null);
+  assert.equal(jwl.parseJwlBibleHref(null), null);
+});
+
+test('verse preview shows at most 5 verses, caches results and retries failures', async () => {
+  const plugin = createPlugin(jwl);
+  let fetches = 0;
+  plugin._fetchDOM = async () => { fetches++; return {}; };
+  plugin._getElementAsText = (_dom, selector) => `${Number(selector.slice(-3))} verse text`;
+  const href = 'jwlibrary:///finder?bible=19119001-19119040&wtlocale=E'; // Ps 119:1-40
+  const first = await plugin._fetchVersePreview(href);
+  assert.equal(first.verses.length, 5);
+  assert.equal(first.verses[0], '1 verse text');
+  assert.equal(first.more, 35);
+  await plugin._fetchVersePreview(href);
+  assert.equal(fetches, 1); // second hover served from the cache
+
+  plugin._fetchDOM = async () => { fetches++; return null; }; // offline
+  const offline = 'jwlibrary:///finder?bible=43003016&wtlocale=E';
+  assert.equal((await plugin._fetchVersePreview(offline)).failed, true);
+  await plugin._fetchVersePreview(offline);
+  assert.equal(fetches, 3); // failures are not cached
+  assert.equal(await plugin._fetchVersePreview('jwlibrary:///finder?docid=1'), null);
+});
