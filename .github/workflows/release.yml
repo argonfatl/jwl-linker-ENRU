@@ -1,0 +1,41 @@
+name: Release
+
+# Push a tag that is exactly the plugin version (e.g. 0.8.0, no "v" prefix)
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check that the tag matches manifest.json and versions.json
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          version=$(node -p "require('./manifest.json').version")
+          if [ "$tag" != "$version" ]; then
+            echo "Tag $tag does not match manifest.json version $version"
+            exit 1
+          fi
+          node -e "const v=require('./versions.json'); if(!v['$version']) { console.error('versions.json has no entry for $version'); process.exit(1); }"
+
+      - run: npm run check
+      - run: npm test
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" main.js manifest.json styles.css \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes

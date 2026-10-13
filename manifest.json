@@ -1,11 +1,11 @@
 {
 	"id": "jwl-linker-en-ru-es",
 	"name": "JWL Linker EN-RU-ES",
-	"version": "0.7.4",
-	"minAppVersion": "1.0.0",
-	"description": "Comprehensive JW Library linker supporting Bible references and JW publications in English, Russian, and Spanish. Features: auto-formatting (od 15 par. 3 → od chap. 15 par. 3)",
+	"version": "0.8.0",
+	"minAppVersion": "1.7.2",
+	"description": "Link Bible references and publications of Jehovah's Witnesses to JW Library, and cite verses and paragraphs from jw.org in English, Russian, and Spanish.",
 	"author": "Argonfatl",
-	"authorUrl": "https://github.com/argonfatl/jwl-linker-ENRU",
-	"fundingUrl": "https://github.com/argonfatl/jwl-linker-ENRU",
+	"authorUrl": "https://github.com/argonfatl",
+	"fundingUrl": "https://buymeacoffee.com/zhhfyn5ympj",
 	"isDesktopOnly": false
 }
