@@ -7,7 +7,10 @@ on:
       - '*'
 
 permissions:
-  contents: write
+  contents: write         # create the GitHub release
+  id-token: write         # sign the build provenance attestation
+  attestations: write     # store the attestation
+  artifact-metadata: write
 
 jobs:
   release:
@@ -31,6 +34,16 @@ jobs:
 
       - run: npm run check
       - run: npm test
+
+      # Lets users verify that the release files were built from this repository:
+      #   gh attestation verify main.js -R argonfatl/jwl-linker-ENRU
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
 
       - name: Create the GitHub release
         env:
