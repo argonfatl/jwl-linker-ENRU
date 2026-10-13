@@ -268,6 +268,15 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
+# 🔒 Privacy and permissions
+
+- **Network**: the plugin only contacts `www.jw.org` (Bible verse text) and `wol.jw.org` (publication paragraphs and article titles), and only when you run a citation command. Nothing is sent anywhere else, and there is no tracking or telemetry.
+- **Clipboard**: the plugin only *writes* to the clipboard, and only when you click an item in the history sidebar to copy it. It never reads the clipboard.
+- **Files**: citations are inserted into the note you are editing; no other files are read or changed. Citation history is kept in Obsidian's workspace layout.
+- **Release files**: `main.js`, `manifest.json` and `styles.css` in each GitHub release are built by GitHub Actions with a signed build provenance attestation. You can check them with `gh attestation verify main.js -R argonfatl/jwl-linker-ENRU`.
+
+---
+
 # 🛠️ Development
 
 The plugin is a single `main.js` file (no build step). Tests use Node's built-in test runner and need no dependencies:
@@ -285,7 +294,9 @@ npm run check     # syntax check of main.js
    git tag 0.8.0
    git push origin 0.8.0
    ```
-3. The *Release* GitHub Action checks that the tag matches `manifest.json`, runs the tests and publishes a release with `main.js`, `manifest.json` and `styles.css`.
+3. The *Release* GitHub Action checks that the tag matches `manifest.json`, runs the tests, attests build provenance and publishes a release with `main.js`, `manifest.json` and `styles.css`.
+
+Pull the merged changes before tagging (`git checkout main && git pull`): the tag must point to the commit that has the new version, otherwise the release check stops.
 
 ---
 
@@ -297,4 +308,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.8.1 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.8.2 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
