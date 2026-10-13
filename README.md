@@ -24,12 +24,10 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 
 ## Manual install (GitHub Releases)
 
-1. Download the latest release from GitHub Releases.
-2. Extract it into your `{Obsidian Vault}/.obsidian/plugins/` folder so you end up with:
-   `{Obsidian Vault}/.obsidian/plugins/jwl-linker/`.
-3. Ensure the plugin folder contains:
-   `manifest.json`, `main.js`, `styles.css`, `versions.json`.
-4. Restart Obsidian and enable the plugin in `Settings` → `Community plugins`.
+1. Download `main.js`, `manifest.json` and `styles.css` from the latest [GitHub release](https://github.com/argonfatl/jwl-linker-ENRU/releases/latest).
+2. Put them in a new folder `{Obsidian Vault}/.obsidian/plugins/jwl-linker-en-ru-es/`
+   (the folder name matches the plugin id in `manifest.json`).
+3. Restart Obsidian and enable the plugin in `Settings` → `Community plugins`.
 
 # 📖 Supported Publication Formats
 
@@ -40,20 +38,23 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 
 ## Watchtower Publications
 ![Plugin in action](demo/RunW.gif)
-- **English**: `w65 6/1 p. 329 par. 6`, `w24 1/15 p. 12 par. 3`
-- **Russian**: `w86.01 28, абз. 11`, `w24.12 15, абз. 5`
-- **Spanish**: `w65 6/1 pág. 329 párr. 6`, `w24 1/15 pág. 12 párr. 3`
+Issues before 2016 came out twice a month and are written with the day; from 2016 on, issues are monthly (`YY.MM`).
+English writes the date as month/day, Russian and Spanish as day/month.
+
+- **English**: `w65 6/1 p. 329 par. 6`, `w23.12 p. 20 par. 7`
+- **Russian**: `w10 15/1 с. 3 абз. 1`, `w25.01 28, абз. 11`, `w25.3 с. 8 абз. 2`
+- **Spanish**: `w10 15/1 pág. 3 párr. 1`, `w23.12 pág. 20 párr. 7`
 
 ## Watchtower Study Edition (ws)
-- **English**: `ws12 2/15 15 par. 2`, `ws25 March p. 8 par. 2`
-- **Russian**: `ws12.02 15 абз. 2`, `ws25 Март с. 8 абз. 2`
-- **Spanish**: `ws12 2/15 15 párr. 2`, `ws25 Marzo pág. 8 párr. 2`
+The study edition existed until 2015; from 2016 on, study articles are in the monthly `w` issues.
+WOL resolves `ws` references in English only.
+
+- **English**: `ws12 2/15 15 par. 2`
 
 ## Other Publications
 - **English**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
 - **Russian**: `od 15 абз. 3`, `cl глава 8 с. 77 абз. 2`
 - **Spanish**: `od 15 párr. 3`, `cl cap. 8 pág. 77 párr. 2`
-- **Page Ranges**: `si pp. 300-301 par. 11`, `si сс. 300-301 абз. 11`, `si págs. 300-301 párr. 11`
 
 ## Auto-formatting Examples
 
@@ -64,14 +65,16 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 
 ### Watchtower Month Names Auto-formatting
 **Pre-2016 (Two issues per month):**
-- **Russian**: `w10 15 Января с. 3 абз. 1` → `w10 1/15 с. 3 абз. 1`
-- **English**: `w10 15 January p. 3 par. 1` → `w10 1/15 p. 3 par. 1`
-- **Spanish**: `w10 15 Enero pág. 3 párr. 1` → `w10 1/15 pág. 3 párr. 1`
+- **Russian**: `w10 15 Января с. 3 абз. 1` → `w10 15/1 с. 3 абз. 1`
+- **English**: `w10 15 January p. 3 par. 1` → `w10 01/15 p. 3 par. 1`
+- **Spanish**: `w10 15 Enero pág. 3 párr. 1` → `w10 15/1 pág. 3 párr. 1`
+
+Without a day (`w10 January ...`) the issue is ambiguous, so add the day for issues before 2016.
 
 **Post-2016 (One issue per month):**
 - **Russian**: `w16 Январь с. 3 абз. 1` → `w16.01 3, абз. 1`
-- **English**: `w25 March p. 8 par. 2` → `w25 3/1 p. 8 par. 2`
-- **Spanish**: `w25 Marzo pág. 8 párr. 2` → `w25 3/1 pág. 8 párr. 2`
+- **English**: `w25 March p. 8 par. 2` → `w25.03 p. 8 par. 2`
+- **Spanish**: `w25 Marzo pág. 8 párr. 2` → `w25.03 pág. 8 párr. 2`
 
 # 🎯 How to Use In Reading View
 
@@ -79,6 +82,7 @@ Displays all valid scripture references as *JW Library* links with automatic lan
 Open any page with scripture references and switch to *Reading View* to see hyperlinks with full book names.
 
 > Note: This only affects the *Reading View*, it does not modify the underlying Markdown text.
+> Headings, callouts, existing links and code are left as they are.
 
 # ⚡ How to Use In Editing View
 
@@ -113,7 +117,7 @@ To access the commands:
 
 ## Language Detection
 - **Automatic**: Detects Cyrillic characters for Russian, Spanish Bible book names, defaults to English
-- **Manual**: Set preferred language in plugin settings (English/Russian/Spanish)
+- **Manual**: Set the citation language in plugin settings (English/Russian/Spanish). Publication references typed in another language format are converted, e.g. `w23.12 p. 20 par. 7` is cited from the Russian edition as `w23.12 20, абз. 7`. Page numbers match across languages for recent issues; in very old issues (for example 1960s) they can differ, so a converted reference may point to another article
 - **Dual Language Mode**: Show content in two languages simultaneously
   - Separate toggles for Bible verses and publications
   - Configurable first and second language (ru, en, es)
@@ -146,9 +150,9 @@ Rom 1:20
 ![Plugin in actionB](demo/Run.gif)
 ## Publication Citation (Russian)
 ```markdown
-w86.01 28, абз. 11
-> [!cite] ПУБЛ. — [Сторожевая башня 1986 Январь с. 28 абз. 11](https://wol.jw.org/...)
-> **11** Большинство людей сегодня не признают принцип главенства...
+w25.3 с. 8 абз. 2
+> [!cite] ПУБЛ. — [Сторожевая башня 2025 Март с. 8 абз. 2](https://wol.jw.org/...)
+> **2** Иисус любил Иегову всем разумом...
 ```
 
 ## Publication Citation (Spanish)
@@ -264,6 +268,27 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
+# 🛠️ Development
+
+The plugin is a single `main.js` file (no build step). Tests use Node's built-in test runner and need no dependencies:
+
+```bash
+npm test          # parsing, formatting and citation tests (tests/)
+npm run check     # syntax check of main.js
+```
+
+## Releasing
+
+1. Update the version in `manifest.json`, `package.json` and `versions.json` (`"<version>": "<minAppVersion>"`).
+2. Commit, then push a tag that is exactly the version number (no `v` prefix):
+   ```bash
+   git tag 0.8.0
+   git push origin 0.8.0
+   ```
+3. The *Release* GitHub Action checks that the tag matches `manifest.json`, runs the tests and publishes a release with `main.js`, `manifest.json` and `styles.css`.
+
+---
+
 # ☕ Support
 
 If you find this plugin helpful and want to support its development:
@@ -272,4 +297,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.7.2 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.8.0 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile

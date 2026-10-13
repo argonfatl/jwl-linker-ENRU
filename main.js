@@ -40,6 +40,7 @@ const InterfaceStrings = {
     name: 'JWL Linker',
     invalidScripture: '⚠️ Это недопустимая ссылка на стих.',
     invalidUrl: '⚠️ Это недопустимая ссылка wol.jw.org.',
+    invalidPublication: '⚠️ Это недопустимая ссылка на публикацию.',
     onlineLookupFailed: '⚠️ Не удалось получить текст из интернета. Попробуйте ещё раз.',
     noEditor: '⚠️ Нет активного редактора.',
     noSelection: '⚠️ На текущей строке нет текста или выделения.',
@@ -101,7 +102,7 @@ const InterfaceStrings = {
     settingsOpenSidebarOnStartup: 'Открывать боковую панель при запуске',
     settingsOpenSidebarOnStartupDesc: 'Если включено, боковая панель JWL Linker будет открываться автоматически при запуске Obsidian.',
     settingsDebug: 'Режим отладки',
-    settingsDebugDesc: 'Если включено, будут доступны отладочные функции в консоли (window.test*).',
+    settingsDebugDesc: 'Если включено, подробности работы плагина записываются в консоль разработчика.',
     settingsResetDefault: 'Сбросить к настройкам по умолчанию',
     settingsResetDefaultDesc: 'Вернуть все настройки к исходным значениям по умолчанию.',
     settingsClearHistory: 'Очистить историю',
@@ -119,6 +120,7 @@ const InterfaceStrings = {
     menuConvertJworg: 'Преобразовать ссылку jw.org в JW Library',
     menuOpenJWLibrary: 'Открыть стих в JW Library',
     menuOpenSidebar: 'Открыть боковую панель',
+    menuOpenMenu: 'Открыть меню',
     menuBatchConvert: 'Цитировать все ссылки в документе',
     batchProcessing: 'Загрузка цитат...',
     batchComplete: 'Добавлено цитат: {count}',
@@ -130,6 +132,7 @@ const InterfaceStrings = {
     name: 'JWL Linker',
     invalidScripture: '⚠️ This is not a valid scripture reference.',
     invalidUrl: '⚠️ This is not a valid wol.jw.org url.',
+    invalidPublication: '⚠️ This is not a valid publication reference.',
     onlineLookupFailed: '⚠️ Online scripture lookup failed. Try again.',
     noEditor: '⚠️ No active editor available.',
     noSelection: '⚠️ Nothing on cursor line or no selection.',
@@ -156,9 +159,9 @@ const InterfaceStrings = {
     settingsPubTemplateDesc: 'Use this template when citing from a publication in normal text formatting (jw.org or article lookup)',
     settingsPubCallout: 'Template for publication citation in callout',
     settingsPubCalloutDesc: 'Use this template when citing from a publication using the callout format (jw.org or article lookup)',
-    settingsInterfaceLang: 'Interface Language',
+    settingsInterfaceLang: 'Interface language',
     settingsInterfaceLangDesc: 'Choose the interface language for the plugin.',
-    settingsCitationLang: 'Citation Language',
+    settingsCitationLang: 'Citation language',
     settingsCitationLangDesc: 'Choose language for citations or use auto-detection.',
     settingsHistorySize: 'No. of history items',
     settingsHistorySizeDesc: 'How many history items to show in the sidebar.',
@@ -169,7 +172,7 @@ const InterfaceStrings = {
     settingsDualMode: 'Dual publication mode',
     settingsDualModeDesc: 'Show publications in both English and Russian simultaneously.',
     // Dual language mode settings
-    settingsDualModeSection: 'Dual Language Mode',
+    settingsDualModeSection: 'Dual language mode',
     settingsDualModeSectionDesc: 'Settings for displaying citations in two languages simultaneously',
     settingsDualModeVerses: 'Dual mode for Bible verses',
     settingsDualModeVersesDesc: 'Enable displaying Bible texts in two languages simultaneously',
@@ -195,7 +198,7 @@ const InterfaceStrings = {
     settingsOpenSidebarOnStartup: 'Open sidebar on startup',
     settingsOpenSidebarOnStartupDesc: 'If enabled, the JWL Linker sidebar will open automatically when Obsidian starts.',
     settingsDebug: 'Debug mode',
-    settingsDebugDesc: 'If enabled, debug helpers will be exposed in the console (window.test*).',
+    settingsDebugDesc: 'If enabled, the plugin writes details of its work to the developer console.',
     // Menu commands
     menuCiteVerses: 'Cite verses',
     menuCiteVersesCallout: 'Cite verses as callout',
@@ -209,6 +212,7 @@ const InterfaceStrings = {
     menuConvertJworg: 'Convert jw.org url to JW Library',
     menuOpenJWLibrary: 'Open scripture at caret in JW Library',
     menuOpenSidebar: 'Open sidebar',
+    menuOpenMenu: 'Open menu',
     menuBatchConvert: 'Cite all references in document',
     batchProcessing: 'Loading citations...',
     batchComplete: 'Citations added: {count}',
@@ -220,6 +224,7 @@ const InterfaceStrings = {
     name: 'JWL Linker',
     invalidScripture: '⚠️ Esta no es una referencia bíblica válida.',
     invalidUrl: '⚠️ Esta no es una URL válida de wol.jw.org.',
+    invalidPublication: '⚠️ Esta no es una referencia de publicación válida.',
     onlineLookupFailed: '⚠️ Falló la búsqueda bíblica en línea. Inténtalo de nuevo.',
     noEditor: '⚠️ No hay editor activo disponible.',
     noSelection: '⚠️ Nada en la línea del cursor o sin selección.',
@@ -285,7 +290,7 @@ const InterfaceStrings = {
     settingsOpenSidebarOnStartup: 'Abrir panel lateral al iniciar',
     settingsOpenSidebarOnStartupDesc: 'Si se activa, el panel lateral de JWL Linker se abrirá automáticamente al iniciar Obsidian.',
     settingsDebug: 'Modo de depuración',
-    settingsDebugDesc: 'Si se activa, se expondrán funciones de depuración en la consola (window.test*).',
+    settingsDebugDesc: 'Si se activa, el plugin escribe detalles de su funcionamiento en la consola de desarrollo.',
     // Menu commands
     menuCiteVerses: 'Citar versículos',
     menuCiteVersesCallout: 'Citar versículos como destacado',
@@ -299,6 +304,7 @@ const InterfaceStrings = {
     menuConvertJworg: 'Convertir URL de jw.org a JW Library',
     menuOpenJWLibrary: 'Abrir escritura en JW Library',
     menuOpenSidebar: 'Abrir barra lateral',
+    menuOpenMenu: 'Abrir menú',
     menuBatchConvert: 'Citar todas las referencias del documento',
     batchProcessing: 'Cargando citas...',
     batchComplete: 'Citas añadidas: {count}',
@@ -447,22 +453,10 @@ const Config = {
   scriptureNoVerseRegex: /(('?)((?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.]{2,}|song of solomon))((?: ?(?:\d{1,3})(?![\d:]);?)+))(\]|<\/a>)?/gimu,
   wolLinkRegex: /(\[([^\[\]]*)\]\()?(https\:\/\/wol\.jw\.org[^\s\)]{2,})(\))?/gim,
   jworgLinkRegex: /(\[([^\[\]]*)\]\()?(https[^\s\)]+jw\.org[^\s\)]{2,})(\))?/gim,
-  // Russian publication reference regex (only Russian format with абз.)
-  // Russian: w25.01 28, абз. 11 OR w25.3 с. 8 абз. 2 OR ws12.02 15 абз. 2
-  russianPubRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/g,
-  // Russian pre-2016 day/month format: w10 15/1 с. 3 абз. 1 (day/month, as in Russian publications)
-  russianPubDayRegex: /w(s)?(\d{2})\s+(\d{1,2})\/(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/g,
   // Russian publication with month names regex (w25 Март с. 8 абз. 2, ws12 Февраль с. 15 абз. 2)
   russianPubMonthRegex: /w(s)?(\d{2})\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
   // Russian publication with day and month names regex (w10 15 Января с. 3 абз. 1, ws10 15 Января с. 3 абз. 1)
   russianPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(январь|февраль|март|апрель|май|июнь|июль|август|сентябрь|октябрь|ноябрь|декабрь|января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+с\.\s*(\d+)\s+абз\.\s*(\d+)/gi,
-  // English publication reference regex (formats like w65 6/1 p. 329 par. 6, ws12 2/15 15 par. 2)
-  // English: w65 6/1 p. 329 par. 6, w24 1/15 p. 12 par. 3, ws12 2/15 15 par. 2
-  englishPubRegex: /w[s]?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)\s+par\.\s*(\d+)/gi,
-  // English publication with month number format (w23.12 20 par. 7, ws23.12 p. 20 par. 7)
-  // Used to support post-2016 style month-only references (YY.MM) in English.
-  // Also accepts the Spanish markers (pág./párr.) so post-2016 Spanish references are routed here
-  englishPubMonthNumberRegex: /w[s]?(\d{2})\.(\d{1,2})\s+(?:(?:p|pág)\.\s*)?(\d+)\s+(?:par|párr)\.\s*(\d+)/gi,
   // English publication with month names regex (w25 March p. 8 par. 2, ws12 February p. 15 par. 2)
   englishPubMonthRegex: /w(s)?(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi,
   // English publication with day and month names regex (w10 15 January p. 3 par. 1, ws10 15 January p. 3 par. 1)
@@ -526,17 +520,6 @@ function isValidUrl(url) {
   } catch {
     return false;
   }
-}
-
-/**
- * Is this a Russian Watchtower reference (w25.01 28, абз. 11 | w10 15/1 с. 3 абз. 1)?
- * @param {string} input
- * @returns {boolean}
- */
-function isRussianPubReference(input) {
-  Config.russianPubRegex.lastIndex = 0;
-  Config.russianPubDayRegex.lastIndex = 0;
-  return Config.russianPubRegex.test(input) || Config.russianPubDayRegex.test(input);
 }
 
 // All the available commands provided by the plugin
@@ -762,7 +745,7 @@ function guessIssueDay(monthNumber) {
 /**
  * Shared Watchtower auto-formatter for the English and Spanish month-name formats
  * Pre-2016 (semi-monthly issues): w10 1/15 p. 3 par. 1 (English, month/day) | w10 15/1 pág. 3 párr. 1 (Spanish, day/month)
- * 2016+ (monthly issues): w25.03 p. 8 par. 2 — handled by englishPubMonthNumberRegex
+ * 2016+ (monthly issues): w25.03 p. 8 par. 2 — parsed by WatchtowerRegex
  * @param {string} input
  * @param {{dayMonthRegex: RegExp, monthRegex: RegExp, months: Object, pageTerm: string, parTerm: string, dayFirst?: boolean, label: string}} opts
  * @returns {string}
@@ -877,25 +860,6 @@ function autoFormatSpanishWatchtower(input) {
   });
 }
 
-/**
- * Parse a Russian Watchtower reference in either supported format:
- *   w25.01 28, абз. 11 | w25.3 с. 8 абз. 2 | ws12.02 15 абз. 2   (YY.MM)
- *   w10 15/1 с. 3 абз. 1                                          (pre-2016 day/month)
- * @param {string} input
- * @returns {{isStudy: boolean, year: string, monthNum: string, day: string|null, page: string, paragraph: string}|null}
- */
-function parseRussianPubReference(input) {
-  let m = /w(s)?(\d{2})\.(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/.exec(input);
-  if (m) {
-    return { isStudy: Boolean(m[1]), year: m[2], monthNum: m[3], day: null, page: m[4], paragraph: m[5] };
-  }
-  m = /w(s)?(\d{2})\s+(\d{1,2})\/(\d{1,2})\s+(?:с\.\s*)?(\d+),?\s*абз\.\s*(\d+)/.exec(input);
-  if (m && Number(m[4]) >= 1 && Number(m[4]) <= 12) {
-    return { isStudy: Boolean(m[1]), year: m[2], monthNum: m[4], day: m[3], page: m[5], paragraph: m[6] };
-  }
-  return null;
-}
-
 const RussianMonthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const RussianMonthNamesGenitive = ['', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
@@ -924,6 +888,209 @@ function fillCitationTemplate(template, title, text) {
   return template.replace('{title}', () => title).replace('{text}', () => body);
 }
 
+/* ---------------------------------------------------------------------------
+ * Publication references (Watchtower and other publications)
+ *
+ * All publication citations go through the same three steps:
+ *   1. parse the reference, whatever language format it was typed in
+ *   2. build the WOL search query and the title in the citation language
+ *   3. fetch the paragraph from the WOL lookup page (.resultItems)
+ * WOL resolves exact references ("w23.12 p. 20 par. 7", "w25.03 8, абз. 2",
+ * "od cap. 15 párr. 3") and returns the requested paragraph.
+ * ------------------------------------------------------------------------- */
+
+const SpanishMonthNames = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const EnglishMonthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** Conventions of each citation language (keys match Languages: EN, RU, ES) */
+const PubLangs = {
+  EN: {
+    label: 'PUB.', chapter: 'chap.', page: 'p.', pages: 'pp.', par: 'par.',
+    dayFirst: false, // w10 1/15 = 15 January
+    notFound: 'Text not found. Try search:',
+    watchtower: 'The Watchtower', watchtowerStudy: 'The Watchtower (Study Edition)',
+    month: (m) => EnglishMonthNames[m],
+    issue: (day, m) => `${EnglishMonthNames[m]} ${day}`,
+  },
+  RU: {
+    label: 'ПУБЛ.', chapter: 'глава', page: 'с.', pages: 'сс.', par: 'абз.',
+    dayFirst: true, // w10 15/1 = 15 января
+    notFound: 'Текст не найден. Попробуйте поиск:',
+    watchtower: 'Сторожевая башня', watchtowerStudy: 'Сторожевая башня (выпуск для изучения)',
+    month: (m) => RussianMonthNames[m],
+    issue: (day, m) => `${day} ${RussianMonthNamesGenitive[m]}`,
+  },
+  ES: {
+    label: 'PUBL.', chapter: 'cap.', page: 'pág.', pages: 'págs.', par: 'párr.',
+    dayFirst: true, // w10 15/1 = 15 de enero
+    notFound: 'Texto no encontrado. Pruebe la búsqueda:',
+    watchtower: 'La Atalaya', watchtowerStudy: 'La Atalaya (edición de estudio)',
+    month: (m) => SpanishMonthNames[m].charAt(0).toUpperCase() + SpanishMonthNames[m].slice(1),
+    issue: (day, m) => `${day} de ${SpanishMonthNames[m]}`,
+  },
+};
+
+/** Publication titles by citation language */
+const PublicationTitles = {
+  EN: {
+    od: 'Organized to Do Jehovah\'s Will', 'it-1': 'Insight on the Scriptures, Volume 1',
+    'it-2': 'Insight on the Scriptures, Volume 2', si: 'All Scripture Is Inspired of God and Beneficial',
+    g: 'Awake!', w: 'The Watchtower', km: 'Our Kingdom Ministry',
+    mwb: 'Our Christian Life and Ministry—Meeting Workbook', lff: 'Listen to God and Live Forever',
+    rs: 'Reasoning From the Scriptures', cl: 'Draw Close to Jehovah',
+    jv: 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom', dp: 'Pay Attention to Daniel\'s Prophecy!',
+    'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I', 'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
+    be: 'Learn From the Theocratic Ministry School', th: 'Apply Yourself to Reading and Teaching',
+  },
+  RU: {
+    od: 'Организованы исполнять волю Иеговы', 'it-1': 'Понимание Писания, том 1',
+    'it-2': 'Понимание Писания, том 2', si: 'Все Писание вдохновлено Богом и полезно',
+    g: 'Пробудитесь!', w: 'Сторожевая башня', km: 'Наше царственное служение',
+    mwb: 'Наша христианская жизнь и служение', lff: 'Слушай Бога и живи вечно',
+    rs: 'Рассуждение на основании Писаний', cl: 'Приближайтесь к Иегове',
+    jv: 'Свидетели Иеговы — возвещатели Царства Бога', dp: 'Обратите внимание на пророчество Даниила!',
+    'ip-1': 'Пророчество Исаии — свет для всего человечества I', 'ip-2': 'Пророчество Исаии — свет для всего человечества II',
+    be: 'Учимся в Школе теократического служения', th: 'Развивай навыки чтения и способность',
+  },
+  ES: {
+    od: 'Organizados para hacer la voluntad de Jehová', 'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
+    'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2', si: 'Toda Escritura es inspirada de Dios y provechosa',
+    g: '¡Despertad!', w: 'La Atalaya', km: 'Nuestro Ministerio del Reino',
+    mwb: 'Nuestra Vida Cristiana y Ministerio—Cuaderno de reunión', lff: 'Escucha a Dios y vivirás para siempre',
+    rs: 'Razonamiento a partir de las Escrituras', cl: 'Acerquémonos a Jehová',
+    jv: 'Los testigos de Jehová, proclamadores del Reino de Dios', dp: '¡Presta atención a la profecía de Daniel!',
+    'ip-1': 'La profecía de Isaías: luz para toda la humanidad I', 'ip-2': 'La profecía de Isaías: luz para toda la humanidad II',
+    be: 'Benefíciese de la Escuela del Ministerio Teocrático', th: 'Aplícate a la lectura y la enseñanza',
+  },
+};
+
+/**
+ * Watchtower reference in any supported format (the paragraph is required):
+ *   w25.01 28, абз. 11 | w25.3 с. 8 абз. 2 | w10 15/1 с. 3 абз. 1   (Russian)
+ *   w23.12 p. 20 par. 7 | w65 6/1 p. 329 par. 6 | ws12 2/15 15 par. 2 (English, month/day)
+ *   w23.12 pág. 20 párr. 7 | w10 15/1 pág. 3 párr. 1                (Spanish, day/month)
+ * Groups: 1 study, 2 year, 3 month (YY.MM), 4/5 day-month or month-day,
+ *         6 page marker, 7 page, 8 paragraph marker, 9 paragraph
+ */
+const WatchtowerRegex =
+  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párr|par)\.\s*(\d+)/i;
+
+/**
+ * Parse a Watchtower reference
+ * @param {string} input
+ * @returns {{whole: string, isStudy: boolean, year: string, month: number, day: number|null,
+ *   page: string, paragraph: string, sourceLang: string}|null}
+ */
+function parseWatchtowerReference(input) {
+  const m = WatchtowerRegex.exec(input ?? '');
+  if (!m) return null;
+  return watchtowerFromMatch(m);
+}
+
+/** @param {RegExpMatchArray} m match of WatchtowerRegex */
+function watchtowerFromMatch(m) {
+  const [whole, study, year, dotMonth, a, b, pageMarker, page, parMarker, paragraph] = m;
+  const marker = parMarker.toLowerCase();
+  const sourceLang = marker === 'абз' ? 'RU' : marker === 'párr' ? 'ES' : 'EN';
+  let month;
+  let day = null;
+  if (dotMonth) {
+    month = Number(dotMonth);
+  } else if (PubLangs[sourceLang].dayFirst) {
+    day = Number(a);
+    month = Number(b);
+  } else {
+    month = Number(a);
+    day = Number(b);
+  }
+  if (month < 1 || month > 12 || (day !== null && (day < 1 || day > 31))) return null;
+  return { whole, isStudy: Boolean(study), year, month, day, page, paragraph, sourceLang, pageMarker };
+}
+
+/** WOL search query for a Watchtower reference, in the citation language */
+function formatWatchtowerQuery(ref, lang) {
+  const L = PubLangs[lang];
+  const code = ref.isStudy ? 'ws' : 'w';
+  if (ref.day) {
+    const issue = L.dayFirst ? `${ref.day}/${ref.month}` : `${ref.month}/${ref.day}`;
+    return `${code}${ref.year} ${issue} ${L.page} ${ref.page} ${L.par} ${ref.paragraph}`;
+  }
+  const month = String(ref.month).padStart(2, '0');
+  if (lang === 'RU') {
+    return `${code}${ref.year}.${month} ${ref.page}, ${L.par} ${ref.paragraph}`;
+  }
+  return `${code}${ref.year}.${month} ${L.page} ${ref.page} ${L.par} ${ref.paragraph}`;
+}
+
+/** Display title for a Watchtower reference, in the citation language */
+function formatWatchtowerTitle(ref, lang) {
+  const L = PubLangs[lang];
+  const name = ref.isStudy ? L.watchtowerStudy : L.watchtower;
+  const issue = ref.day ? L.issue(ref.day, ref.month) : L.month(ref.month);
+  return `${name} ${toFullYear(ref.year)} ${issue} ${L.page} ${ref.page} ${L.par} ${ref.paragraph}`;
+}
+
+/**
+ * Parse another publication reference (od 15 par. 3, it-1 332, cl глава 8 с. 77 абз. 2, ...)
+ * @param {string} input
+ * @returns {{whole: string, pubCode: string, number: string, page: string|undefined,
+ *   paragraph: string|undefined, hasChapter: boolean, sourceLang: string}|null}
+ */
+function parseOtherPublicationReference(input) {
+  const m = matchOtherPublication(input ?? '');
+  if (!m) return null;
+  const [whole, pubCode, number, page, paragraph] = m;
+  const text = whole.trim();
+  let sourceLang = 'EN';
+  if (/абз\.|глава|(?:^|\s)сс?\./i.test(text) || /[Ѐ-ӿ]/.test(input)) {
+    sourceLang = 'RU';
+  } else if (/párr\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
+    sourceLang = 'ES';
+  }
+  return {
+    whole: text,
+    pubCode: pubCode.toLowerCase(),
+    number,
+    page,
+    paragraph,
+    hasChapter: /chap\.|глава|(?:^|\s)cap\./i.test(text),
+    sourceLang,
+  };
+}
+
+/** WOL search query for another publication, in the citation language */
+function formatOtherPublicationQuery(ref, lang) {
+  return `${ref.pubCode} ${formatOtherPublicationLocation(ref, lang)}`;
+}
+
+/** "chap. 15 par. 3" / "глава 15 абз. 3" / "332" ... in the citation language */
+function formatOtherPublicationLocation(ref, lang) {
+  const L = PubLangs[lang];
+  // WOL only resolves od/cl paragraphs with the chapter marker ("od 15 par. 3" finds nothing)
+  const useChapter = ref.hasChapter || (['od', 'cl'].includes(ref.pubCode) && Boolean(ref.paragraph));
+  let location = `${useChapter ? `${L.chapter} ` : ''}${ref.number}`;
+  if (ref.page) location += ` ${ref.page.includes('-') ? L.pages : L.page} ${ref.page}`;
+  if (ref.paragraph) location += ` ${L.par} ${ref.paragraph}`;
+  return location;
+}
+
+/** Display title for another publication, in the citation language */
+function formatOtherPublicationTitle(ref, lang) {
+  const name = PublicationTitles[lang]?.[ref.pubCode] ?? ref.pubCode;
+  return `${name} ${formatOtherPublicationLocation(ref, lang)}`;
+}
+
+/**
+ * Is there a publication reference (Watchtower or other) in this text?
+ * @param {string} input
+ * @returns {boolean}
+ */
+function isPublicationReference(input) {
+  return Boolean(parseWatchtowerReference(input) || matchOtherPublication(input));
+}
+
 /**
  * Update interface language
  * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
@@ -932,94 +1099,6 @@ function updateInterfaceLanguage(interfaceLang) {
   Lang = InterfaceStrings[interfaceLang] || InterfaceStrings.Russian;
 }
 
-/**
- * Test function for Russian publication regex
- * @param {string} input - Test input
- */
-function testRussianPubRegex(input) {
-  debugLog('=== Testing Russian Publication Regex ===');
-  debugLog('Input:', JSON.stringify(input));
-  debugLog('Input length:', input.length);
-  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
-
-  // Test the regex directly
-  const regex = /w(\d{2})\.(\d{1,2})\s+(\d+),?\s*абз\.\s*(\d+)/g;
-  regex.lastIndex = 0;
-  const match = regex.exec(input);
-
-  debugLog('Regex pattern:', regex.source);
-  debugLog('Match result:', match);
-
-  if (match) {
-    const [fullMatch, year, month, page, paragraph] = match;
-    debugLog('Parsed components:', { fullMatch, year, month, page, paragraph });
-
-    // Test month lookup
-    if (month) {
-      const monthLower = month.toLowerCase();
-      debugLog('Month (lowercase):', monthLower);
-      debugLog('Month found in mapping:', RussianMonths[monthLower]);
-    }
-
-    // Test function - no URL generation needed
-  } else {
-    debugLog('No match found');
-    // Try simpler patterns
-    debugLog('Testing simpler patterns:');
-    debugLog('w24 match:', /w24/.test(input));
-    debugLog('Cyrillic match:', /[а-яёА-ЯЁ]/.test(input));
-    debugLog('с. match:', /с\./.test(input));
-    debugLog('Numbers match:', /\d+/.test(input));
-  }
-
-  return match;
-}
-
-/**
- * Test function for English publication regex
- * @param {string} input - Test input
- */
-function testEnglishPubRegex(input) {
-  debugLog('=== Testing English Publication Regex ===');
-  debugLog('Input:', JSON.stringify(input));
-  debugLog('Input length:', input.length);
-  debugLog('Input chars:', input.split('').map(c => `${c} (${c.charCodeAt(0)})`));
-
-  // Test the regex directly
-  const regex = /w(\d{2})\s+(\d{1,2}\/\d{1,2})\s+p\.\s*(\d+)\s+par\.\s*(\d+)/g;
-  regex.lastIndex = 0;
-  const match = regex.exec(input);
-
-  debugLog('Regex pattern:', regex.source);
-  debugLog('Match result:', match);
-
-  if (match) {
-    const [fullMatch, year, monthDay, page, paragraph] = match;
-    debugLog('Parsed components:', { fullMatch, year, monthDay, page, paragraph });
-
-    // Test month/day parsing
-    if (monthDay) {
-      const [month, day] = monthDay.split('/').map(n => parseInt(n));
-      debugLog('Parsed month/day:', { month, day });
-
-      // Test month lookup
-      const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'];
-      const englishMonth = englishMonths[month];
-      debugLog('English month:', englishMonth);
-    }
-  } else {
-    debugLog('No match found');
-    // Try simpler patterns
-    debugLog('Testing simpler patterns:');
-    debugLog('w65 match:', /w65/.test(input));
-    debugLog('p. match:', /p\./.test(input));
-    debugLog('par. match:', /par\./.test(input));
-    debugLog('Numbers match:', /\d+/.test(input));
-  }
-
-  return match;
-}
 
 class JWLLinkerPlugin extends Plugin {
   constructor() {
@@ -1027,8 +1106,6 @@ class JWLLinkerPlugin extends Plugin {
     super(...arguments);
     /** @type {Object} */
     this.settings = {};
-    /** @type {Menu} */
-    this.menu = new Menu();
     this.menuClass = 'jwl-linker-plugin-menu-container';
   }
 
@@ -1105,7 +1182,7 @@ class JWLLinkerPlugin extends Plugin {
 
     /** @namespace */
     this.api = {
-      getAllScriptureLinks: this._parseScriptureLinks,
+      getAllScriptureLinks: this._parseScriptureLinks.bind(this),
       DisplayType: DisplayType,
     };
 
@@ -1119,13 +1196,10 @@ class JWLLinkerPlugin extends Plugin {
       });
     }
 
-    // Cache the populated menu
-    this.menu = null;
-
     // Add the global Open JWL Menu command (for Mobile toolbar)
     this.addCommand({
       id: this.MenuName.id,
-      name: this.MenuName.text,
+      name: Lang.menuOpenMenu,
       icon: this.MenuName.icon,
       editorCallback: (editor) => this.showMenu(editor),
     });
@@ -1142,7 +1216,7 @@ class JWLLinkerPlugin extends Plugin {
         menu.addItem((item) => {
           item.setTitle(this.MenuName.text).setIcon(this.MenuName.icon);
           const submenu = item.setSubmenu();
-          this.buildMenu(submenu);
+          this.buildMenu(submenu, editor);
         });
       }),
     );
@@ -1161,44 +1235,7 @@ class JWLLinkerPlugin extends Plugin {
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
 
-    // biome-ignore lint: ⚠️
-    console.log(
-      `%c${this.manifest.name} ${this.manifest.version} loaded`,
-      'background-color: purple; padding:4px; border-radius:4px',
-    );
-
-    if (this.settings.debug) {
-      window.testRussianPubRegex = testRussianPubRegex;
-      window.testEnglishPubRegex = testEnglishPubRegex;
-      window.testLanguageDetection = (input) => {
-        debugLog('=== Testing Language Detection ===');
-        debugLog('Input:', input);
-        const detected = detectLanguage(input);
-        debugLog('Detected language:', detected);
-        return detected;
-      };
-      window.testAutoFormatting = (input) => {
-        debugLog('=== Testing Auto-formatting ===');
-        debugLog('Original:', input);
-        let formatted = autoFormatRussianWatchtower(input);
-        if (formatted !== input) {
-          debugLog('Russian formatted:', formatted);
-          return formatted;
-        }
-        formatted = autoFormatEnglishWatchtower(input);
-        if (formatted !== input) {
-          debugLog('English formatted:', formatted);
-          return formatted;
-        }
-        formatted = autoFormatSpanishWatchtower(input);
-        if (formatted !== input) {
-          debugLog('Spanish formatted:', formatted);
-          return formatted;
-        }
-        debugLog('No formatting applied');
-        return input;
-      };
-    }
+    debugLog(`${this.manifest.name} ${this.manifest.version} loaded`);
   }
 
   onunload() { }
@@ -1219,6 +1256,7 @@ class JWLLinkerPlugin extends Plugin {
     let leaf = workspace.getLeavesOfType(JWL_LINKER_VIEW).first();
     if (!leaf) {
       leaf = workspace.getRightLeaf(false); // false => no split
+      if (!leaf) return;
       await leaf.setViewState({
         type: JWL_LINKER_VIEW,
         active: true,
@@ -1377,57 +1415,9 @@ class JWLLinkerPlugin extends Plugin {
       // Overlap test: [start,end) intersects any scripture range.
       const overlapsScripture = (start, end) => scriptureRanges.some((r) => start < r.end && end > r.start);
 
-      // 2. Find Russian publication references (w25.01 28, абз. 11)
-      const ruPubRegex = new RegExp(Config.russianPubRegex.source, 'gi');
-      while ((match = ruPubRegex.exec(content)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
-        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
-          allReferences.push({
-            type: 'publication',
-            full: match[0],
-            text: match[0],
-            index: match.index,
-            line: this._getLineNumber(content, match.index)
-          });
-        }
-      }
-
-      // 2b. Find Russian pre-2016 references (w10 15/1 с. 3 абз. 1)
-      const ruPubDayRegex = new RegExp(Config.russianPubDayRegex.source, 'gi');
-      while ((match = ruPubDayRegex.exec(content)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
-        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
-          allReferences.push({
-            type: 'publication',
-            full: match[0],
-            text: match[0],
-            index: match.index,
-            line: this._getLineNumber(content, match.index)
-          });
-        }
-      }
-
-      // 3. Find English publication references (w65 6/1 p. 329 par. 6)
-      const enPubRegex = new RegExp(Config.englishPubRegex.source, 'gi');
-      while ((match = enPubRegex.exec(content)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
-        if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
-          allReferences.push({
-            type: 'publication',
-            full: match[0],
-            text: match[0],
-            index: match.index,
-            line: this._getLineNumber(content, match.index)
-          });
-        }
-      }
-
-      // 3b. Find English publication references with month number (w23.12 20 par. 7)
-      const enPubMonthNumberRegex = new RegExp(Config.englishPubMonthNumberRegex.source, 'gi');
-      while ((match = enPubMonthNumberRegex.exec(content)) !== null) {
+      // 2. Find Watchtower references in any supported format (see WatchtowerRegex)
+      const watchtowerRegex = new RegExp(WatchtowerRegex.source, 'gi');
+      while ((match = watchtowerRegex.exec(content)) !== null) {
         const start = match.index;
         const end = start + match[0].length;
         if (!this._isInsideCallout(content, match.index) && !overlapsScripture(start, end)) {
@@ -1576,41 +1566,15 @@ class JWLLinkerPlugin extends Plugin {
    */
   async _fetchPublicationCitation(input, view, command) {
     input = normalizeInput(input);
-
-    // If user provided a specific paragraph, prefer callout format even in single-mode
-    // so the extracted text is grouped under a [!cite] block.
-    if (command === Cmd.citePublicationLookup) {
-      const hasParagraph = /(?:\bpar\.\s*\d+|\bабз\.\s*\d+|\bpárr\.\s*\d+)/i.test(input);
-      if (hasParagraph) {
-        command = Cmd.citeVerseCallout;
-      }
+    if (parseWatchtowerReference(input)) {
+      return await this._fetchWatchtowerCitation(input, view, command);
     }
-
-    // Check if it's a Russian publication reference first (only абз. format)
-    if (isRussianPubReference(input)) {
-      return await this._fetchRussianPublicationCitation(input, view, command);
-    }
-
-    // Check if it's an English publication reference
-    Config.englishPubRegex.lastIndex = 0;
-    if (Config.englishPubRegex.test(input)) {
-      return await this._fetchEnglishPublicationCitation(input, view, command);
-    }
-
-    // Check if it's an English publication reference with month number (w23.12 20 par. 7)
-    Config.englishPubMonthNumberRegex.lastIndex = 0;
-    if (Config.englishPubMonthNumberRegex.test(input)) {
-      return await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
-    }
-
-    // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
     if (matchOtherPublication(input)) {
       return await this._fetchOtherPublicationCitation(input, view, command);
     }
-
-    // Fallback to lookup citation
     return await this._fetchLookupCitation(input, view);
   }
+
 
   /**
    * KEY FEATURE
@@ -1653,71 +1617,33 @@ class JWLLinkerPlugin extends Plugin {
 
       loadingNotice = new Notice(`${Lang.loadingCitation} ${selection}`); // remain open until we complete
       const view = await this.getView();
+      let job;
       switch (command) {
         case Cmd.citeVerse:
         case Cmd.citeVerseCallout:
-          // Check if it's a Russian publication reference first
-          if (isRussianPubReference(selection)) {
-            this._fetchRussianPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
+          if (isPublicationReference(selection)) {
+            job = this._fetchPublicationCitation(selection, view, command);
+          } else if (this.settings.dualModeVerses) {
+            // Dual mode: Bible verses in the two configured languages
+            job = this._fetchDualBibleCitation(selection, view, caret, command);
           } else {
-            // Check if it's an English publication reference
-            Config.englishPubRegex.lastIndex = 0; // Reset regex
-            Config.englishPubMonthNumberRegex.lastIndex = 0;
-            if (Config.englishPubRegex.test(selection)) {
-              this._fetchEnglishPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-            } else if (Config.englishPubMonthNumberRegex.test(selection)) {
-              this._fetchEnglishMonthNumberPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-            } else {
-              // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
-              if (matchOtherPublication(selection)) {
-                this._fetchOtherPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-              } else {
-                // Convert Scripture reference into bible verse citation (+ JW Library MD URL*)
-                if (this.settings.dualModeVerses) {
-                  // Dual mode: show Bible verses in two configured languages
-                  this._fetchDualBibleCitation(selection, view, caret, command).then(replaceEditorSelection, handleCitationError);
-                } else {
-                  this._fetchBibleCitation(selection, view, caret, command).then(replaceEditorSelection, handleCitationError);
-                }
-              }
-            }
+            // Scripture reference → verse citation (+ JW Library link)
+            job = this._fetchBibleCitation(selection, view, caret, command);
           }
           break;
         case Cmd.citeParagraph:
         case Cmd.citeParagraphCallout:
         case Cmd.addLinkTitle:
-          // Convert JW.Org Finder-type URL to a paragraph citation (+ JW Library MD URL*)
-          this._fetchParagraphCitation(selection, view, caret, command, pars).then(replaceEditorSelection, handleCitationError);
+          // jw.org finder / wol.jw.org URL → paragraph citation
+          job = this._fetchParagraphCitation(selection, view, caret, command, pars);
           break;
         case Cmd.citePublicationLookup:
-          if (this.settings.dualModePublications) {
-            // Dual mode: show publications in two configured languages
-            this._fetchDualPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-          } else {
-            // Single mode: check if it's a Russian publication reference first (only абз. format)
-            if (isRussianPubReference(selection)) {
-              this._fetchRussianPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-            } else {
-              // Check if it's an English publication reference
-              Config.englishPubRegex.lastIndex = 0; // Reset regex
-              Config.englishPubMonthNumberRegex.lastIndex = 0;
-              if (Config.englishPubRegex.test(selection)) {
-                this._fetchEnglishPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-              } else if (Config.englishPubMonthNumberRegex.test(selection)) {
-                this._fetchEnglishMonthNumberPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-              } else {
-                // Check if it's another JW publication reference (od, it-1, it-2, si, etc.)
-                if (matchOtherPublication(selection)) {
-                  this._fetchOtherPublicationCitation(selection, view, command).then(replaceEditorSelection, handleCitationError);
-                } else {
-                  // Convert Publication lookup into a article citation (original behavior)
-                  this._fetchLookupCitation(selection, view).then(replaceEditorSelection, handleCitationError);
-                }
-              }
-            }
-          }
+          job = this.settings.dualModePublications
+            ? this._fetchDualPublicationCitation(selection, view, command)
+            : this._fetchPublicationCitation(selection, view, command);
           break;
       }
+      job?.then(replaceEditorSelection, handleCitationError);
     } else {
       new Notice(Lang.noSelection, Config.delay);
     }
@@ -1748,18 +1674,13 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {Editor}
    */
   confirmEditor(editor) {
-    let activeEditor = editor;
-    if (!activeEditor?.hasFocus()) {
-      const view = this.app.workspace.getMostRecentLeaf()?.view;
-      if (view?.editor) {
-        activeEditor = view.editor;
-      }
-    }
+    const activeEditor = editor ?? this.app.workspace.activeEditor?.editor;
     if (!activeEditor) {
       new Notice(Lang.noEditor, Config.delay);
     }
     return activeEditor;
   }
+
 
   /**
    * Get a valid view reference even if deferred, so that we can add to the history
@@ -1787,18 +1708,16 @@ class JWLLinkerPlugin extends Plugin {
     // Is the menu already active?
     if (document.querySelector(`.menu${this.menuClass}`)) return;
 
-    if (!this.menu) {
-      this.menu = this.buildMenu();
-    }
-
-    if (!editor || !editor.hasFocus()) {
+    if (!editor) {
       new Notice(Lang.noEditor, Config.delay);
       return;
     }
+    // Rebuilt each time so check marks and the target editor are current
+    const menu = this.buildMenu(undefined, editor);
     const cursor = editor.getCursor('from');
     const offset = editor.posToOffset(cursor);
     const coords = editor.cm.coordsAtPos(offset);
-    this.menu.showAtPosition({
+    menu.showAtPosition({
       x: coords.right,
       y: coords.top + 20,
     });
@@ -1809,7 +1728,7 @@ class JWLLinkerPlugin extends Plugin {
    * @param {*} submenu submenu instance of a parent menu; if empty create new menu
    * @returns New menu ready to use
    */
-  buildMenu(submenu = undefined) {
+  buildMenu(submenu = undefined, editor = undefined) {
     /** @type {Menu} */
     const menu = submenu ? submenu : new Menu();
     // this class is needed to identify if the menu is already open
@@ -1827,7 +1746,7 @@ class JWLLinkerPlugin extends Plugin {
       menu.addItem((item) => {
         item.setTitle(cmd.text);
         item.setIcon(cmd.icon);
-        item.onClick(() => this.app.commands.executeCommandById(`${this.manifest.id}:${cmd.id}`));
+        item.onClick(() => cmd.fn(editor ?? this.app.workspace.activeEditor?.editor));
       });
       if (cmd.sep ?? null) menu.addSeparator();
     }
@@ -2331,1570 +2250,140 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
-   * Fetch Russian publication citation (e.g., w25.01 28, абз. 11)
-   * @param {string} input - Russian publication reference
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
+   * Citation language for a publication reference: the fixed "Citation language" setting,
+   * or the language the reference was typed in
+   * @param {string} detected - language implied by the reference format (EN, RU, ES)
+   * @returns {string} EN | RU | ES
    */
-  async _fetchRussianPublicationCitation(input, view, command) {
-    debugLog('Trying to parse Russian publication:', input);
+  _publicationLanguage(detected) {
+    const fixed = Languages[this.settings?.lang];
+    if (fixed && PubLangs[fixed]) return fixed;
+    return PubLangs[detected] ? detected : 'EN';
+  }
 
-    // Use exec for proper group extraction - Russian format only
-    // Supports both w (Watchtower) and ws (Watchtower Study)
-    const parsed = parseRussianPubReference(input);
-    if (!parsed) {
-      debugLog('No match found for:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-    const { isStudy, year, monthNum, day, page, paragraph } = parsed;
-    debugLog('Parsed:', parsed);
-
-    // Check if Watchtower year is available online
-    const publicationYear = toFullYear(year);
-    const availability = checkPublicationAvailability('w', 'RU', publicationYear);
-    if (availability.isOffline) {
-      debugLog('Russian Watchtower not available for year:', publicationYear);
-      return `${input}\n${availability.message}`;
-    }
-
-    const monthName = RussianMonthNames[parseInt(monthNum, 10)];
-    const fullYear = toFullYear(year);
-    const pubName = isStudy ? 'Сторожевая башня (выпуск для изучения)' : 'Сторожевая башня';
-    const pubCode = isStudy ? 'ws' : 'w';
-    const issue = day ? `${Number(day)} ${RussianMonthNamesGenitive[parseInt(monthNum, 10)]}` : monthName;
-    const title = `${pubName} ${fullYear} ${issue} с. ${page} абз. ${paragraph}`;
-
-    // WOL resolves the exact reference and returns the paragraph text in .resultItems
-    // (checked on wol.jw.org: "w25.03 8, абз. 2" and "w10 15/1 с. 3 абз. 1")
-    const query = day
-      ? `${pubCode}${year} ${Number(day)}/${Number(monthNum)} с. ${page} абз. ${paragraph}`
-      : `${pubCode}${year}.${monthNum.padStart(2, '0')} ${page}, абз. ${paragraph}`;
-    const wolUrl = `${getConfigForLanguage('RU').wolLookup}${encodeURIComponent(query)}`;
+  /**
+   * Fetch a paragraph from the WOL lookup page and format it with the citation template
+   * @param {{lang: string, query: string, title: string, command: string, view: Object}} options
+   * @returns {Promise<string>} the formatted citation (without the original reference line)
+   */
+  async _citeFromWol({ lang, query, title, command, view }) {
+    const L = PubLangs[lang] ?? PubLangs.EN;
+    const url = `${getConfigForLanguage(lang).wolLookup}${encodeURIComponent(query)}`;
 
     let text = '';
-    const cache = view?.getFromHistory?.(wolUrl);
+    const cache = view?.getFromHistory?.(url);
     if (cache) {
       text = cache.content.join('');
     } else {
-      const dom = await this._fetchDOM(wolUrl);
+      const dom = await this._fetchDOM(url);
       if (dom) {
         text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
         if (text) text = this._boldInitialNumber(text);
       }
     }
 
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${wolUrl})`;
-    }
-
+    const linkedTitle = this.settings.citationLink ? `[${title}](${url})` : title;
     if (text) {
-      view?.addToHistory?.(wolUrl, citationTitle, [text]);
+      view?.addToHistory?.(url, linkedTitle, [text]);
       view?.showHistory?.();
     } else {
-      text = `Текст не найден. Попробуйте поиск: [${query}](${wolUrl})`;
+      text = `${L.notFound} [${query}](${url})`;
     }
 
-    let template = '';
-    if (command === Cmd.citeVerse) {
-      template = this.settings.pubTemplate;
-    } else {
-      template = this.settings.pubCalloutTemplate;
-    }
-    // A callout template needs every line of the text inside the callout
+    let template = command === Cmd.citeVerse ? this.settings.pubTemplate : this.settings.pubCalloutTemplate;
+    template = template.replace(/ПУБЛ\.|PUBL\.|PUB\./, L.label);
+    // A callout template needs every line inside the callout (see fillCitationTemplate)
     if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
       template = `> ${template.trimStart()}`;
     }
-    if (template.trimStart().startsWith('>')) {
-      text = text.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    } else {
+    if (!template.trimStart().startsWith('>')) {
       text = text.replace(/\s*\n\s*/g, ' ');
     }
-
-    const output = [input];
-    output.push(fillCitationTemplate(template, citationTitle, text));
-    return output.join('\n');
+    return fillCitationTemplate(template, linkedTitle, text);
   }
 
   /**
-   * Fetch Russian publication citation in callout format (for dual mode)
-   * @param {string} input - Russian publication reference
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation in callout format
+   * Cite a Watchtower reference (any supported format, see WatchtowerRegex)
+   * @param {string} input - text containing the reference
+   * @param {View} view - view for history
+   * @param {Cmd} command
+   * @returns {Promise<string>}
    */
-  async _fetchRussianPublicationCitationCallout(input, view, command) {
-    debugLog('Trying to parse Russian publication for callout:', input);
-
-    // Use exec for proper group extraction - Russian format only
-    // Supports both w (Watchtower) and ws (Watchtower Study)
-    const parsed = parseRussianPubReference(input);
-    if (!parsed) {
-      debugLog('No match found for Russian callout:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-    const { isStudy, year, monthNum, day, page, paragraph } = parsed;
-    debugLog('Russian callout parsed:', parsed);
-
-    const monthName = RussianMonthNames[parseInt(monthNum, 10)];
-    const fullYear = toFullYear(year);
-    const pubName = isStudy ? 'Сторожевая башня (выпуск для изучения)' : 'Сторожевая башня';
-    const pubCode = isStudy ? 'ws' : 'w';
-    const issue = day ? `${Number(day)} ${RussianMonthNamesGenitive[parseInt(monthNum, 10)]}` : monthName;
-    const title = `${pubName} ${fullYear} ${issue} с. ${page} абз. ${paragraph}`;
-
-    // Use Russian WOL search (same approach as English but with Russian locale)
-    const russianInput = day
-      ? `${pubCode}${year} ${Number(day)}/${Number(monthNum)} с. ${page} абз. ${paragraph}`
-      : `${pubCode}${year}.${monthNum} ${page} абз. ${paragraph}`;
-    const russianLookupUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(russianInput)}`;
-
-    // Create link title with WOL search link (like English version)
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${russianLookupUrl})`;
-    }
-
-    // Try to fetch real content from Russian WOL search
-    let content = [];
-    let text = '';
-    const cache = view?.getFromHistory?.(russianLookupUrl); // try the cache first
-    if (cache) {
-      content = cache.content;
-    } else {
-      const dom = await this._fetchDOM(russianLookupUrl);
-      if (dom) {
-        // Try to extract content from Russian WOL search results (same selectors as English)
-        text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-        if (!text) {
-          // Try alternative selectors
-          text = this._getElementAsText(dom, '.searchResult', TargetType.jwonline);
-        }
-        if (!text) {
-          // Try more selectors for Russian WOL
-          const altSelectors = [
-            '.cardLine1',
-            '.cardLine2',
-            '.cardTitleBlock',
-            '.result'
-          ];
-
-          for (const selector of altSelectors) {
-            text = this._getElementAsText(dom, selector, TargetType.jwonline);
-            if (text) break;
-          }
-        }
-
-        if (!text) {
-          text = `**${paragraph}** Русский текст не найден. Попробуйте поиск: [${russianInput}](${russianLookupUrl})`;
-        }
-        content.push(text);
-      } else {
-        content.push(`**${paragraph}** Не удалось загрузить WOL. Попробуйте: [${russianInput}](${russianLookupUrl})`);
-      }
-    }
-
-    if (content.length > 0) {
-      view?.addToHistory?.(russianLookupUrl, citationTitle, content);
-      view?.showHistory?.();
-      text = content.join('');
-      text = this._boldInitialNumber(text);
-
-      // Check if paragraph content was actually found
-      if (!text || text.includes('Русский текст не найден') || text.includes('Не удалось загрузить WOL')) {
-        text = `На странице нет нумерации абзацев. Попробуйте поиск: [${russianInput}](${russianLookupUrl}). ${text}`;
-      }
-    } else {
-      text = `На странице нет нумерации абзацев. **${paragraph}** Содержимое не найдено. Попробуйте поиск: [${russianInput}](${russianLookupUrl})`;
-    }
-
-    // Use callout template like English version
-    let template = this.settings.pubCalloutTemplate;
-    // Keep "ПУБЛ." for Russian
-    // Check if template is actually a callout (user editable):
-    // If so all lines need to be part of the callout syntax
-    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
-      const trimmed = template.trimStart();
-      const leadingWs = template.slice(0, template.length - trimmed.length);
-      template = `${leadingWs}> ${trimmed}`;
-    }
-
-    if (template.includes('[!cite]')) {
-      text = text.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    } else if (template[0] === '>') {
-      text = text.replace(/^./gm, '>$&').substring(1);
-    }
-    const citation = fillCitationTemplate(template, citationTitle, text);
-
-    const output = `${input}\n${citation}`;
-    return output;
+  async _fetchWatchtowerCitation(input, view, command) {
+    const ref = parseWatchtowerReference(input);
+    if (!ref) return `${input} | ${Lang.invalidPublication}`;
+    const lang = this._publicationLanguage(ref.sourceLang);
+    const availability = checkPublicationAvailability('w', lang, toFullYear(ref.year));
+    if (availability.isOffline) return `${input}\n${availability.message}`;
+    const citation = await this._citeFromWol({
+      lang,
+      query: formatWatchtowerQuery(ref, lang),
+      title: formatWatchtowerTitle(ref, lang),
+      command,
+      view,
+    });
+    return `${input}\n${citation}`;
   }
 
   /**
-   * Fetch English publication citation (e.g., w65 6/1 p. 329 par. 6)
-   * @param {string} input - English publication reference
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
-   */
-  async _fetchEnglishPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English publication:', input);
-
-    // Use exec for proper group extraction - English format (paragraph optional)
-    // Supports both w (Watchtower) and ws (Watchtower Study)
-    const regex = /w(s)?(\d{2})\s+(\d{1,2}\/\d{1,2})\s+(?:p\.\s*)?(\d+)(?:\s+par\.\s*(\d+))?/gi;
-    regex.lastIndex = 0;
-    const match = regex.exec(input);
-
-    if (!match) {
-      debugLog('No match found for English publication:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    debugLog('English publication match found:', match);
-    const [fullMatch, isStudy, year, monthDay, page, paragraph] = match;
-    debugLog('Parsed:', { fullMatch, year, monthDay, page, paragraph });
-
-    // Check if Watchtower year is available online
-    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-    const availability = checkPublicationAvailability('w', 'EN', publicationYear);
-    if (availability.isOffline) {
-      debugLog('English Watchtower not available for year:', publicationYear);
-      return `${input}\n${availability.message}`;
-    }
-
-    // Parse month/day format (e.g., "6/1" -> month=6, day=1)
-    const [month, day] = monthDay.split('/').map(n => parseInt(n));
-
-    // Create English month names
-    const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
-    const englishMonth = englishMonths[month];
-
-    // Create title for display - handle year conversion properly
-    // For years like 65, it should be 1965; for years like 24, it could be 1924 or 2024
-    // Since w65 is clearly 1965, we'll assume years < 50 are 20xx, >= 50 are 19xx
-    const displayYear = parseInt(year) >= 50 ? `19${year}` : `20${year}`;
-    const pubName = isStudy ? 'The Watchtower (Study Edition)' : 'The Watchtower';
-    const title = `${pubName} ${displayYear} ${englishMonth} ${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`;
-
-    // Create better search URLs for English publications
-    const paddedMonth = month.toString().padStart(2, '0');
-    const paddedDay = day.toString().padStart(2, '0');
-
-    // Detect language and get appropriate config first
-    let lang = this.settings?.lang || 'Auto';
-    if (lang === 'Auto') {
-      lang = detectLanguage(input);
-    } else {
-      lang = Languages[lang] || 'EN';
-    }
-
-    const isRussian = lang === 'RU';
-    const langConfig = getConfigForLanguage(lang);
-
-    debugLog('Detected language for English publication:', lang, 'isRussian:', isRussian);
-
-    // For old publications, try different search strategies and direct links
-    // Try direct WOL publication links for old magazines
-    const pubCode = isStudy ? 'ws' : 'w';
-    const directWolUrl = `${langConfig.wolPublications}${displayYear}/${paddedMonth}/${paddedDay}`;
-
-    // Fallback search URLs - include paragraph number for better content matching
-    const searchQuery1 = `${pubCode}${year} ${month}/${day} p. ${page} par. ${paragraph}`;
-    const searchQuery2 = `${pubCode}${year} ${month}/${day}`;
-    const searchQuery3 = `"${pubName}" ${displayYear} ${englishMonth} ${day}`;
-
-    const wolUrl1 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery1)}`;
-    const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
-    const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
-
-    debugLog('Generated English WOL URLs:', { directWolUrl, wolUrl1, wolUrl2, wolUrl3 });
-
-    // For old publications (pre-2000), use JW.org finder format with docid
-    const isOldPublication = parseInt(displayYear) < 2000;
-
-    let jwlibUrl;
-    if (isOldPublication) {
-      // For old publications, use JW.org finder format like JW Library generates
-      // Format: https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&docid=1965402&par=8
-      // Calculate docid automatically based on year, month, and day
-      // Paragraph adjustment varies by year: w50 uses +1, w65 uses +2
-      // TEMPORARILY DISABLED - testing without adjustment
-      let adjustedParagraph = parseInt(paragraph); // No adjustment for testing
-      // if (parseInt(displayYear) <= 1955) {
-      //   adjustedParagraph = parseInt(paragraph) + 1; // w50 1/1 par 3 → par 4
-      // } else {
-      //   adjustedParagraph = parseInt(paragraph) + 2; // w65 6/1 par 6 → par 8
-      // }
-
-      // Calculate issue number for docid based on known examples:
-      // w50 1/1 → docid=1950003 (January 1st = issue 003)
-      // w50 12/15 → docid=1950925 (December 15th = issue 925)
-      // w65 6/1 → docid=1965402 (June 1st = issue 402)
-      // w90 1/1 → docid=1990004 (January 1st = issue 004)
-      // Pattern: seems to be sequential numbering within each year
-
-      let issueNumber;
-
-      // Create a lookup table for known values and interpolate
-      const knownIssues = {
-        1950: {
-          1: { 1: 3 },      // w50 1/1 = issue 3
-          12: { 15: 925 }   // w50 12/15 = issue 925
-        },
-        1965: { 6: { 1: 402 } },  // w65 6/1 = issue 402
-        1990: { 1: { 1: 4 } }     // w90 1/1 = issue 4
-      };
-
-      // Check if we have exact match
-      if (knownIssues[parseInt(displayYear)] &&
-        knownIssues[parseInt(displayYear)][month] &&
-        knownIssues[parseInt(displayYear)][month][day]) {
-        issueNumber = knownIssues[parseInt(displayYear)][month][day];
-      } else {
-        // Estimate based on bi-weekly pattern (24 issues per year)
-        // January 1st is typically issue 1-3, so we'll use a simple formula
-        const issueInYear = (month - 1) * 2 + (day === 15 ? 2 : 1);
-
-        // Adjust based on year - this is a rough estimate
-        if (parseInt(displayYear) >= 1960) {
-          issueNumber = issueInYear + 390; // Based on w65 pattern
-        } else {
-          issueNumber = issueInYear; // Based on w50 pattern
-        }
-      }
-
-      const docid = `${displayYear}${String(issueNumber).padStart(3, '0')}`;
-      jwlibUrl = `https://www.jw.org/finder?srcid=jwlshare&wtlocale=E&prefer=lang&docid=${docid}&par=${adjustedParagraph}`;
-      debugLog('Old publication - calculated docid:', docid, 'for', `w${year} ${month}/${day}`);
-    } else {
-      // For newer publications, try direct link
-      jwlibUrl = `jwlibrary:///publication/w/${displayYear}/${paddedMonth}/${paddedDay}`;
-      debugLog('Modern publication - using direct JW Library link:', jwlibUrl);
-    }
-
-    const output = [];
-    output.push(input); // keep original input on first line
-
-    // Create different search links for old vs new publications
-    let searchLinks;
-    if (isOldPublication) {
-      // For old publications, provide note about manual search + WOL search options
-      searchLinks = [
-        `📚 *Old publication - JW Library link may need manual docid adjustment*`,
-        `[WOL Search: w${year} ${month}/${day}](${wolUrl1})`,
-        `[WOL Search: "${displayYear} ${englishMonth} ${day}"](${wolUrl2})`,
-        `[WOL Search: w${displayYear}](${wolUrl3})`
-      ];
-    } else {
-      searchLinks = [
-        `[WOL Direct: ${displayYear}/${paddedMonth}/${paddedDay}](${directWolUrl})`,
-        `[WOL Search: w${year} ${month}/${day}](${wolUrl1})`,
-        `[WOL Search: "${displayYear} ${englishMonth} ${day}"](${wolUrl2})`,
-        `[WOL Search: w${displayYear}](${wolUrl3})`
-      ];
-    }
-
-    const webLink = searchLinks.join(' • ');
-
-    // Create citation title with optional link
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      // For old publications, use WOL search link instead of JW Library finder
-      const linkUrl = isOldPublication ? wolUrl1 : jwlibUrl;
-      citationTitle = `[${title}](${linkUrl})`;
-    }
-
-    // Try to fetch actual content from WOL for both old and modern publications
-    let actualText = '';
-
-    // Use search URL like modern publications do, not direct links
-    const contentUrl = wolUrl1; // Use search URL: w90 1/1
-
-    const cache = view?.getFromHistory?.(contentUrl);
-    if (cache) {
-      actualText = cache.content.join('');
-    } else {
-      try {
-        const dom = await this._fetchDOM(contentUrl);
-        if (dom) {
-          // Try to extract content from direct WOL page (same selectors as modern publications)
-          let text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-          if (!text) {
-            // Try selectors for direct publication pages
-            const directSelectors = ['.docSubContent', '.bodyTxt', '.sb', '.so', '.sc', '.si', '.se'];
-            for (const selector of directSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (!text) {
-            // Fallback to search result selectors
-            const searchSelectors = ['.searchResult', '.cardLine1', '.cardLine2', '.result', '.pub-content'];
-            for (const selector of searchSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (text) {
-            actualText = this._boldInitialNumber(text);
-            // Cache the result
-            view?.addToHistory?.(contentUrl, `WOL Direct: ${displayYear}/${paddedMonth}/${paddedDay}`, [actualText]);
-          }
-        }
-      } catch (error) {
-        debugLog('Failed to fetch content from WOL:', error);
-      }
-    }
-
-    // Add to history
-    const historyContent = actualText ? [actualText, `Search options: ${webLink}`] : [`Search options: ${webLink}`];
-    view?.addToHistory?.(jwlibUrl, title, historyContent);
-    view?.showHistory?.();
-
-    // Format citation - show multiple search options
-    let template = '';
-    if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      // For old publications, always use callout format but don't extract text
-      // since WOL doesn't have reliable paragraph-level content for old publications
-      if (isOldPublication) {
-        template = this.settings.pubCalloutTemplate;
-      } else {
-        template = (command === Cmd.citePublicationLookup && paragraph)
-          ? this.settings.pubCalloutTemplate
-          : this.settings.pubTemplate;
-      }
-    } else if (command === Cmd.citeVerseCallout) {
-      template = this.settings.pubCalloutTemplate;
-    }
-
-    // For English publications, use "PUB." instead of "ПУБЛ."
-    template = template.replace('ПУБЛ.', 'PUB.');
-
-    // Fix template to not break markdown links - remove quotes and italics around {text}
-    if (template.includes('"*{text}*"')) {
-      template = template.replace('"*{text}*"', '{text}');
-    } else if (template.includes('*{text}*') || template.includes('"{text}"')) {
-      // Handle case where there might be newlines or other characters
-      // Remove both quotes and italics around {text}
-      template = template.replace(/"?\*?\{text\}\*?"?/g, '{text}');
-    }
-
-    // Use actual text if available for both old and modern publications
-    // If no text found, fall back to search links
-    let textToUse = actualText || webLink;
-
-    // Check if paragraph was specified but no content found, or if no paragraph was specified
-    if (paragraph && !actualText) {
-      textToUse = `No paragraph numbering found on the page. Try search: [${searchQuery1}](${wolUrl1}). ` + textToUse;
-    } else if (!paragraph) {
-      textToUse = `No paragraph numbering found on the page. Specify paragraph number to get content. Try search: [${searchQuery2}](${wolUrl2}). ` + textToUse;
-    }
-
-    // If using callout template, format text properly for callout
-    if (template.includes('> [!cite]')) {
-      // Format text for callout - each line should start with '>' but avoid double '>'
-      // First remove any existing '>' at the start, then add single '>'
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    }
-
-    const citation = fillCitationTemplate(template, citationTitle, textToUse);
-    output.push(citation);
-
-    return output.join('\n');
-  }
-
-  /**
-   * Fetch English publication citation with month number format (w23.12 20 par. 7)
-   * @param {string} input - English publication reference with month number
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
-   */
-  async _fetchEnglishMonthNumberPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English month-number publication:', input);
-
-    const regex = /w(s)?(\d{2})\.(\d{1,2})\s+(?:(?:p|pág)\.\s*)?(\d+)\s+(?:par|párr)\.\s*(\d+)/i;
-    const match = regex.exec(input);
-
-    if (!match) {
-      debugLog('No match found for English month-number publication:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    const [, isStudy, year, monthNum, page, paragraph] = match;
-    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-    const availability = checkPublicationAvailability('w', 'EN', publicationYear);
-    if (availability.isOffline) {
-      debugLog('English Watchtower not available for year:', publicationYear);
-      return `${input}\n${availability.message}`;
-    }
-
-    const month = parseInt(monthNum, 10);
-    const displayYear = publicationYear.toString();
-
-    // Detect language and get appropriate config
-    const lang = this._resolveTextLanguage(input);
-    const isSpanish = lang === 'ES';
-    const monthNames = isSpanish
-      ? ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-      : ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const monthLabel = monthNames[month] || monthNum;
-    const pubName = isSpanish
-      ? (isStudy ? 'La Atalaya (edición de estudio)' : 'La Atalaya')
-      : (isStudy ? 'The Watchtower (Study Edition)' : 'The Watchtower');
-    const pageTerm = isSpanish ? 'pág.' : 'p.';
-    const parTerm = isSpanish ? 'párr.' : 'par.';
-    const title = `${pubName} ${displayYear} ${monthLabel} ${pageTerm} ${page} ${parTerm} ${paragraph}`;
-
-    const langConfig = getConfigForLanguage(lang);
-    const pubCode = isStudy ? 'ws' : 'w';
-
-    // Use WOL lookup/search URL (monthly issues don't have a stable /YYYY/MM/DD path)
-    const query = `${pubCode}${year}.${month} ${pageTerm} ${page} ${parTerm} ${paragraph}`;
-    const wolUrl = `${langConfig.wolLookup}${encodeURIComponent(query)}`;
-
-    const output = [];
-    output.push(input);
-
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${wolUrl})`;
-    }
-
-    // Try to fetch content
-    let actualText = '';
-    const cache = view?.getFromHistory?.(wolUrl);
-    if (cache) {
-      actualText = cache.content.join('');
-    } else {
-      try {
-        const dom = await this._fetchDOM(wolUrl);
-        if (dom) {
-          let text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
-          if (text) {
-            text = this._boldInitialNumber(text);
-          }
-          if (!text) {
-            const selectors = ['.resultItems', '.docSubContent', '.bodyTxt', '.searchResult', '.cardLine2', '.result', '.pub-content'];
-            for (const selector of selectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (text) {
-            actualText = text;
-            view?.addToHistory?.(wolUrl, title, [text]);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching English month-number publication:', error);
-      }
-    }
-
-    let template = '';
-    if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      template = command === Cmd.citePublicationLookup
-        ? this.settings.pubCalloutTemplate
-        : this.settings.pubTemplate;
-    } else if (command === Cmd.citeVerseCallout) {
-      template = this.settings.pubCalloutTemplate;
-    }
-    template = template.replace('ПУБЛ.', isSpanish ? 'PUBL.' : 'PUB.');
-
-    const notAvailable = isSpanish ? '*Contenido no disponible. Pruebe la búsqueda:*' : '*Content not available. Try search:*';
-    let textToUse = actualText || `${notAvailable} [${query}](${wolUrl})`;
-    if (actualText) {
-      textToUse = this._boldInitialNumber(textToUse);
-    }
-
-    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
-      const trimmed = template.trimStart();
-      const leadingWs = template.slice(0, template.length - trimmed.length);
-      template = `${leadingWs}> ${trimmed}`;
-    }
-
-    if (template.includes('[!cite]')) {
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    }
-
-    const citation = fillCitationTemplate(template, citationTitle, textToUse);
-    output.push(citation);
-    return output.join('\n');
-  }
-
-  /**
-   * Fetch English publication citation with month name format (w25 March p. 8 par. 2)
-   * @param {string} input - English publication reference with month name
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
-   */
-  async _fetchEnglishMonthPublicationCitation(input, view, command) {
-    debugLog('Trying to parse English month publication:', input);
-
-    // Parse month name format: w25 March p. 8 par. 2
-    const regex = /w(\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+p\.\s*(\d+)\s+par\.\s*(\d+)/gi;
-    regex.lastIndex = 0;
-    const match = regex.exec(input);
-
-    if (!match) {
-      debugLog('No match found for English month publication:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    const [fullMatch, year, monthName, page, paragraph] = match;
-    debugLog('English month publication parsed:', { fullMatch, year, monthName, page, paragraph });
-
-    // Calculate full year
-    const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-
-    // Create title
-    const title = `The Watchtower ${fullYear} ${monthName} p. ${page} par. ${paragraph}`;
-
-    // Create WOL search URL
-    const wolUrl = `https://wol.jw.org/en/wol/l/r1/lp-e?q=${encodeURIComponent(input)}`;
-
-    const output = [];
-    output.push(input);
-
-    // Create citation title with link
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${wolUrl})`;
-    }
-
-    // Try to fetch content from WOL
-    let actualText = '';
-    const cache = view?.getFromHistory?.(wolUrl);
-    if (cache) {
-      actualText = cache.content.join('');
-    } else {
-      try {
-        const dom = await this._fetchDOM(wolUrl);
-        if (dom) {
-          let text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-          if (!text) {
-            const selectors = ['.searchResult', '.cardLine1', '.cardLine2', '.result', '.pub-content', '.docSubContent', '.bodyTxt'];
-            for (const selector of selectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (text) {
-            actualText = text;
-            view?.addToHistory?.(wolUrl, title, [text]);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching English month publication:', error);
-      }
-    }
-
-    // Format output
-    let template = this.settings.pubCalloutTemplate;
-    template = template.replace(/ПУБЛ\./g, 'PUB.');
-
-    let textToUse = actualText || `*Content not available. Try search:* [${input}](${wolUrl})`;
-    if (actualText) {
-      textToUse = this._boldInitialNumber(textToUse);
-    }
-
-    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
-      const trimmed = template.trimStart();
-      const leadingWs = template.slice(0, template.length - trimmed.length);
-      template = `${leadingWs}> ${trimmed}`;
-    }
-
-    if (template.includes('[!cite]')) {
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    }
-
-    const citation = fillCitationTemplate(template, citationTitle, textToUse);
-    output.push(citation);
-
-    return output.join('\n');
-  }
-
-  /**
-   * Fetch Spanish publication citation with month name format (w25 Marzo pág. 8 párr. 2)
-   * @param {string} input - Spanish publication reference with month name
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
-   */
-  async _fetchSpanishMonthPublicationCitation(input, view, command) {
-    debugLog('Trying to parse Spanish month publication:', input);
-
-    // Parse month name format: w25 Marzo pág. 8 párr. 2, ws12 Febrero pág. 15 párr. 2
-    // Supports both w (Watchtower) and ws (Watchtower Study)
-    // Also accepts the month/day form used by dual mode: w03 7/15 pág. 22 párr. 3
-    const regex = /w(s)?(\d{2})\s+(?:(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Setiembre|Octubre|Noviembre|Diciembre)|(\d{1,2})\/(\d{1,2}))\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/i;
-    const match = regex.exec(input);
-
-    if (!match) {
-      debugLog('No match found for Spanish month publication:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    const [fullMatch, isStudy, year, monthNameMatch, monthNum, dayNum, page, paragraph] = match;
-    const spanishMonthNames = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const monthName = monthNameMatch ?? `${Number(dayNum)} de ${spanishMonthNames[Number(monthNum)] ?? monthNum}`;
-    debugLog('Spanish month publication parsed:', { fullMatch, isStudy, year, monthName, page, paragraph });
-
-    // Calculate full year
-    const fullYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
-
-    // Create title
-    const pubName = isStudy ? 'La Atalaya (edición de estudio)' : 'La Atalaya';
-    const title = `${pubName} ${fullYear} ${monthName} pág. ${page} párr. ${paragraph}`;
-
-    // Create WOL search URL
-    const wolUrl = `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(input)}`;
-
-    const output = [];
-    output.push(input);
-
-    // Create citation title with link
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${wolUrl})`;
-    }
-
-    // Try to fetch content from WOL
-    let actualText = '';
-    const cache = view?.getFromHistory?.(wolUrl);
-    if (cache) {
-      actualText = cache.content.join('');
-    } else {
-      try {
-        const dom = await this._fetchDOM(wolUrl);
-        if (dom) {
-          let text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-          if (!text) {
-            const selectors = ['.searchResult', '.cardLine1', '.cardLine2', '.result', '.pub-content', '.docSubContent', '.bodyTxt'];
-            for (const selector of selectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (text) {
-            actualText = text;
-            view?.addToHistory?.(wolUrl, title, [text]);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching Spanish month publication:', error);
-      }
-    }
-
-    // Format output
-    let template = this.settings.pubCalloutTemplate;
-    template = template.replace(/ПУБЛ\./g, 'PUBL.');
-
-    let textToUse = actualText || `*Contenido no disponible. Pruebe la búsqueda:* [${input}](${wolUrl})`;
-    if (actualText) {
-      textToUse = this._boldInitialNumber(textToUse);
-    }
-
-    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
-      const trimmed = template.trimStart();
-      const leadingWs = template.slice(0, template.length - trimmed.length);
-      template = `${leadingWs}> ${trimmed}`;
-    }
-
-    if (template.includes('[!cite]')) {
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
-    }
-
-    const citation = fillCitationTemplate(template, citationTitle, textToUse);
-    output.push(citation);
-
-    return output.join('\n');
-  }
-
-  /**
-   * Fetch other JW publication citation (od, it-1, it-2, si, etc.)
-   * @param {string} input - Other publication reference (e.g., "od 15 par. 3")
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted citation
+   * Cite another publication (od, it-1, cl, si, ...)
+   * @param {string} input - text containing the reference
+   * @param {View} view - view for history
+   * @param {Cmd} command
+   * @returns {Promise<string>}
    */
   async _fetchOtherPublicationCitation(input, view, command) {
-    debugLog('Trying to parse other publication:', input);
-
-    // Use exec for proper group extraction
-    const match = matchOtherPublication(input);
-
-    if (!match) {
-      debugLog('No match found for other publication:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    debugLog('Other publication match found:', match);
-    const [fullMatch, pubCode, issueOrPage, page, paragraph] = match;
-    debugLog('Parsed:', { fullMatch, pubCode, issueOrPage, page, paragraph });
-
-    // Check if publication is available online
-    let lang = this.settings?.lang || 'Auto';
-    if (lang === 'Auto') {
-      lang = detectLanguage(input);
-    } else {
-      lang = Languages[lang] || 'EN';
-    }
-
-    const availability = checkPublicationAvailability(pubCode, lang);
-    if (availability.isOffline) {
-      debugLog('Publication not available online:', pubCode);
-      return `${input}\n${availability.message}`;
-    }
-
-    // Auto-format certain publications to use chapter format
-    let formattedInput = input;
-    const hasChapter = input.includes('chap.') || input.includes('глава') || input.includes('cap.');
-
-    // Detect language-specific terms in input
-    const isRussianInput = /абз\.|глава/.test(input);
-    const isSpanishInput = /párr\.|cap\./.test(input);
-
-    // For "od" and "cl" publications, automatically add chapter format if not present
-    if ((pubCode === 'od' || pubCode === 'cl') && !hasChapter && paragraph) {
-      if (isRussianInput) {
-        // Russian format: od 15 абз. 3 → od глава 15 абз. 3
-        formattedInput = input.replace(/^(od|cl)\s+(\d+)\s+(абз\.\s*\d+)/, `$1 глава $2 $3`);
-      } else if (isSpanishInput) {
-        // Spanish format: od 15 párr. 3 → od cap. 15 párr. 3
-        formattedInput = input.replace(/^(od|cl)\s+(\d+)\s+(párr\.\s*\d+)/, `$1 cap. $2 $3`);
-      } else {
-        // English format: od 15 par. 3 → od chap. 15 par. 3
-        formattedInput = `${pubCode} chap. ${issueOrPage} par. ${paragraph}`;
-      }
-      debugLog('Auto-formatted reference:', input, '→', formattedInput);
-    }
-
-    // Use already detected language from availability check above
-    const isRussian = lang === 'RU';
-    const isSpanish = lang === 'ES';
-
-    let publicationTitles;
-    if (isRussian) {
-      publicationTitles = {
-        'od': 'Организованы исполнять волю Иеговы',
-        'it-1': 'Понимание Писания, том 1',
-        'it-2': 'Понимание Писания, том 2',
-        'si': 'Все Писание вдохновлено Богом и полезно',
-        'g': 'Пробудитесь!',
-        'w': 'Сторожевая башня',
-        'km': 'Наше царственное служение',
-        'mwb': 'Наша христианская жизнь и служение',
-        'lff': 'Слушай Бога и живи вечно',
-        'rr': 'Рассуждение на основании Писаний',
-        'rs': 'Рассуждение на основании Писаний',
-        'cl': 'Приближайтесь к Иегове',
-        'jv': 'Свидетели Иеговы — возвещатели Царства Бога',
-        'dp': 'Обратите внимание на пророчество Даниила!',
-        'ip-1': 'Пророчество Исаии — свет для всего человечества I',
-        'ip-2': 'Пророчество Исаии — свет для всего человечества II',
-        'be': 'Учимся в Школе теократического служения',
-        'th': 'Развивай навыки чтения и способность'
-      };
-    } else if (isSpanish) {
-      publicationTitles = {
-        'od': 'Organizados para hacer la voluntad de Jehová',
-        'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
-        'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2',
-        'si': 'Toda Escritura es inspirada de Dios y provechosa',
-        'g': '¡Despertad!',
-        'w': 'La Atalaya',
-        'km': 'Nuestro Ministerio del Reino',
-        'mwb': 'Nuestra Vida Cristiana y Ministerio—Cuaderno de reunión',
-        'lff': 'Escucha a Dios y vivirás para siempre',
-        'rr': 'Razonamiento a partir de las Escrituras',
-        'rs': 'Razonamiento a partir de las Escrituras',
-        'cl': 'Acerquémonos a Jehová',
-        'jv': 'Los testigos de Jehová, proclamadores del Reino de Dios',
-        'dp': '¡Presta atención a la profecía de Daniel!',
-        'ip-1': 'La profecía de Isaías: luz para toda la humanidad I',
-        'ip-2': 'La profecía de Isaías: luz para toda la humanidad II',
-        'be': 'Benefíciese de la Escuela del Ministerio Teocrático',
-        'th': 'Aplícate a la lectura y la enseñanza'
-      };
-    } else {
-      publicationTitles = {
-        'od': 'Organized to Do Jehovah\'s Will',
-        'it-1': 'Insight on the Scriptures, Volume 1',
-        'it-2': 'Insight on the Scriptures, Volume 2',
-        'si': 'All Scripture Is Inspired of God and Beneficial',
-        'g': 'Awake!',
-        'w': 'The Watchtower',
-        'km': 'Our Kingdom Ministry',
-        'mwb': 'Our Christian Life and Ministry—Meeting Workbook',
-        'lff': 'Listen to God and Live Forever',
-        'rr': 'Reasoning From the Scriptures',
-        'rs': 'Reasoning From the Scriptures',
-        'cl': 'Draw Close to Jehovah',
-        'jv': 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom',
-        'dp': 'Pay Attention to Daniel\'s Prophecy!',
-        'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I',
-        'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
-        'be': 'Learn From the Theocratic Ministry School',
-        'th': 'Apply Yourself to Reading and Teaching'
-      };
-    }
-
-    const publicationTitle = publicationTitles[pubCode] || `Publication ${pubCode.toUpperCase()}`;
-
-    // Create title for display (use language-specific terms)
-    let title;
-    let chapterTerm, parTerm, pagePrefix;
-
-    if (isRussian) {
-      chapterTerm = 'глава';
-      parTerm = 'абз.';
-      pagePrefix = page && page.includes('-') ? 'сс.' : 'с.';
-    } else if (isSpanish) {
-      chapterTerm = 'cap.';
-      parTerm = 'párr.';
-      pagePrefix = page && page.includes('-') ? 'págs.' : 'pág.';
-    } else {
-      chapterTerm = 'chap.';
-      parTerm = 'par.';
-      pagePrefix = page && page.includes('-') ? 'pp.' : 'p.';
-    }
-
-    if (hasChapter && page && paragraph) {
-      // Format: cl chap. 8 p. 77 par. 2 / cl глава 8 с. 77 абз. 2
-      title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
-    } else if (hasChapter && paragraph) {
-      // Format: od chap. 15 par. 1 / od глава 15 абз. 1
-      title = `${publicationTitle} ${chapterTerm} ${issueOrPage} ${parTerm} ${paragraph}`;
-    } else if (hasChapter) {
-      // Format: od chap. 15 / od глава 15
-      title = `${publicationTitle} ${chapterTerm} ${issueOrPage}`;
-    } else if (page && paragraph) {
-      // Format: si pp. 300-301 par. 11 / si págs. 300-301 párr. 11 / si сс. 300-301 абз. 11
-      title = `${publicationTitle} ${pagePrefix} ${page} ${parTerm} ${paragraph}`;
-    } else if (paragraph) {
-      // Format: od 15 par. 3 / od 15 абз. 3
-      title = `${publicationTitle} ${issueOrPage} ${parTerm} ${paragraph}`;
-    } else if (page) {
-      // Format: it-1 332 / si pp. 300-301 / si págs. 300-301
-      title = `${publicationTitle} ${pagePrefix} ${page}`;
-    } else {
-      // Format: it-1 332, od 15, g 24/01
-      title = `${publicationTitle} ${issueOrPage}`;
-    }
-
-    const langConfig = getConfigForLanguage(lang);
-
-    debugLog('Detected language for other publication:', lang, 'isRussian:', isRussian);
-
-    // Create search URLs with appropriate language
-    const searchQuery1 = formattedInput; // Use formatted input for better search results
-    const searchQuery2 = `"${publicationTitle}" ${paragraph ? `paragraph ${paragraph}` : ''}`;
-    const searchQuery3 = `${pubCode} ${issueOrPage}`;
-
-    const wolUrl1 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery1)}`;
-    const wolUrl2 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery2)}`;
-    const wolUrl3 = `${langConfig.wolLookup}${encodeURIComponent(searchQuery3)}`;
-
-    debugLog('Generated other publication WOL URLs:', { wolUrl1, wolUrl2, wolUrl3 });
-
-    const output = [];
-    output.push(input); // keep original input on first line
-
-    // Create search links
-    const searchLinks = [
-      `[WOL Search: ${formattedInput}](${wolUrl1})`,
-      `[WOL Search: "${publicationTitle}"](${wolUrl2})`,
-      `[WOL Search: ${pubCode} ${issueOrPage}](${wolUrl3})`
-    ];
-
-    const webLink = searchLinks.join(' • ');
-
-    // Create citation title with optional link
-    let citationTitle = title;
-    if (this.settings.citationLink) {
-      citationTitle = `[${title}](${wolUrl1})`;
-    }
-
-    // Try to fetch actual content from WOL
-    let actualText = '';
-    const contentUrl = wolUrl1;
-
-    const cache = view?.getFromHistory?.(contentUrl);
-    if (cache) {
-      actualText = cache.content.join('');
-    } else {
-      try {
-        const dom = await this._fetchDOM(contentUrl);
-        if (dom) {
-          // Try to extract content using same selectors as other publications
-          let text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-          if (!text) {
-            // Try alternative selectors for search results
-            const searchSelectors = ['.searchResult', '.cardLine1', '.cardLine2', '.result', '.pub-content'];
-            for (const selector of searchSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (!text) {
-            // Try selectors for direct publication content
-            const contentSelectors = ['.docSubContent', '.bodyTxt', '.sb', '.so', '.sc', '.si', '.se', 'p'];
-            for (const selector of contentSelectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-          if (text) {
-            actualText = this._boldInitialNumber(text);
-            debugLog('Successfully extracted text for other publication:', text.substring(0, 100) + '...');
-            // Cache the result
-            view?.addToHistory?.(contentUrl, `WOL Search: ${input}`, [actualText]);
-          } else {
-            debugLog('No text found for other publication:', input, 'URL:', contentUrl);
-          }
-        }
-      } catch (error) {
-        debugLog('Failed to fetch content from WOL:', error);
-      }
-    }
-
-    // Add to history
-    const historyContent = actualText ? [actualText, `Search options: ${webLink}`] : [`Search options: ${webLink}`];
-    view?.addToHistory?.(wolUrl1, title, historyContent);
-    view?.showHistory?.();
-
-    // Format citation
-    let template = '';
-    if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      template = this.settings.pubCalloutTemplate;
-    } else if (command === Cmd.citeVerseCallout) {
-      template = this.settings.pubCalloutTemplate;
-    }
-
-    // Use appropriate language prefix based on detected language
-    if (isRussian) {
-      // Keep "ПУБЛ." for Russian
-      template = template.replace('PUB.', 'ПУБЛ.');
-    } else if (isSpanish) {
-      // Use "PUBL." for Spanish
-      template = template.replace('PUB.', 'PUBL.');
-      template = template.replace('ПУБЛ.', 'PUBL.');
-    } else {
-      // Use "PUB." for English
-      template = template.replace('ПУБЛ.', 'PUB.');
-      template = template.replace('PUBL.', 'PUB.');
-    }
-
-    // Fix template to not break markdown links
-    if (template.includes('"*{text}*"')) {
-      template = template.replace('"*{text}*"', '{text}');
-    } else if (template.includes('*{text}*') || template.includes('"{text}"')) {
-      template = template.replace(/"?\*?\{text\}\*?"?/g, '{text}');
-    }
-
-    // Use actual text if available, otherwise fall back to search links
-    let textToUse = actualText || webLink;
-
-    // Check if paragraph was specified but no content found
-    if (paragraph && !actualText) {
-      let noParMessage;
-      if (isRussian) {
-        noParMessage = `На странице нет нумерации абзацев. Попробуйте поиск: [${formattedInput}](${wolUrl1}). `;
-      } else if (isSpanish) {
-        noParMessage = `En la página no hay numeración de párrafos. Pruebe la búsqueda: [${formattedInput}](${wolUrl1}). `;
-      } else {
-        noParMessage = `No paragraph numbering found on the page. Try search: [${formattedInput}](${wolUrl1}). `;
-      }
-      textToUse = noParMessage + textToUse;
-    }
-
-    // If using callout template, format text properly for callout
-    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
-      const trimmed = template.trimStart();
-      const leadingWs = template.slice(0, template.length - trimmed.length);
-      template = `${leadingWs}> ${trimmed}`;
-    }
-
-    if (template.includes('[!cite]')) {
-      // Format text for callout - each line should start with '>' but avoid double '>'
-      // First remove any existing '>' at the start, then add single '>'
-      textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>').replace(/^> > /gm, '> ');
-    }
-
-    const citation = fillCitationTemplate(template, citationTitle, textToUse);
-    output.push(citation);
-
-    return output.join('\n');
+    const ref = parseOtherPublicationReference(input);
+    if (!ref) return `${input} | ${Lang.invalidPublication}`;
+    const lang = this._publicationLanguage(ref.sourceLang);
+    const availability = checkPublicationAvailability(ref.pubCode, lang);
+    if (availability.isOffline) return `${input}\n${availability.message}`;
+    const citation = await this._citeFromWol({
+      lang,
+      query: formatOtherPublicationQuery(ref, lang),
+      title: formatOtherPublicationTitle(ref, lang),
+      command,
+      view,
+    });
+    return `${input}\n${citation}`;
   }
 
   /**
-   * Fetch publication citation in dual mode using configured languages
-   * @param {string} input - Publication reference (e.g., "w24.01 14 par. 18")
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Formatted dual citation
+   * Cite a publication in the two configured dual-mode languages
+   * @param {string} input - publication reference (any language format)
+   * @param {View} view - view for history
+   * @param {Cmd} command
+   * @returns {Promise<string>}
    */
   async _fetchDualPublicationCitation(input, view, command) {
     input = normalizeInput(input);
-    debugLog('Trying dual mode for publication:', input);
+    const citeCommand = command === Cmd.citeVerse ? Cmd.citeVerse : Cmd.citeVerseCallout;
+    const watchtower = parseWatchtowerReference(input);
+    const other = watchtower ? null : parseOtherPublicationReference(input);
+    if (!watchtower && !other) return `${input} | ${Lang.invalidPublication}`;
 
-    const citationCommand = command === Cmd.citePublicationLookup ? Cmd.citeVerseCallout : command;
-
-    // Get configured languages
     const { firstLang, secondLang } = this._getDualLanguages();
-    debugLog('Dual mode languages:', { firstLang, secondLang });
-
-    // Parse the input to extract components - support multiple publication types
-    let regex, match;
-
-    // Try Watchtower format first: w23.12 20, абз. 8, 9 OR w25.3 с. 8 абз. 2
-    regex = /w(\d{2})\.(\d{1,2})\s+(?:(?:с\.|p\.|pág\.)\s*)?(\d+)(?:[,\s]*(?:par\.|абз\.|párr\.)\s*(\d+)(?:[,\s]*\d+)*)?/g;
-    regex.lastIndex = 0;
-    match = regex.exec(input);
-
-    if (!match) {
-      // Try month/day format: w03 7/15 22 [par. N] (supports English par., Russian абз., Spanish párr.)
-      regex = /w(\d{2})\s+(\d{1,2})\/(\d{1,2})\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/g;
-      regex.lastIndex = 0;
-      match = regex.exec(input);
-
-      if (match) {
-        const [fullMatch, year, month, day, page, paragraph] = match;
-        debugLog('Month/day format detected:', { fullMatch, year, month, day, page, paragraph });
-
-        // Convert to standard format for processing
-        const paddedMonth = month.padStart(2, '0');
-
-        // Create input formats for each language
-        const langInputs = {
-          en: `w${year} ${month}/${day} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`,
-          ru: `w${year}.${paddedMonth} ${page}${paragraph ? `, абз. ${paragraph}` : ''}`,
-          es: `w${year} ${month}/${day} pág. ${page}${paragraph ? ` párr. ${paragraph}` : ''}`
-        };
-
-        // Create WOL search URLs for each language
-        const wolUrls = {
-          en: `https://wol.jw.org/en/wol/l/r1/lp-e?q=${encodeURIComponent(langInputs.en)}`,
-          ru: `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(langInputs.ru)}`,
-          es: `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(langInputs.es)}`
-        };
-
-        const output = [];
-        output.push(input); // keep original input on first line
-
-        try {
-          // Fetch citation for first language
-          const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, citationCommand, paragraph, wolUrls[firstLang]);
-
-          // Fetch citation for second language
-          const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, citationCommand, paragraph, wolUrls[secondLang]);
-
-          // Format dual output with configured language order
-          output.push(this._getLanguageLabel(firstLang));
-          output.push(firstCitation.split('\n').slice(1).join('\n'));
-
-          if (secondCitation) {
-            output.push('');
-            output.push(this._getLanguageLabel(secondLang));
-            output.push(secondCitation.split('\n').slice(1).join('\n'));
-          }
-
-          return output.join('\n');
-        } catch (error) {
-          console.error('Error in dual mode month/day format:', error);
-          return `${input} | ${Lang.onlineLookupFailed}`;
-        }
+    const output = [input];
+    for (const [i, langCode] of [firstLang, secondLang].entries()) {
+      const lang = langCode.toUpperCase();
+      if (i > 0) output.push('');
+      output.push(this._getLanguageLabel(langCode));
+      const availability = watchtower
+        ? checkPublicationAvailability('w', lang, toFullYear(watchtower.year))
+        : checkPublicationAvailability(other.pubCode, lang);
+      if (availability.isOffline) {
+        output.push(availability.message);
+        continue;
       }
+      output.push(await this._citeFromWol({
+        lang,
+        query: watchtower ? formatWatchtowerQuery(watchtower, lang) : formatOtherPublicationQuery(other, lang),
+        title: watchtower ? formatWatchtowerTitle(watchtower, lang) : formatOtherPublicationTitle(other, lang),
+        command: citeCommand,
+        view,
+      }));
     }
-
-    if (!match) {
-      // Try English publication format: w65 6/1 p. 329 par. 6
-      Config.englishPubRegex.lastIndex = 0;
-      match = Config.englishPubRegex.exec(input);
-
-      if (match) {
-        debugLog('English publication format detected:', input);
-        const englishCitation = await this._fetchEnglishPublicationCitation(input, view, command);
-        const output = [];
-        output.push(input);
-        output.push(this._getLanguageLabel('en'));
-        output.push(englishCitation.split('\n').slice(1).join('\n'));
-        return output.join('\n');
-      }
-
-      // Try English publication month-number format: w23.12 20 par. 7
-      Config.englishPubMonthNumberRegex.lastIndex = 0;
-      match = Config.englishPubMonthNumberRegex.exec(input);
-
-      if (match) {
-        debugLog('English month-number publication format detected:', input);
-        const englishCitation = await this._fetchEnglishMonthNumberPublicationCitation(input, view, command);
-        const output = [];
-        output.push(input);
-        output.push(this._getLanguageLabel('en'));
-        output.push(englishCitation.split('\n').slice(1).join('\n'));
-        return output.join('\n');
-      }
-
-      // Try other publication formats: od 15 par. 3, it-1 332 par. 5, si 28 par. 12
-      match = matchOtherPublication(input);
-
-      if (match) {
-        // For other JW publications, fetch in both configured languages
-        debugLog('Other JW publication detected in dual mode:', input);
-
-        // Parse the input to extract components
-        const otherPubMatch = input.match(/^([a-z]{1,3}(?:-\d)?)\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/i);
-        if (otherPubMatch) {
-          const [, pubCode, issueOrPage, paragraph] = otherPubMatch;
-
-          // Create input formats for each language
-          const langInputs = {
-            en: `${pubCode} ${issueOrPage}${paragraph ? ` par. ${paragraph}` : ''}`,
-            ru: `${pubCode} ${issueOrPage}${paragraph ? ` абз. ${paragraph}` : ''}`,
-            es: `${pubCode} ${issueOrPage}${paragraph ? ` párr. ${paragraph}` : ''}`
-          };
-
-          const output = [];
-          output.push(input); // keep original input on first line
-
-          try {
-            // Fetch citation for first language
-            debugLog(`Fetching ${firstLang} citation for other pub:`, langInputs[firstLang]);
-            const firstCitation = await this._fetchOtherPublicationCitationForLang(langInputs[firstLang], firstLang, view, command);
-
-            // Fetch citation for second language
-            debugLog(`Fetching ${secondLang} citation for other pub:`, langInputs[secondLang]);
-            const secondCitation = await this._fetchOtherPublicationCitationForLang(langInputs[secondLang], secondLang, view, command);
-
-            // Format dual output with configured language order
-            output.push(this._getLanguageLabel(firstLang));
-            output.push(firstCitation.split('\n').slice(1).join('\n'));
-
-            if (secondCitation) {
-              output.push('');
-              output.push(this._getLanguageLabel(secondLang));
-              output.push(secondCitation.split('\n').slice(1).join('\n'));
-            }
-
-            return output.join('\n');
-          } catch (error) {
-            console.error('Error in dual mode for other publication:', error);
-            return `${input} | ${Lang.onlineLookupFailed}`;
-          }
-        }
-
-        // Fallback to single language if parsing failed
-        const citation = await this._fetchOtherPublicationCitation(input, view, command);
-        const output = [];
-        output.push(input);
-        output.push(this._getLanguageLabel(firstLang));
-        output.push(citation.split('\n').slice(1).join('\n'));
-        return output.join('\n');
-      }
-    }
-
-    if (!match) {
-      debugLog('No match found for dual mode:', input);
-      return `${input} | ${Lang.invalidScripture}`;
-    }
-
-    const [fullMatch, year, monthNum, page, paragraph] = match;
-    debugLog('Dual mode parsed:', { fullMatch, year, monthNum, page, paragraph });
-
-    // Month names for each language
-    const monthNames = {
-      en: ['', 'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'],
-      ru: ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-      es: ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    };
-
-    const monthInt = parseInt(monthNum);
-
-    // Create input formats for each language - use month names for modern publications
-    const langInputs = {
-      en: `w${year} ${monthNames.en[monthInt]} p. ${page}${paragraph ? ` par. ${paragraph}` : ''}`,
-      ru: `w${year}.${monthNum} ${page}${paragraph ? ` абз. ${paragraph}` : ''}`,
-      es: `w${year} ${monthNames.es[monthInt]} pág. ${page}${paragraph ? ` párr. ${paragraph}` : ''}`
-    };
-
-    // Create WOL search URLs for each language
-    const wolUrls = {
-      en: `https://wol.jw.org/en/wol/l/r1/lp-e?q=${encodeURIComponent(langInputs.en)}`,
-      ru: `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(langInputs.ru)}`,
-      es: `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(langInputs.es)}`
-    };
-
-    const output = [];
-    output.push(input); // keep original input on first line
-
-    try {
-      // Fetch citation for first language
-      const firstCitation = await this._fetchCitationByLanguage(langInputs[firstLang], firstLang, view, citationCommand, paragraph, wolUrls[firstLang]);
-
-      // Fetch citation for second language
-      const secondCitation = await this._fetchCitationByLanguage(langInputs[secondLang], secondLang, view, citationCommand, paragraph, wolUrls[secondLang]);
-
-      // Format dual output with configured language order
-      output.push(this._getLanguageLabel(firstLang));
-      output.push(firstCitation.split('\n').slice(1).join('\n'));
-
-      if (secondCitation) {
-        output.push('');
-        output.push(this._getLanguageLabel(secondLang));
-        output.push(secondCitation.split('\n').slice(1).join('\n'));
-      }
-
-      return output.join('\n');
-    } catch (error) {
-      console.error('Error in dual mode:', error);
-      return `${input} | ${Lang.onlineLookupFailed}`;
-    }
-  }
-
-  /**
-   * Fetch citation for a specific language
-   * @param {string} input - Formatted input for the language
-   * @param {string} langCode - Language code: 'en', 'ru', 'es'
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @param {string} paragraph - Paragraph number (optional)
-   * @param {string} wolUrl - WOL search URL for fallback
-   * @returns {string} - Citation text
-   */
-  async _fetchCitationByLanguage(input, langCode, view, command, paragraph, wolUrl) {
-    debugLog(`Fetching ${langCode} citation for:`, input);
-
-    if (langCode === 'en') {
-      // Check if input matches month name format (w25 March p. 8 par. 2)
-      Config.englishPubMonthRegex.lastIndex = 0;
-      if (Config.englishPubMonthRegex.test(input)) {
-        return await this._fetchEnglishMonthPublicationCitation(input, view, command);
-      }
-      // Otherwise use standard English format
-      return await this._fetchEnglishPublicationCitation(input, view, command);
-    } else if (langCode === 'ru') {
-      if (paragraph) {
-        return await this._fetchRussianPublicationCitationCallout(input, view, command);
-      } else {
-        return `${input}\nНа странице нет нумерации абзацев. Укажите номер абзаца для получения содержимого. Попробуйте поиск: [${input}](${wolUrl})`;
-      }
-    } else if (langCode === 'es') {
-      // Check if input matches Spanish month name format (w25 Marzo pág. 8 párr. 2)
-      Config.spanishPubMonthRegex.lastIndex = 0;
-      if (Config.spanishPubMonthRegex.test(input)) {
-        return await this._fetchSpanishMonthPublicationCitation(input, view, command);
-      }
-      if (paragraph) {
-        return await this._fetchSpanishMonthPublicationCitation(input, view, command);
-      } else {
-        return `${input}\nEn la página no hay numeración de párrafos. Especifique el número de párrafo para obtener el contenido. Pruebe la búsqueda: [${input}](${wolUrl})`;
-      }
-    }
-
-    // Fallback to generic fetch
-    return await this._fetchLookupCitation(input, view);
-  }
-
-  /**
-   * Fetch other publication citation for a specific language (od, it-1, si, etc.)
-   * @param {string} input - Formatted input for the language
-   * @param {string} langCode - Language code: 'en', 'ru', 'es'
-   * @param {View} view - View for history
-   * @param {Cmd} command - Command type
-   * @returns {string} - Citation text
-   */
-  async _fetchOtherPublicationCitationForLang(input, langCode, view, command) {
-    debugLog(`Fetching other publication for ${langCode}:`, input);
-
-    // Language configurations with direct document URLs
-    const langConfigs = {
-      'en': {
-        wolBase: 'https://wol.jw.org/en/wol/d/r1/lp-e/',
-        wolLookup: 'https://wol.jw.org/en/wol/l/r1/lp-e?q='
-      },
-      'ru': {
-        wolBase: 'https://wol.jw.org/ru/wol/d/r2/lp-u/',
-        wolLookup: 'https://wol.jw.org/ru/wol/l/r2/lp-u?q='
-      },
-      'es': {
-        wolBase: 'https://wol.jw.org/es/wol/d/r4/lp-s/',
-        wolLookup: 'https://wol.jw.org/es/wol/l/r4/lp-s?q='
-      }
-    };
-
-    const config = langConfigs[langCode];
-    if (!config) {
-      return `${input}\n[${langCode}] ${Lang.onlineLookupFailed}`;
-    }
-
-    // Parse the input
-    const match = input.match(/^([a-z]{1,3}(?:-\d)?)\s+(\d+)(?:\s+(?:par\.|абз\.|párr\.)\s*(\d+))?/i);
-    if (!match) {
-      return `${input}\n[${langCode}] ${Lang.invalidScripture}`;
-    }
-
-    const [, pubCode, issueOrPage, paragraph] = match;
-    const issueOrPageNum = parseInt(issueOrPage);
-
-    // Document IDs for publications (same IDs work for all languages)
-    const publicationDocIds = {
-      'od': {
-        1: 1102014931, 2: 1102014932, 3: 1102014933, 4: 1102014934, 5: 1102014935,
-        6: 1102014936, 7: 1102014937, 8: 1102014938, 9: 1102014939, 10: 1102014940,
-        11: 1102014941, 12: 1102014942, 13: 1102014943, 14: 1102014944, 15: 1102014945,
-        16: 1102014946, 17: 1102014947
-      },
-      'cl': {
-        1: 1102002061, 2: 1102002062, 3: 1102002063, 4: 1102002064, 5: 1102002065,
-        6: 1102002066, 7: 1102002067, 8: 1102002068, 9: 1102002069, 10: 1102002070,
-        11: 1102002071, 12: 1102002072, 13: 1102002073, 14: 1102002074, 15: 1102002075,
-        16: 1102002076, 17: 1102002077, 18: 1102002078, 19: 1102002079, 20: 1102002080,
-        21: 1102002081, 22: 1102002082, 23: 1102002083, 24: 1102002084, 25: 1102002085,
-        26: 1102002086, 27: 1102002087, 28: 1102002088, 29: 1102002089, 30: 1102002090,
-        31: 1102002091
-      }
-    };
-
-    // Publication titles by language
-    const publicationTitles = {
-      'en': {
-        'od': 'Organized to Do Jehovah\'s Will',
-        'it-1': 'Insight on the Scriptures, Volume 1',
-        'it-2': 'Insight on the Scriptures, Volume 2',
-        'cl': 'Draw Close to Jehovah',
-        'si': 'All Scripture Is Inspired of God and Beneficial'
-      },
-      'ru': {
-        'od': 'Организованы исполнять волю Иеговы',
-        'it-1': 'Понимание Писания, том 1',
-        'it-2': 'Понимание Писания, том 2',
-        'cl': 'Приближайтесь к Иегове',
-        'si': '«Всё Писание вдохновлено Богом и полезно»'
-      },
-      'es': {
-        'od': 'Organizados para hacer la voluntad de Jehová',
-        'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
-        'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2',
-        'cl': 'Acerquémonos a Jehová',
-        'si': 'Toda Escritura es inspirada por Dios y provechosa'
-      }
-    };
-
-    const pubTitle = publicationTitles[langCode]?.[pubCode.toLowerCase()] || `Publication ${pubCode.toUpperCase()}`;
-
-    // Build terms based on language
-    const isPageBased = pubCode.toLowerCase() === 'si' || pubCode.toLowerCase().startsWith('it-');
-    const terms = {
-      'en': isPageBased ? { unit: 'p.', par: 'par.' } : { unit: 'chap.', par: 'par.' },
-      'ru': isPageBased ? { unit: 'с.', par: 'абз.' } : { unit: 'глава', par: 'абз.' },
-      'es': isPageBased ? { unit: 'pág.', par: 'párr.' } : { unit: 'cap.', par: 'párr.' }
-    };
-    const term = terms[langCode];
-
-    // Build title
-    const title = paragraph
-      ? `${pubTitle} ${term.unit} ${issueOrPage} ${term.par} ${paragraph}`
-      : `${pubTitle} ${term.unit} ${issueOrPage}`;
-
-    // Get direct document URL if available
-    const pubDocIds = publicationDocIds[pubCode.toLowerCase()];
-    let directUrl = '';
-    let wolUrl = '';
-
-    if (pubDocIds && pubDocIds[issueOrPageNum]) {
-      const docId = pubDocIds[issueOrPageNum];
-      directUrl = `${config.wolBase}${docId}`;
-      wolUrl = paragraph ? `${directUrl}#p${paragraph}` : directUrl;
-    } else {
-      // Fallback to search URL
-      wolUrl = `${config.wolLookup}${encodeURIComponent(input)}`;
-    }
-
-    debugLog(`Direct URL for ${langCode}:`, directUrl || wolUrl);
-
-    try {
-      let text = '';
-
-      if (directUrl) {
-        // Fetch from direct document URL
-        const dom = await this._fetchDOM(directUrl);
-        if (dom && paragraph) {
-          // Extract specific paragraph by ID
-          text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
-          if (text) {
-            text = this._boldInitialNumber(text);
-          }
-        }
-      }
-
-      if (!text) {
-        const dom = await this._fetchDOM(wolUrl);
-        if (dom) {
-          if (paragraph) {
-            text = this._getElementAsText(dom, `#p${paragraph}`, TargetType.jwonline);
-            if (text) {
-              text = this._boldInitialNumber(text);
-            }
-          }
-
-          if (!text) {
-            const selectors = ['.resultItems', '.docSubContent', '.bodyTxt', '.searchResult', '.cardLine2', '.result', '.pub-content'];
-            for (const selector of selectors) {
-              text = this._getElementAsText(dom, selector, TargetType.jwonline);
-              if (text) break;
-            }
-          }
-        }
-      }
-
-      if (!text) {
-        const notAvailableMsg = {
-          'en': `*Content not available. Try search:* [${input}](${wolUrl})`,
-          'ru': `*Содержимое недоступно. Попробуйте поиск:* [${input}](${wolUrl})`,
-          'es': `*Contenido no disponible. Pruebe la búsqueda:* [${input}](${wolUrl})`
-        };
-        text = notAvailableMsg[langCode] || notAvailableMsg['en'];
-      }
-
-      // Create citation title with link
-      let citationTitle = title;
-      if (this.settings.citationLink) {
-        citationTitle = `[${title}](${wolUrl})`;
-      }
-
-      // Format output - adjust template header based on language
-      let template = this.settings.pubCalloutTemplate;
-
-      // Replace publication header based on language
-      if (langCode === 'en') {
-        template = template.replace(/ПУБЛ\.|PUB\.|PUBL\./g, 'PUB.');
-      } else if (langCode === 'es') {
-        template = template.replace(/ПУБЛ\.|PUB\.|PUBL\./g, 'PUBL.');
-      } else {
-        template = template.replace(/PUB\.|PUBL\./g, 'ПУБЛ.');
-      }
-
-      const citation = fillCitationTemplate(template, citationTitle, text);
-
-      const output = [];
-      output.push(input);
-      output.push(citation);
-
-      return output.join('\n');
-    } catch (error) {
-      console.error(`Error fetching other publication for ${langCode}:`, error);
-      return `${input}\n[${langCode}] ${Lang.onlineLookupFailed}`;
-    }
+    return output.join('\n');
   }
 
   /**
@@ -4070,15 +2559,12 @@ class JWLLinkerPlugin extends Plugin {
         {
           // All jw.org Bible pages (en/ru/es) have #v<id> verse elements: the structured
           // path keeps chapter numbers ("1" not "23") and poetry line breaks
-          let html = elem.innerHTML;
-          const blocks = ['<span class="newblock"></span>', '<span class="parabreak"></span>'].map(
-            (el) => new RegExp(el, 'gm'),
-          );
-          for (const el of blocks) {
-            html = html.replace(el, '\n');
+          // Block and paragraph break markers become line breaks, then take the plain text
+          const clone = elem.cloneNode(true);
+          for (const marker of clone.querySelectorAll('span.newblock, span.parabreak')) {
+            marker.replaceWith('\n');
           }
-          // Now remove html tags
-          text = new DOMParser().parseFromString(html, 'text/html').body.textContent.trim();
+          text = clone.textContent.trim();
           // Check for initial chapter numbers (always first element) and replace with 1
           if (elem.querySelector('.chapterNum')) {
             text = text.replace(Config.initialNumRegex, '1 ');
@@ -4209,6 +2695,7 @@ class JWLLinkerPlugin extends Plugin {
       /** @type {TReference} */
       let reference = {
         original: original,
+        index: match.index,
         book: match[3],
         passages: [],
         isPlainText: Boolean(match[2]), // ' => skip this verse, no link
@@ -4708,14 +3195,63 @@ class ScripturePostProcessor extends MarkdownRenderChild {
   }
 
   onload() {
-    const rawHtml = this.containerEl.innerHTML;
-    if (!/\d/.test(rawHtml) && !/wol\.jw\.org|jw\.org\/finder|jwlibrary:\/\//i.test(rawHtml)) return;
-    const html = rawHtml.replaceAll('&nbsp;', '\u00A0');
-    const { output, changed } = this.plugin._convertScriptureToJWLibrary(html, DisplayType.href);
-    if (changed) {
-      this.containerEl.innerHTML = output;
+    const el = this.containerEl;
+    // References in headings and callouts break their formatting, leave them as they are
+    const first = el.firstElementChild;
+    if (first && (/^H[1-6]$/.test(first.tagName) || first.hasAttribute('data-callout'))) return;
+    if (!/\d/.test(el.textContent ?? '')) return;
+
+    // Only plain text: skip existing links, code and math
+    const walker = el.ownerDocument.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) =>
+        node.parentElement?.closest('a, code, pre, .math') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+    });
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    for (const node of textNodes) {
+      linkScripturesInTextNode(this.plugin, node);
     }
   }
+}
+
+/**
+ * Replace the scripture references in a text node with JW Library links (DOM API only)
+ * @param {Plugin} plugin
+ * @param {Text} node
+ * @returns {boolean} true if the node was replaced
+ */
+function linkScripturesInTextNode(plugin, node) {
+  const text = node.nodeValue ?? '';
+  if (!/\d/.test(text)) return false;
+  const references = plugin
+    ._parseScriptureLinks(text, DisplayType.href, plugin.settings.spaceAfterPunct)
+    .filter((ref) => !ref.isLinkAlready && ref.passages.some((passage) => passage.link))
+    .sort((a, b) => a.index - b.index);
+  if (references.length === 0) return false;
+
+  const doc = node.ownerDocument;
+  const fragment = doc.createDocumentFragment();
+  let pos = 0;
+  for (const ref of references) {
+    if (ref.index < pos) continue; // overlapping match
+    fragment.append(text.slice(pos, ref.index));
+    for (const passage of ref.passages) {
+      if (passage.delimiter) fragment.append(passage.delimiter);
+      if (passage.link) {
+        const a = doc.createElement('a');
+        a.textContent = passage.display;
+        a.setAttribute('href', passage.link.jwlib);
+        a.setAttribute('title', passage.link.jwlib); // make the target URL visible on hover
+        fragment.append(a);
+      } else {
+        fragment.append(passage.display);
+      }
+    }
+    pos = ref.index + ref.original.length;
+  }
+  fragment.append(text.slice(pos));
+  node.replaceWith(fragment);
+  return true;
 }
 
 class JWLLinkerSettingTab extends PluginSettingTab {
@@ -4724,28 +3260,8 @@ class JWLLinkerSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  /**
-   * Resolve 'Auto' language setting to actual language code
-   * Based on user's locale or interface language setting
-   * @returns {string} Language code: 'ru', 'en', or 'es'
-   */
   _resolveAutoLanguage() {
-    // Try to detect from interface language setting
-    const interfaceLang = this.plugin.settings.interfaceLang;
-    if (interfaceLang === 'Russian') return 'ru';
-    if (interfaceLang === 'Spanish') return 'es';
-    if (interfaceLang === 'English') return 'en';
-
-    // Try to detect from browser/system locale
-    const locale = navigator.language || navigator.userLanguage || 'en';
-    const langCode = locale.split('-')[0].toLowerCase();
-
-    // Map to supported languages
-    if (langCode === 'ru') return 'ru';
-    if (langCode === 'es') return 'es';
-
-    // Default to English if not in supported list
-    return 'en';
+    return this.plugin._resolveAutoLanguage();
   }
 
   display() {
@@ -4754,11 +3270,6 @@ class JWLLinkerSettingTab extends PluginSettingTab {
 
     containerEl.empty();
     containerEl.addClass('jwl-settings');
-
-    new Setting(containerEl)
-      .setName(Lang.settingsDisplay)
-      .setDesc(Lang.settingsDisplayDesc)
-      .setHeading();
 
     new Setting(containerEl)
       .setName(Lang.settingsOpenSidebarOnStartup)
@@ -4780,6 +3291,12 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    // General settings stay at the top without a heading (Obsidian guidelines)
+    new Setting(containerEl)
+      .setName(Lang.settingsDisplay)
+      .setDesc(Lang.settingsDisplayDesc)
+      .setHeading();
 
     new Setting(containerEl)
       .setName(Lang.settingsVerseTemplate)
