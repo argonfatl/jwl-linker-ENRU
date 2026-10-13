@@ -7,6 +7,7 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 ## ✨ Key Features
 
 - 📖 **Bible References**: Automatic conversion to JW Library links with verse text extraction
+- 👁️ **Verse Preview**: Hover over a scripture link in reading view to see the verse text (desktop)
 - 📚 **Publication Support**: Watchtower, Awake!, books (od, it-1, cl, si, etc.) in multiple formats
 - 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
 - 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names (English/Russian/Spanish)
@@ -80,6 +81,8 @@ Without a day (`w10 January ...`) the issue is ambiguous, so add the day for iss
 
 Displays all valid scripture references as *JW Library* links with automatic language detection.
 Open any page with scripture references and switch to *Reading View* to see hyperlinks with full book names.
+
+On desktop, rest the mouse on a scripture link for half a second to see the verse text in a popup (up to 5 verses; longer passages show how many more there are). Clicking the link still opens *JW Library*. Turn it off in settings with *Verse text on hover*. There is no popup on phones and tablets: a tap opens *JW Library*.
 
 > Note: This only affects the *Reading View*, it does not modify the underlying Markdown text.
 > Headings, callouts, existing links and code are left as they are.
@@ -270,7 +273,7 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 # 🔒 Privacy and permissions
 
-- **Network**: the plugin only contacts `www.jw.org` (Bible verse text) and `wol.jw.org` (publication paragraphs and article titles), and only when you run a citation command. Nothing is sent anywhere else, and there is no tracking or telemetry.
+- **Network**: the plugin only contacts `www.jw.org` (Bible verse text) and `wol.jw.org` (publication paragraphs and article titles), and only when you run a citation command or rest the mouse on a scripture link (verse preview, can be turned off). Nothing is sent anywhere else, and there is no tracking or telemetry.
 - **Clipboard**: the plugin only *writes* to the clipboard, and only when you click an item in the history sidebar to copy it. It never reads the clipboard.
 - **Files**: citations are inserted into the note you are editing; no other files are read or changed. Citation history is kept in Obsidian's workspace layout.
 - **Release files**: `main.js`, `manifest.json` and `styles.css` in each GitHub release are built by GitHub Actions with a signed build provenance attestation. You can check them with `gh attestation verify main.js -R argonfatl/jwl-linker-ENRU`.
@@ -308,4 +311,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.8.2 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.9.0 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
