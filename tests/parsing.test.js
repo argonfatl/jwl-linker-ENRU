@@ -50,7 +50,8 @@ test('English Watchtower month names are auto-formatted correctly', () => {
 
 test('Spanish and Russian Watchtower month names are auto-formatted correctly', () => {
   assert.equal(jwl.autoFormatSpanishWatchtower('w25 Marzo pág. 8 párr. 2'), 'w25.03 pág. 8 párr. 2');
-  assert.equal(jwl.autoFormatSpanishWatchtower('w10 15 Enero pág. 3 párr. 1'), 'w10 01/15 pág. 3 párr. 1');
+  // Spanish pre-2016 uses day/month, like Russian (checked on wol.jw.org)
+  assert.equal(jwl.autoFormatSpanishWatchtower('w10 15 Enero pág. 3 párr. 1'), 'w10 15/1 pág. 3 párr. 1');
   // Russian pre-2016 uses day/month
   assert.equal(jwl.autoFormatRussianWatchtower('w10 15 января с. 3 абз. 1'), 'w10 15/1 с. 3 абз. 1');
   assert.equal(jwl.autoFormatRussianWatchtower('w25 Март с. 8 абз. 2'), 'w25.03 8, абз. 2');
@@ -90,12 +91,26 @@ test('Russian Watchtower references parse in all supported formats', () => {
   assert.equal(jwl.parseRussianPubReference('просто текст'), null);
 });
 
-test('Russian publication citations use the parsed reference and Russian locale', async () => {
+test('Russian publication citations insert the paragraph text from the WOL lookup', async () => {
   const plugin = createPlugin(jwl, { pubTemplate: '{title}\n{text}', pubCalloutTemplate: '> [!cite] ПУБЛ. — {title}\n> {text}\n' });
-  const out = await plugin._fetchRussianPublicationCitation('w25.3 с. 8 абз. 2', null, 'citeVerse');
+  const urls = [];
+  plugin._fetchDOM = async (url) => {
+    urls.push(decodeURIComponent(url));
+    return { querySelector: (sel) => (sel === '.resultItems' ? { textContent: '2 Иисус любил Иегову всем разумом.' } : null) };
+  };
+  const out = await plugin._fetchRussianPublicationCitation('w25.3 с. 8 абз. 2', null, 'citeVerseCallout');
   assert.doesNotMatch(out, /недопустимая/);
-  assert.match(out, /Сторожевая башня 2025 Март с\. 8 абз\. 2/);
-  assert.match(out, /wtlocale=U/);
+  assert.equal(urls[0], 'https://wol.jw.org/ru/wol/l/r2/lp-u?q=w25.03 8, абз. 2');
+  assert.match(out, /^> \[!cite\] ПУБЛ\. — \[Сторожевая башня 2025 Март с\. 8 абз\. 2\]\(https:\/\/wol\.jw\.org\/ru\//m);
+  assert.match(out, /^> \*\*2\*\* Иисус любил Иегову всем разумом\.$/m);
+
+  // pre-2016 day/month query, and a readable fallback when nothing is found
+  urls.length = 0;
+  plugin._fetchDOM = async (url) => { urls.push(decodeURIComponent(url)); return null; };
+  const old = await plugin._fetchRussianPublicationCitation('w10 15/1 с. 3 абз. 1', null, 'citeVerse');
+  assert.equal(urls[0], 'https://wol.jw.org/ru/wol/l/r2/lp-u?q=w10 15/1 с. 3 абз. 1');
+  assert.match(old, /Сторожевая башня 2010 15 января с\. 3 абз\. 1/);
+  assert.match(old, /Текст не найден/);
 });
 
 test('wol.jw.org and jw.org finder links are parsed in any language', () => {
@@ -149,4 +164,14 @@ test('history respects the historySize setting', () => {
   for (let i = 0; i < 10; i++) view.addToHistory(`url${i}`, `link${i}`, ['text']);
   assert.equal(view.history.length, 3);
   assert.equal(view.history[0].url, 'url9');
+});
+
+test('callout templates keep every line inside the callout without doubling ">"', () => {
+  const tpl = '> [!cite] PUB. — {title}\n> {text}\n';
+  assert.equal(
+    jwl.fillCitationTemplate(tpl, 'T', '**7** first\n> second\n\nthird $1'),
+    '> [!cite] PUB. — T\n> **7** first\n> second\n>\n> third $1\n',
+  );
+  // plain templates are left as they are
+  assert.equal(jwl.fillCitationTemplate('{title}\n“*{text}*”', 'T', 'a\nb'), 'T\n“*a\nb*”');
 });

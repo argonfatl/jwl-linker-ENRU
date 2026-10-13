@@ -761,10 +761,10 @@ function guessIssueDay(monthNumber) {
 
 /**
  * Shared Watchtower auto-formatter for the English and Spanish month-name formats
- * Pre-2016 (semi-monthly issues): w10 1/15 p. 3 par. 1
+ * Pre-2016 (semi-monthly issues): w10 1/15 p. 3 par. 1 (English, month/day) | w10 15/1 pág. 3 párr. 1 (Spanish, day/month)
  * 2016+ (monthly issues): w25.03 p. 8 par. 2 — handled by englishPubMonthNumberRegex
  * @param {string} input
- * @param {{dayMonthRegex: RegExp, monthRegex: RegExp, months: Object, pageTerm: string, parTerm: string, label: string}} opts
+ * @param {{dayMonthRegex: RegExp, monthRegex: RegExp, months: Object, pageTerm: string, parTerm: string, dayFirst?: boolean, label: string}} opts
  * @returns {string}
  */
 function autoFormatLatinWatchtower(input, opts) {
@@ -774,6 +774,9 @@ function autoFormatLatinWatchtower(input, opts) {
       return `${pubCode}${year}.${monthNumber} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
     }
     const issueDay = day ? Number(day) : guessIssueDay(monthNumber);
+    if (opts.dayFirst) {
+      return `${pubCode}${year} ${issueDay}/${Number(monthNumber)} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
+    }
     return `${pubCode}${year} ${monthNumber}/${issueDay} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
   };
 
@@ -869,6 +872,7 @@ function autoFormatSpanishWatchtower(input) {
     months: SpanishMonths,
     pageTerm: 'pág.',
     parTerm: 'párr.',
+    dayFirst: true, // Spanish WOL uses day/month: w10 15/1
     label: 'Spanish',
   });
 }
@@ -896,6 +900,29 @@ const RussianMonthNames = ['', 'Январь', 'Февраль', 'Март', 'А
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const RussianMonthNamesGenitive = ['', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+/**
+ * Fill a citation template ({title}, {text}).
+ * For callout templates ("> [!cite] ...\n> {text}") every line of a multi-line text must
+ * stay inside the callout, but the line the template already prefixes with "> " must not
+ * get a second ">" (that renders as a nested quote).
+ * Function replacers are used so "$" in fetched text is never treated as a pattern.
+ * @param {string} template
+ * @param {string} title
+ * @param {string} text
+ * @returns {string}
+ */
+function fillCitationTemplate(template, title, text) {
+  let body = text ?? '';
+  if (template.trimStart().startsWith('>')) {
+    const lines = body.split('\n').map((line) => line.replace(/^>\s?/, ''));
+    const firstLinePrefixed = /(^|\n)>[ \t]*\{text\}/.test(template);
+    body = lines
+      .map((line, i) => (i === 0 && firstLinePrefixed ? line : line.trim() ? `> ${line}` : '>'))
+      .join('\n');
+  }
+  return template.replace('{title}', () => title).replace('{text}', () => body);
+}
 
 /**
  * Update interface language
@@ -2066,9 +2093,7 @@ class JWLLinkerPlugin extends Plugin {
         const flushCalloutBlock = () => {
           if (!calloutBlock) return;
           const combinedText = calloutBlock.texts.join('');
-          const citation = calloutBlock.template
-            .replace('{title}', calloutBlock.title)
-            .replace('{text}', combinedText);
+          const citation = fillCitationTemplate(calloutBlock.template, calloutBlock.title, combinedText);
           output.push(citation);
           calloutBlock = null;
           calloutChapter = '';
@@ -2114,7 +2139,7 @@ class JWLLinkerPlugin extends Plugin {
             let template = '';
             if (command === Cmd.citeVerse) {
               template = this.settings.verseTemplate;
-              const citation = template.replace('{title}', title).replace('{text}', text);
+              const citation = fillCitationTemplate(template, title, text);
               output.push(citation);
             } else if (command === Cmd.citeVerseCallout) {
               template = this.settings.verseCalloutTemplate;
@@ -2298,7 +2323,7 @@ class JWLLinkerPlugin extends Plugin {
         }
       }
 
-      return template.replace('{title}', title).replace('{text}', text);
+      return fillCitationTemplate(template, title, text);
     } catch (error) {
       console.error(`Error fetching Bible verse for ${langCode}:`, error);
       return `[${langCode}] ${Lang[OutputError.onlineLookupFailed]}`;
@@ -2326,22 +2351,13 @@ class JWLLinkerPlugin extends Plugin {
     debugLog('Parsed:', parsed);
 
     // Check if Watchtower year is available online
-    const publicationYear = parseInt(year) < 50 ? 2000 + parseInt(year) : 1900 + parseInt(year);
+    const publicationYear = toFullYear(year);
     const availability = checkPublicationAvailability('w', 'RU', publicationYear);
     if (availability.isOffline) {
       debugLog('Russian Watchtower not available for year:', publicationYear);
       return `${input}\n${availability.message}`;
     }
 
-    // Create WOL search URL directly
-    const englishMonths = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
-    const englishMonth = englishMonths[parseInt(monthNum)];
-    const searchQuery = `w${year} ${englishMonth}`;
-    const wolUrl = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(searchQuery)}`;
-    debugLog('Generated WOL URL:', wolUrl);
-
-    // Convert month number to Russian month name for display
     const monthName = RussianMonthNames[parseInt(monthNum, 10)];
     const fullYear = toFullYear(year);
     const pubName = isStudy ? 'Сторожевая башня (выпуск для изучения)' : 'Сторожевая башня';
@@ -2349,50 +2365,55 @@ class JWLLinkerPlugin extends Plugin {
     const issue = day ? `${Number(day)} ${RussianMonthNamesGenitive[parseInt(monthNum, 10)]}` : monthName;
     const title = `${pubName} ${fullYear} ${issue} с. ${page} абз. ${paragraph}`;
 
-    // Create JW Library search URL for Russian (JW Library uses wtlocale=U for Russian)
-    const jwlibUrl = `jwlibrary:///finder?wtlocale=U&q=${encodeURIComponent(`${pubCode}${year}.${monthNum}`)}`;
+    // WOL resolves the exact reference and returns the paragraph text in .resultItems
+    // (checked on wol.jw.org: "w25.03 8, абз. 2" and "w10 15/1 с. 3 абз. 1")
+    const query = day
+      ? `${pubCode}${year} ${Number(day)}/${Number(monthNum)} с. ${page} абз. ${paragraph}`
+      : `${pubCode}${year}.${monthNum.padStart(2, '0')} ${page}, абз. ${paragraph}`;
+    const wolUrl = `${getConfigForLanguage('RU').wolLookup}${encodeURIComponent(query)}`;
 
-    const output = [];
-    output.push(input); // keep original input on first line
+    let text = '';
+    const cache = view?.getFromHistory?.(wolUrl);
+    if (cache) {
+      text = cache.content.join('');
+    } else {
+      const dom = await this._fetchDOM(wolUrl);
+      if (dom) {
+        text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
+        if (text) text = this._boldInitialNumber(text);
+      }
+    }
 
-    // Create multiple search links for Russian publications
-    const paddedMonth = monthNum.padStart(2, '0');
-
-    const altSearch1 = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(`w${year}/${paddedMonth}`)}`;
-    const altSearch2 = `https://wol.jw.org/ru/wol/l/r2/lp-u?q=${encodeURIComponent(`"Сторожевая башня" ${fullYear} ${monthName}`)}`;
-
-    const searchLinks = [
-      `[WOL: w${year}.${monthNum}](${wolUrl})`,
-      `[WOL: w${year}/${paddedMonth}](${altSearch1})`,
-      `[WOL: "${fullYear} ${monthName}"](${altSearch2})`
-    ];
-
-    const webLink = searchLinks.join(' • ');
-
-    // For Russian publications, just create a link without trying to extract content
-    // since WOL search pages don't have extractable content
     let citationTitle = title;
     if (this.settings.citationLink) {
-      citationTitle = `[${title}](${jwlibUrl})`;
+      citationTitle = `[${title}](${wolUrl})`;
     }
 
-    // Add to history
-    view?.addToHistory?.(jwlibUrl, title, [`Варианты поиска: ${webLink}`]);
-    view?.showHistory?.();
+    if (text) {
+      view?.addToHistory?.(wolUrl, citationTitle, [text]);
+      view?.showHistory?.();
+    } else {
+      text = `Текст не найден. Попробуйте поиск: [${query}](${wolUrl})`;
+    }
 
-    // Format citation - show multiple search options
     let template = '';
-    if (command === Cmd.citeVerse || command === Cmd.citePublicationLookup) {
-      template = command === Cmd.citePublicationLookup
-        ? this.settings.pubCalloutTemplate
-        : this.settings.pubTemplate;
-    } else if (command === Cmd.citeVerseCallout) {
+    if (command === Cmd.citeVerse) {
+      template = this.settings.pubTemplate;
+    } else {
       template = this.settings.pubCalloutTemplate;
     }
+    // A callout template needs every line of the text inside the callout
+    if (template.includes('[!cite]') && !template.trimStart().startsWith('>')) {
+      template = `> ${template.trimStart()}`;
+    }
+    if (template.trimStart().startsWith('>')) {
+      text = text.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
+    } else {
+      text = text.replace(/\s*\n\s*/g, ' ');
+    }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', webLink);
-    output.push(citation);
-
+    const output = [input];
+    output.push(fillCitationTemplate(template, citationTitle, text));
     return output.join('\n');
   }
 
@@ -2504,7 +2525,7 @@ class JWLLinkerPlugin extends Plugin {
     } else if (template[0] === '>') {
       text = text.replace(/^./gm, '>$&').substring(1);
     }
-    const citation = template.replace('{title}', citationTitle).replace('{text}', text);
+    const citation = fillCitationTemplate(template, citationTitle, text);
 
     const output = `${input}\n${citation}`;
     return output;
@@ -2779,7 +2800,7 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    const citation = fillCitationTemplate(template, citationTitle, textToUse);
     output.push(citation);
 
     return output.join('\n');
@@ -2899,7 +2920,7 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    const citation = fillCitationTemplate(template, citationTitle, textToUse);
     output.push(citation);
     return output.join('\n');
   }
@@ -2991,7 +3012,7 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    const citation = fillCitationTemplate(template, citationTitle, textToUse);
     output.push(citation);
 
     return output.join('\n');
@@ -3089,7 +3110,7 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>');
     }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    const citation = fillCitationTemplate(template, citationTitle, textToUse);
     output.push(citation);
 
     return output.join('\n');
@@ -3406,7 +3427,7 @@ class JWLLinkerPlugin extends Plugin {
       textToUse = textToUse.replace(/^>\s*/gm, '').replace(/^/gm, '> ').replace(/^> $/gm, '>').replace(/^> > /gm, '> ');
     }
 
-    const citation = template.replace('{title}', citationTitle).replace('{text}', textToUse);
+    const citation = fillCitationTemplate(template, citationTitle, textToUse);
     output.push(citation);
 
     return output.join('\n');
@@ -3863,7 +3884,7 @@ class JWLLinkerPlugin extends Plugin {
         template = template.replace(/PUB\.|PUBL\./g, 'ПУБЛ.');
       }
 
-      const citation = template.replace('{title}', citationTitle).replace('{text}', text);
+      const citation = fillCitationTemplate(template, citationTitle, text);
 
       const output = [];
       output.push(input);
@@ -3935,7 +3956,7 @@ class JWLLinkerPlugin extends Plugin {
           text = content.join(glue);
           text = this._boldInitialNumber(text);
         }
-        const citation = template.replace('{title}', link).replace('{text}', text);
+        const citation = fillCitationTemplate(template, link, text);
         output = `${input}\n${citation}`;
       }
       return output;
@@ -3983,7 +4004,7 @@ class JWLLinkerPlugin extends Plugin {
       if (template[0] === '>') {
         text = text.replace(/^./gm, '>$&').substring(1);
       }
-      const citation = template.replace('{title}', link).replace('{text}', text);
+      const citation = fillCitationTemplate(template, link, text);
       // Insert the citation below the lookup query (hard coded formatting)
       const output = `${input}\n${citation}`;
       return output;
@@ -4046,42 +4067,9 @@ class JWLLinkerPlugin extends Plugin {
     const elem = dom.querySelector(selector) ?? null;
     if (elem) {
       if (type === TargetType.scripture) {
-        // Check if this is a Russian JW.org Bible page (different structure)
-        const isRussianBible = dom.querySelector('.bibleText') || dom.querySelector('.verse');
-
-        if (isRussianBible) {
-          // Russian JW.org Bible pages use different structure
-          // Try multiple selectors for Russian pages
-          const russianSelectors = [
-            selector, // original selector
-            selector.replace('#v', '.verse[data-verse="') + '"]',
-            selector.replace('#v', '[data-verse="') + '"]',
-            selector.replace('#v', '.v') // sometimes class instead of id
-          ];
-
-          let foundElem = null;
-          for (const sel of russianSelectors) {
-            foundElem = dom.querySelector(sel);
-            if (foundElem) break;
-          }
-
-          if (foundElem) {
-            text = foundElem.textContent.trim();
-          } else {
-            // Fallback: try to find verse by number in the URL fragment
-            const verseNum = selector.match(/\d+$/);
-            if (verseNum) {
-              const verseElements = dom.querySelectorAll('.verse, .v, [class*="verse"]');
-              for (const ve of verseElements) {
-                if (ve.textContent.includes(verseNum[0])) {
-                  text = ve.textContent.trim();
-                  break;
-                }
-              }
-            }
-          }
-        } else {
-          // Original logic for English/other finder pages
+        {
+          // All jw.org Bible pages (en/ru/es) have #v<id> verse elements: the structured
+          // path keeps chapter numbers ("1" not "23") and poetry line breaks
           let html = elem.innerHTML;
           const blocks = ['<span class="newblock"></span>', '<span class="parabreak"></span>'].map(
             (el) => new RegExp(el, 'gm'),
