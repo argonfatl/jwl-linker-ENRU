@@ -46,6 +46,7 @@ const EXPORTS = [
   'parseRussianPubReference',
   'matchOtherPublication',
   'isLikelyPublication',
+  'fillCitationTemplate',
 ];
 
 function loadPlugin() {
