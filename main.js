@@ -1706,7 +1706,7 @@ class JWLLinkerPlugin extends Plugin {
    */
   showMenu(editor) {
     // Is the menu already active?
-    if (document.querySelector(`.menu${this.menuClass}`)) return;
+    if (document.querySelector(`.menu.${this.menuClass}`)) return;
 
     if (!editor) {
       new Notice(Lang.noEditor, Config.delay);
@@ -3081,7 +3081,7 @@ class JWLLinkerView extends ItemView {
   renderView() {
     this.historyEl = this.contentEl.createDiv({ cls: 'jwl' });
 
-    const detailsEl = createEl('details');
+    const detailsEl = createEl('details', { cls: 'jwl-help' });
     detailsEl.createEl('summary', { text: Lang.help });
     detailsEl.createEl('p', { text: Lang.helpIntro });
     const detailEl = detailsEl.createEl('ul');

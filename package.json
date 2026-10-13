@@ -1,6 +1,6 @@
 {
   "name": "jwl-linker-en-ru-es",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "JW Library linker for Obsidian (English, Russian, Spanish)",
   "scripts": {

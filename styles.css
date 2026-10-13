@@ -1,31 +1,35 @@
+/* JWL Linker: history sidebar */
 .jwl {
-	padding: 0px !important;
-	.item {
-		font-size: var(--font-smaller);
-		padding: 8px 8px 8px 8px;
-		&:hover {
-			color: var(--text-normal);
-			background: var(--background-modifier-active-hover);
-			border-radius: 4px;
-		}
-		p {
-			color: var(--text-muted);
-			display: -webkit-box;
-			/* biome-ignore lint: ; */
-			box-orient: vertical;
-			line-clamp: 5;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 5;
-			overflow: hidden;
-			margin: 0 0 4px 0;
-		}
-		p:not(:first-of-type) {
-			padding-left: 4px;
-		}
-	}
+	padding: 0;
 }
 
-details {
+.jwl .item {
+	font-size: var(--font-smaller);
+	padding: 8px;
+}
+
+.jwl .item:hover {
+	color: var(--text-normal);
+	background: var(--background-modifier-active-hover);
+	border-radius: var(--radius-s);
+}
+
+.jwl .item p {
+	color: var(--text-muted);
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 5;
+	line-clamp: 5;
+	overflow: hidden;
+	margin: 0 0 4px 0;
+}
+
+.jwl .item p:not(:first-of-type) {
+	padding-left: 4px;
+}
+
+/* Help box below the history (scoped so other <details> elements are not affected) */
+.jwl-help {
 	border-top: 1px solid var(--background-modifier-border);
 	color: var(--text-muted);
 	font-size: var(--font-smaller);
@@ -33,57 +37,58 @@ details {
 	padding: 6px 8px 8px 12px;
 }
 
-summary {
+.jwl-help summary {
 	color: var(--text-muted);
-	&:hover {
-		color: var(--text-normal);
-	}
 }
 
-details[open] {
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	padding-left: 11px;
-	p {
-		margin: 8px 0 4px;
-	}
-	ul {
-		margin: 0px;
-		padding-inline-start: 1.8em;
-		li {
-			color: var(--text-muted);
-			list-style-position: outside;
-			padding: 4px 0px;
-		}
-	}
-}
-
-.clear-history:hover {
+.jwl-help summary:hover {
 	color: var(--text-normal);
 }
 
-.menu-item-title span {
+.jwl-help[open] {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	padding-left: 11px;
+}
+
+.jwl-help[open] p {
+	margin: 8px 0 4px;
+}
+
+.jwl-help[open] ul {
+	margin: 0;
+	padding-inline-start: 1.8em;
+}
+
+.jwl-help[open] li {
+	color: var(--text-muted);
+	list-style-position: outside;
+	padding: 4px 0;
+}
+
+.jwl-help .clear-history:hover {
+	color: var(--text-normal);
+}
+
+/* Paragraph count shown in the plugin menu (only in this plugin's menus) */
+.jwl-linker-plugin-menu-container .menu-item-title span {
 	color: var(--text-muted);
 	font-size: 0.8em;
 	margin-left: 0.5em;
 	vertical-align: text-top;
 }
 
-.jwl-settings {
-	textarea {
-		resize: none;
-		width: 20em;
-		height: 5em;
-	}
-	select {
-		width: 5em;
-	}
+/* Settings */
+.jwl-settings textarea {
+	resize: none;
+	width: 20em;
+	height: 5em;
 }
 
-body.is-phone {
-	.jwl-settings {
-		textarea {
-			width: 100%;
-		}
-	}
+.jwl-settings select {
+	width: 5em;
+}
+
+body.is-phone .jwl-settings textarea {
+	width: 100%;
 }
