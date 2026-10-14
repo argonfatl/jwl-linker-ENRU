@@ -277,10 +277,6 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-# 🛠️ Development
-
-Bug reports and suggestions are welcome in [GitHub Issues](https://github.com/argonfatl/jwl-linker-ENRU/issues). Instructions for running the tests and publishing a release are in [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ---
 
 # ☕ Support
