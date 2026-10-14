@@ -277,8 +277,6 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
----
-
 # ☕ Support
 
 If you find this plugin helpful and want to support its development:
