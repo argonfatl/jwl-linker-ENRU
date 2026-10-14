@@ -277,29 +277,6 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 ---
 
-# 🛠️ Development
-
-The plugin is a single `main.js` file (no build step). Tests use Node's built-in test runner and need no dependencies:
-
-```bash
-npm test          # parsing, formatting and citation tests (tests/)
-npm run check     # syntax check of main.js
-```
-
-## Releasing
-
-1. Update the version in `manifest.json`, `package.json` and `versions.json` (`"<version>": "<minAppVersion>"`).
-2. Commit, then push a tag that is exactly the version number (no `v` prefix):
-   ```bash
-   git tag 0.8.0
-   git push origin 0.8.0
-   ```
-3. The *Release* GitHub Action checks that the tag matches `manifest.json`, runs the tests, attests build provenance and publishes a release with `main.js`, `manifest.json` and `styles.css`.
-
-Pull the merged changes before tagging (`git checkout main && git pull`): the tag must point to the commit that has the new version, otherwise the release check stops.
-
----
-
 # ☕ Support
 
 If you find this plugin helpful and want to support its development:
