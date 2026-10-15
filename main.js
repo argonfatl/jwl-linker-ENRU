@@ -1141,6 +1141,27 @@ function parseJwlBibleHref(href) {
 }
 
 /**
+ * Find a Bible book by name or abbreviation (spaces and dots removed, lower case).
+ * The preferred language is tried first, then the other supported languages,
+ * so "Juan 3:16" is found even when auto-detection guessed English.
+ * @param {string} bookKey - e.g. "rom", "1cor", "juan", "пс"
+ * @param {string} preferredLang - EN | RU | ES | ...
+ * @returns {{index: number, lang: string}|null} index = book number - 1
+ */
+function findBibleBook(bookKey, preferredLang) {
+  if (!bookKey) return null;
+  const escaped = bookKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // (^| ) avoids matching inside book names, e.g. "eph" in "zephaniah"
+  const bookRgx = new RegExp(`(^| )${escaped}`, 'm');
+  const langs = [preferredLang, 'EN', 'ES', 'RU'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+  for (const lang of langs) {
+    const index = Bible[lang].Abbreviation.findIndex((elem) => bookRgx.test(elem));
+    if (index !== -1) return { index, lang };
+  }
+  return null;
+}
+
+/**
  * Update interface language
  * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
  */
@@ -2981,6 +3002,7 @@ class JWLLinkerPlugin extends Plugin {
     function validateReference(reference, displayType) {
       // Auto-detect language or use setting
       let lang = this.settings?.lang || DEFAULT_SETTINGS.lang;
+      const autoLang = lang === 'Auto';
       debugLog('validateReference - initial lang setting:', lang);
       debugLog('validateReference - reference.book:', reference.book);
       if (lang === 'Auto') {
@@ -3001,14 +3023,15 @@ class JWLLinkerPlugin extends Plugin {
       let bookNum = 0;
 
       // Check if Bible data exists for this language, fallback to English if not
-      const bibleData = Bible[lang] || Bible['EN'];
-      debugLog('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
-
-      const bookRgx = new RegExp(`(^| )${reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase()}`, 'm'); // no spaces, &nbsp; or .
-      const bookMatch = bibleData.Abbreviation.findIndex((elem) => elem.search(bookRgx) !== -1);
-      if (bookMatch !== -1) {
-        reference.book = bibleData.Book[bookMatch].replaceAll(' ', '\u00A0'); // avoid page breaks in book name
-        bookNum = bookMatch + 1;
+      if (!Bible[lang]) lang = 'EN';
+      const bookKey = reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase(); // no spaces, &nbsp; or .
+      const found = findBibleBook(bookKey, lang);
+      if (found) {
+        bookNum = found.index + 1;
+        // Auto-detection only looks at a few names (e.g. "Juan" is not recognised as Spanish):
+        // when the book is only found in another language, use that language
+        if (autoLang) lang = found.lang;
+        reference.book = Bible[lang].Book[found.index].replaceAll(' ', '\u00A0'); // avoid page breaks in book name
       }
 
       // Now handle each chapter:verse(s) passage

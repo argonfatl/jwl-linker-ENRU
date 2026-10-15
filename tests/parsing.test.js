@@ -262,3 +262,16 @@ test('verse preview shows at most 5 verses, caches results and retries failures'
   assert.equal(fetches, 3); // failures are not cached
   assert.equal(await plugin._fetchVersePreview('jwlibrary:///finder?docid=1'), null);
 });
+
+test('Spanish book names are recognised even when auto-detection guesses English', () => {
+  const plugin = createPlugin(jwl);
+  const link = (text) => plugin._parseScriptureLinks(text, DisplayType.md)[0]?.passages[0]?.link?.jwlib;
+  assert.equal(link('Juan 3:16'), 'jwlibrary:///finder?bible=43003016&wtlocale=S');
+  assert.equal(link('Mateo 24:14'), 'jwlibrary:///finder?bible=40024014&wtlocale=S');
+  assert.equal(link('Salmo 89:18'), 'jwlibrary:///finder?bible=19089018&wtlocale=S');
+  assert.equal(link('John 3:16'), 'jwlibrary:///finder?bible=43003016&wtlocale=E'); // English stays English
+  // a fixed citation language keeps its own locale and book name
+  const ru = createPlugin(jwl, { lang: 'Russian' })._parseScriptureLinks('Juan 3:16', DisplayType.md)[0].passages[0];
+  assert.equal(ru.displayFull, 'Иоанна 3:16');
+  assert.equal(ru.link.jwlib, 'jwlibrary:///finder?bible=43003016&wtlocale=U');
+});
