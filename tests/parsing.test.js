@@ -275,3 +275,42 @@ test('Spanish book names are recognised even when auto-detection guesses English
   assert.equal(ru.displayFull, 'Иоанна 3:16');
   assert.equal(ru.link.jwlib, 'jwlibrary:///finder?bible=43003016&wtlocale=U');
 });
+
+test('paragraph lists and ranges are cited one WOL request per paragraph', async () => {
+  const plugin = createPlugin(jwl, { pubCalloutTemplate: '> [!cite] PUB. — {title}\n> {text}\n' });
+  const queries = [];
+  plugin._fetchDOM = async (url) => {
+    queries.push(decodeURIComponent(url).replace(/^.*\?q=/, ''));
+    const n = queries.length;
+    return { querySelector: (sel) => (sel === '.resultItems' ? { textContent: `${n} paragraph ${n}` } : null) };
+  };
+  const out = await plugin._fetchPublicationCitation('w23.12 p. 20 pars. 7-9', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['w23.12 p. 20 par. 7', 'w23.12 p. 20 par. 8', 'w23.12 p. 20 par. 9']);
+  assert.match(out, /The Watchtower 2023 December p\. 20 par\. 7-9\]/);
+  assert.match(out, /^> \*\*1\*\* paragraph 1\n> \*\*2\*\* paragraph 2\n> \*\*3\*\* paragraph 3$/m);
+
+  queries.length = 0;
+  await plugin._fetchPublicationCitation('w25.01 28, абз. 11, 12', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['w25.01 28, абз. 11', 'w25.01 28, абз. 12']);
+
+  queries.length = 0;
+  await plugin._fetchPublicationCitation('od cap. 15 párr. 3—4', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['od cap. 15 párr. 3', 'od cap. 15 párr. 4']);
+
+  // long ranges are limited to 10 paragraphs, and the title says so
+  assert.equal(jwl.parseWatchtowerReference('w23.12 p. 20 par. 1-30').paragraph, '1-10');
+});
+
+test('links to a paragraph range cite the whole range', async () => {
+  const plugin = createPlugin(jwl, { pubTemplate: '{title}\n{text}' });
+  const [wol] = plugin._getLinksInText('https://wol.jw.org/ru/wol/d/r2/lp-u/2024560#h=5-7');
+  assert.deepEqual([wol.parId, wol.parEnd], ['5', '7']);
+  const [finder] = plugin._getLinksInText('https://www.jw.org/finder?wtlocale=E&docid=1965402&par=8-9');
+  assert.equal(finder.url, 'https://wol.jw.org/en/wol/d/r1/lp-e/1965402#h=8-9');
+
+  const selectors = [];
+  plugin._fetchDOM = async () => ({});
+  plugin._getElementAsText = (_dom, selector) => { selectors.push(selector); return 'text'; };
+  await plugin._fetchParagraphCitation('https://wol.jw.org/en/wol/d/r1/lp-e/2024560#h=5-7', null, 0, 'citeParagraph', 1);
+  assert.deepEqual(selectors.filter((s) => /^#p\d/.test(s)), ['#p5', '#p6', '#p7']);
+});

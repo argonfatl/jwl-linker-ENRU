@@ -482,7 +482,7 @@ const Config = {
   spanishPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
-  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
+  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:pars?\.|абз\.|párrs?\.)\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -505,7 +505,7 @@ const KnownPubCodes = new Set([
 function isLikelyPublication(match) {
   const [full, pubCode] = match;
   if (KnownPubCodes.has(pubCode.toLowerCase())) return true;
-  return /(?:chap\.|глава|cap\.|pp?\.|сс?\.|págs?\.|par\.|абз\.|párr\.)/i.test(full);
+  return /(?:chap\.|глава|cap\.|pp?\.|сс?\.|págs?\.|pars?\.|абз\.|párrs?\.)/i.test(full);
 }
 
 /**
@@ -829,8 +829,8 @@ function normalizeInput(input) {
   // Pages: p., pp., с., сс., pág., págs.
   s = s.replace(/\b(págs?\.|pág\.|pp?\.|сс?\.)\s*(\d)/gi, '$1 $2');
   // Paragraph markers — \b only works for ASCII; абз. and párr. matched without it
-  s = s.replace(/\b(par\.)\s*(\d)/gi, '$1 $2');
-  s = s.replace(/(абз\.|párr\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/\b(pars?\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/(абз\.|párrs?\.)\s*(\d)/gi, '$1 $2');
   // Chapter markers — same: глава and cap. don't use \b
   s = s.replace(/\b(chap\.)\s*(\d)/gi, '$1 $2');
   s = s.replace(/(глава|cap\.)\s*(\d)/gi, '$1 $2');
@@ -989,7 +989,7 @@ const PublicationTitles = {
  *         6 page marker, 7 page, 8 paragraph marker, 9 paragraph
  */
 const WatchtowerRegex =
-  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párr|par)\.\s*(\d+)/i;
+  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párrs?|pars?)\.\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?)/i;
 
 /**
  * Parse a Watchtower reference
@@ -1007,7 +1007,7 @@ function parseWatchtowerReference(input) {
 function watchtowerFromMatch(m) {
   const [whole, study, year, dotMonth, a, b, pageMarker, page, parMarker, paragraph] = m;
   const marker = parMarker.toLowerCase();
-  const sourceLang = marker === 'абз' ? 'RU' : marker === 'párr' ? 'ES' : 'EN';
+  const sourceLang = marker === 'абз' ? 'RU' : marker.startsWith('párr') ? 'ES' : 'EN';
   let month;
   let day = null;
   if (dotMonth) {
@@ -1020,7 +1020,71 @@ function watchtowerFromMatch(m) {
     day = Number(b);
   }
   if (month < 1 || month > 12 || (day !== null && (day < 1 || day > 31))) return null;
-  return { whole, isStudy: Boolean(study), year, month, day, page, paragraph, sourceLang, pageMarker };
+  return {
+    whole, isStudy: Boolean(study), year, month, day, page, paragraph: limitParagraphSpec(normalizeParagraphSpec(paragraph)), sourceLang, pageMarker,
+  };
+}
+
+/** Most paragraphs cited at once (one WOL request per paragraph) */
+const MaxCitedParagraphs = 10;
+
+/**
+ * Paragraph list or range as typed ("8, 9", "8-10", "8—10") → normalised text ("8, 9" / "8-10")
+ * @param {string} spec
+ * @returns {string}
+ */
+function normalizeParagraphSpec(spec) {
+  return String(spec).replace(/\s*[-–—]\s*/g, '-').replace(/\s*,\s*/g, ', ').trim();
+}
+
+/**
+ * Paragraph numbers in a list or range: "8, 9" → [8, 9], "8-10" → [8, 9, 10]
+ * At most MaxCitedParagraphs numbers; a reversed range is read as a single paragraph.
+ * @param {string} spec
+ * @returns {number[]}
+ */
+function expandParagraphSpec(spec) {
+  const numbers = [];
+  for (const part of String(spec ?? '').split(',')) {
+    const [a, b] = part.split('-').map((n) => Number.parseInt(n, 10));
+    if (!Number.isFinite(a)) continue;
+    const last = Number.isFinite(b) && b >= a ? b : a;
+    for (let n = a; n <= last && numbers.length < MaxCitedParagraphs; n++) {
+      if (!numbers.includes(n)) numbers.push(n);
+    }
+  }
+  return numbers;
+}
+
+/**
+ * Keep a paragraph spec within MaxCitedParagraphs, so the title says what is cited:
+ * "1-30" → "1-10"
+ * @param {string} spec - normalised spec
+ * @returns {string}
+ */
+function limitParagraphSpec(spec) {
+  const all = [];
+  for (const part of spec.split(',')) {
+    const [a, b] = part.split('-').map((n) => Number.parseInt(n, 10));
+    if (Number.isFinite(a)) all.push(Number.isFinite(b) && b >= a ? b - a + 1 : 1);
+  }
+  if (all.reduce((sum, n) => sum + n, 0) <= MaxCitedParagraphs) return spec;
+  const cited = expandParagraphSpec(spec);
+  const isRun = cited.every((n, i) => i === 0 || n === cited[i - 1] + 1);
+  return isRun ? `${cited[0]}-${cited[cited.length - 1]}` : cited.join(', ');
+}
+
+/**
+ * One WOL query per paragraph: WOL resolves single paragraphs reliably, while lists
+ * ("par. 7, 8") often find nothing
+ * @param {Object} ref - parsed reference with a .paragraph spec
+ * @param {(ref: Object) => string} formatQuery
+ * @returns {string[]}
+ */
+function paragraphQueries(ref, formatQuery) {
+  const paragraphs = ref.paragraph ? expandParagraphSpec(ref.paragraph) : [];
+  if (paragraphs.length <= 1) return [formatQuery(ref)];
+  return paragraphs.map((n) => formatQuery({ ...ref, paragraph: String(n) }));
 }
 
 /** WOL search query for a Watchtower reference, in the citation language */
@@ -1060,7 +1124,7 @@ function parseOtherPublicationReference(input) {
   let sourceLang = 'EN';
   if (/абз\.|глава|(?:^|\s)сс?\./i.test(text) || /[Ѐ-ӿ]/.test(input)) {
     sourceLang = 'RU';
-  } else if (/párr\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
+  } else if (/párrs?\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
     sourceLang = 'ES';
   }
   return {
@@ -1068,7 +1132,7 @@ function parseOtherPublicationReference(input) {
     pubCode: pubCode.toLowerCase(),
     number,
     page,
-    paragraph,
+    paragraph: paragraph ? limitParagraphSpec(normalizeParagraphSpec(paragraph)) : undefined,
     hasChapter: /chap\.|глава|(?:^|\s)cap\./i.test(text),
     sourceLang,
   };
@@ -2426,32 +2490,40 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
-   * Fetch a paragraph from the WOL lookup page and format it with the citation template
-   * @param {{lang: string, query: string, title: string, command: string, view: Object}} options
+   * Fetch paragraphs from the WOL lookup page and format them with the citation template
+   * @param {{lang: string, queries: string[], title: string, command: string, view: Object}} options
+   *   queries: one WOL search per paragraph (see paragraphQueries)
    * @returns {Promise<string>} the formatted citation (without the original reference line)
    */
-  async _citeFromWol({ lang, query, title, command, view }) {
+  async _citeFromWol({ lang, queries, title, command, view }) {
     const L = PubLangs[lang] ?? PubLangs.EN;
-    const url = `${getConfigForLanguage(lang).wolLookup}${encodeURIComponent(query)}`;
+    const lookup = getConfigForLanguage(lang).wolLookup;
+    const urls = queries.map((query) => `${lookup}${encodeURIComponent(query)}`);
 
-    let text = '';
-    const cache = view?.getFromHistory?.(url);
-    if (cache) {
-      text = cache.content.join('');
-    } else {
-      const dom = await this._fetchDOM(url);
-      if (dom) {
-        text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-        if (text) text = this._boldInitialNumber(text);
+    const texts = [];
+    for (const url of urls) {
+      let text = '';
+      const cache = view?.getFromHistory?.(url);
+      if (cache) {
+        text = cache.content.join('');
+      } else {
+        const dom = await this._fetchDOM(url);
+        if (dom) {
+          text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
+          if (text) text = this._boldInitialNumber(text);
+        }
       }
+      if (text) texts.push(text);
     }
 
-    const linkedTitle = this.settings.citationLink ? `[${title}](${url})` : title;
-    if (text) {
-      view?.addToHistory?.(url, linkedTitle, [text]);
+    const linkedTitle = this.settings.citationLink ? `[${title}](${urls[0]})` : title;
+    let text;
+    if (texts.length > 0) {
+      text = texts.join('\n');
+      view?.addToHistory?.(urls.join(' '), linkedTitle, [text]);
       view?.showHistory?.();
     } else {
-      text = `${L.notFound} [${query}](${url})`;
+      text = `${L.notFound} [${queries[0]}](${urls[0]})`;
     }
 
     let template = command === Cmd.citeVerse ? this.settings.pubTemplate : this.settings.pubCalloutTemplate;
@@ -2481,7 +2553,7 @@ class JWLLinkerPlugin extends Plugin {
     if (availability.isOffline) return `${input}\n${availability.message}`;
     const citation = await this._citeFromWol({
       lang,
-      query: formatWatchtowerQuery(ref, lang),
+      queries: paragraphQueries(ref, (r) => formatWatchtowerQuery(r, lang)),
       title: formatWatchtowerTitle(ref, lang),
       command,
       view,
@@ -2504,7 +2576,7 @@ class JWLLinkerPlugin extends Plugin {
     if (availability.isOffline) return `${input}\n${availability.message}`;
     const citation = await this._citeFromWol({
       lang,
-      query: formatOtherPublicationQuery(ref, lang),
+      queries: paragraphQueries(ref, (r) => formatOtherPublicationQuery(r, lang)),
       title: formatOtherPublicationTitle(ref, lang),
       command,
       view,
@@ -2541,7 +2613,9 @@ class JWLLinkerPlugin extends Plugin {
       }
       output.push(await this._citeFromWol({
         lang,
-        query: watchtower ? formatWatchtowerQuery(watchtower, lang) : formatOtherPublicationQuery(other, lang),
+        queries: watchtower
+          ? paragraphQueries(watchtower, (r) => formatWatchtowerQuery(r, lang))
+          : paragraphQueries(other, (r) => formatOtherPublicationQuery(r, lang)),
         title: watchtower ? formatWatchtowerTitle(watchtower, lang) : formatOtherPublicationTitle(other, lang),
         command: citeCommand,
         view,
@@ -2556,13 +2630,17 @@ class JWLLinkerPlugin extends Plugin {
    * @param {View} view
    * @param {number} caret position of the caret in the input
    * @param {Cmd} command full paragraph, inline or title only
-   * @param {number} pars number of paragraphs to extract (1-3 right now)
+   * @param {number} pars number of paragraphs to extract (the "paragraph count" setting; a range link overrides it)
    * @returns {string}
    */
   async _fetchParagraphCitation(input, view, caret, command, pars) {
     const match = this._getLinkAtCaret(input, caret);
     if (!match || !isValidUrl(match.url)) {
       return `${input} | ${Lang[OutputError.invalidUrl]}`;
+    }
+    // A link to a paragraph range (#h=5-7, par=5-7) cites the whole range
+    if (match.parEnd && Number(match.parEnd) > Number(match.parId)) {
+      pars = Math.min(Number(match.parEnd) - Number(match.parId) + 1, MaxCitedParagraphs);
     }
     let link = '';
     let content = [];
@@ -3146,11 +3224,13 @@ class JWLLinkerPlugin extends Plugin {
     let parId = '';
     let wtlocale = 'E';
     // Any language: https://wol.jw.org/<lang>/wol/d/<r>/<lp>/<docid>#h=<par>
-    const wolMatch = /^https:\/\/wol\.jw\.org\/([a-z-]+)\/wol\/d\/[^/]+\/[^/]+\/(\d+)(?:#h=(\d+))?/i.exec(url);
+    let parEnd = '';
+    const wolMatch = /^https:\/\/wol\.jw\.org\/([a-z-]+)\/wol\/d\/[^/]+\/[^/]+\/(\d+)(?:#h=(\d+)(?:-(\d+))?)?/i.exec(url);
     if (wolMatch) {
       wtlocale = { ru: 'U', es: 'S', en: 'E', de: 'X', fr: 'F', nl: 'O' }[wolMatch[1].toLowerCase()] ?? 'E';
       docId = wolMatch[2];
       parId = wolMatch[3] ?? '';
+      parEnd = wolMatch[4] ?? '';
     } else if (/^https:\/\/www\.jw\.org\/finder\?/i.test(url)) {
       let params;
       try {
@@ -3159,14 +3239,16 @@ class JWLLinkerPlugin extends Plugin {
         return null;
       }
       docId = params.get('docid') ?? '';
-      // par may be a range ("5-7"); the first paragraph id is enough to locate it
-      parId = (params.get('par') ?? '').match(/^\d+/)?.[0] ?? '';
+      // par may be a range ("5-7")
+      const par = /^(\d+)(?:-(\d+))?/.exec(params.get('par') ?? '');
+      parId = par?.[1] ?? '';
+      parEnd = par?.[2] ?? '';
       wtlocale = params.get('wtlocale') ?? 'E';
       if (!docId) return null;
       // switch the link style from finder to wol
       // so that we can scrape the paragraph content later if needed
       const lang = { U: 'RU', S: 'ES' }[wtlocale] ?? 'EN';
-      url = `${getConfigForLanguage(lang).wolPublications}${docId}${parId ? `#h=${parId}` : ''}`;
+      url = `${getConfigForLanguage(lang).wolPublications}${docId}${parId ? `#h=${parId}${parEnd ? `-${parEnd}` : ''}` : ''}`;
     } else {
       return null;
     }
@@ -3176,6 +3258,7 @@ class JWLLinkerPlugin extends Plugin {
       url: url,
       docId: docId,
       parId: parId,
+      parEnd: parEnd,
       wtlocale: wtlocale,
     };
   }
