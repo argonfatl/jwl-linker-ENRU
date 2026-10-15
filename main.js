@@ -10,6 +10,7 @@ const {
   PluginSettingTab,
   Setting,
   Platform,
+  editorLivePreviewField,
 } = require('obsidian');
 
 const DEFAULT_SETTINGS = {
@@ -20,6 +21,7 @@ const DEFAULT_SETTINGS = {
   historySize: 20,
   boldInitialNum: true,
   versePreview: true, // show the verse text in a popup when hovering a scripture link (desktop only)
+  livePreviewLinks: true, // mark scripture references as links in Live Preview
   citationLink: true,
   spaceAfterPunct: true,
   paraCount: 1,
@@ -78,7 +80,9 @@ const InterfaceStrings = {
     settingsBoldNumbers: 'Номера стихов жирным шрифтом',
     settingsBoldNumbersDesc: 'Применять жирное форматирование к номерам стихов или абзацев в цитируемом тексте.',
     settingsVersePreview: 'Текст стиха при наведении',
-    settingsVersePreviewDesc: 'Показывать текст стиха во всплывающем окне при наведении на ссылку в режиме чтения (только на компьютере).',
+    settingsVersePreviewDesc: 'Показывать текст стиха во всплывающем окне при наведении на ссылку (только на компьютере).',
+    settingsLivePreviewLinks: 'Ссылки на стихи в режиме редактирования',
+    settingsLivePreviewLinksDesc: 'Подчёркивать ссылки на стихи в режиме Live Preview. Cmd/Ctrl+щелчок открывает стих в JW Library, текст заметки не меняется.',
     versePreviewLoading: 'Загрузка…',
     versePreviewMore: '… и ещё стихов: {count}',
     settingsCitationLink: 'Ссылка на цитируемые стихи',
@@ -174,7 +178,9 @@ const InterfaceStrings = {
     settingsBoldNumbers: 'Initial numbers in bold',
     settingsBoldNumbersDesc: 'Apply bold markup to initial numbers in verses or paragraphs in the cited text.',
     settingsVersePreview: 'Verse text on hover',
-    settingsVersePreviewDesc: 'Show the verse text in a popup when you hover over a scripture link in reading view (desktop only).',
+    settingsVersePreviewDesc: 'Show the verse text in a popup when you hover over a scripture link (desktop only).',
+    settingsLivePreviewLinks: 'Scripture links while editing',
+    settingsLivePreviewLinksDesc: 'Underline scripture references in Live Preview. Cmd/Ctrl+click opens the verse in JW Library; the note text is not changed.',
     versePreviewLoading: 'Loading…',
     versePreviewMore: '… and {count} more verses',
     settingsCitationLink: 'Link cited scripture',
@@ -270,7 +276,9 @@ const InterfaceStrings = {
     settingsBoldNumbers: 'Números iniciales en negrita',
     settingsBoldNumbersDesc: 'Aplicar formato en negrita a los números iniciales en versículos o párrafos en el texto citado.',
     settingsVersePreview: 'Texto del versículo al pasar el cursor',
-    settingsVersePreviewDesc: 'Muestra el texto del versículo en una ventana emergente al pasar el cursor sobre un enlace bíblico en la vista de lectura (solo escritorio).',
+    settingsVersePreviewDesc: 'Muestra el texto del versículo en una ventana emergente al pasar el cursor sobre un enlace bíblico (solo escritorio).',
+    settingsLivePreviewLinks: 'Enlaces bíblicos al editar',
+    settingsLivePreviewLinksDesc: 'Subraya las referencias bíblicas en Vista previa en vivo. Cmd/Ctrl+clic abre el versículo en JW Library; el texto de la nota no cambia.',
     versePreviewLoading: 'Cargando…',
     versePreviewMore: '… y {count} versículos más',
     settingsCitationLink: 'Enlazar escritura citada',
@@ -1225,6 +1233,100 @@ function findBibleBook(bookKey, preferredLang) {
   return null;
 }
 
+/* ---------------------------------------------------------------------------
+ * Scripture links in Live Preview
+ * ------------------------------------------------------------------------- */
+
+/** Lines longer than this are not scanned (performance) */
+const LivePreviewMaxLineLength = 5000;
+
+/**
+ * Character ranges of the scripture passages in a line of text, with their JW Library links.
+ * The text itself is not changed: each passage ("Ps 23:1-3", "5", "24:1" in "Ps 23:1-3, 5; 24:1")
+ * gets its own range so the link and the hover preview match what is under the mouse.
+ * @param {Plugin} plugin
+ * @param {string} text - one line
+ * @returns {Array<{from: number, to: number, href: string}>} sorted, non-overlapping
+ */
+function scriptureLinkRanges(plugin, text) {
+  if (!text || text.length > LivePreviewMaxLineLength || !/\d/.test(text)) return [];
+  const references = plugin
+    ._parseScriptureLinks(text, DisplayType.href, plugin.settings.spaceAfterPunct)
+    .filter((ref) => !ref.isLinkAlready && !ref.isPlainText && ref.passages.some((p) => p.link))
+    .sort((a, b) => a.index - b.index);
+
+  const ranges = [];
+  let lastEnd = -1;
+  for (const ref of references) {
+    if (ref.index < lastEnd) continue; // overlapping match
+    const segments = passageSegments(ref.original, ref.bookLength);
+    if (segments && segments.length === ref.passages.length) {
+      ref.passages.forEach((passage, i) => {
+        if (passage.link) {
+          ranges.push({ from: ref.index + segments[i][0], to: ref.index + segments[i][1], href: passage.link.jwlib });
+        }
+      });
+    } else {
+      // could not split the reference into passages: link all of it to the first passage
+      const first = ref.passages.find((p) => p.link);
+      ranges.push({ from: ref.index, to: ref.index + ref.original.length, href: first.link.jwlib });
+    }
+    lastEnd = ref.index + ref.original.length;
+  }
+  return ranges;
+}
+
+/**
+ * Split a scripture reference as typed into one [start, end) range per passage, in the same
+ * order as _parseScriptureLinks creates passages: chapters are separated by ";", verses by ",",
+ * and two consecutive verses ("1, 2") form one passage.
+ * The first range includes the book name.
+ * @param {string} original - e.g. "Ps 23:1-3, 5; 24:1"
+ * @param {number} bookLength - length of the book name part (incl. a plain-text marker)
+ * @returns {Array<[number, number]>|null}
+ */
+function passageSegments(original, bookLength) {
+  if (!Number.isFinite(bookLength)) return null;
+  const segments = [];
+  let pos = bookLength;
+  const parts = original.slice(bookLength).split(';');
+  for (const [p, part] of parts.entries()) {
+    const partStart = pos;
+    pos += part.length + 1; // + ";"
+    const colon = part.indexOf(':');
+    if (colon === -1) {
+      segments.push([p === 0 ? 0 : partStart + leadingSpaces(part), partStart + trimmedEnd(part)]);
+      continue;
+    }
+    // verses after the colon, with their offsets in the part
+    const verses = [];
+    let vPos = colon + 1;
+    for (const verse of part.slice(colon + 1).split(',')) {
+      verses.push({ text: verse, start: vPos + leadingSpaces(verse), end: vPos + trimmedEnd(verse) });
+      vPos += verse.length + 1; // + ","
+    }
+    for (let i = 0; i < verses.length; i++) {
+      let end = verses[i].end;
+      const current = Number(verses[i].text);
+      const next = i < verses.length - 1 ? Number(verses[i + 1].text) : NaN;
+      if (current === next - 1) {
+        end = verses[i + 1].end; // two consecutive verses are one passage
+      }
+      const start = i === 0 ? (p === 0 ? 0 : leadingSpaces(part)) : verses[i].start;
+      segments.push([partStart + (p === 0 && i === 0 ? -partStart : start), partStart + end]);
+      if (current === next - 1) i++;
+    }
+  }
+  return segments;
+
+  function leadingSpaces(str) {
+    return str.length - str.trimStart().length;
+  }
+  function trimmedEnd(str) {
+    return str.trimEnd().length;
+  }
+}
+
 /**
  * Update interface language
  * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
@@ -1350,8 +1452,9 @@ class JWLLinkerPlugin extends Plugin {
         window.clearTimeout(closeTimer);
         return;
       }
-      const link = target?.closest('a');
-      const href = link?.getAttribute('href');
+      // <a href> in reading view, <span data-jwl-href> in Live Preview
+      const link = target?.closest('a[href], [data-jwl-href]');
+      const href = link?.getAttribute('data-jwl-href') ?? link?.getAttribute('href');
       if (!link || !parseJwlBibleHref(href)) {
         if (current) closeSoon();
         return;
@@ -1376,6 +1479,87 @@ class JWLLinkerPlugin extends Plugin {
       if (evt.key === 'Escape') close();
     });
     this.registerDomEvent(window, 'scroll', close, { capture: true });
+  }
+
+  /**
+   * Live Preview: mark scripture passages as links (the note text is not changed).
+   * Cmd/Ctrl+click opens JW Library; a plain click places the cursor as usual.
+   * CodeMirror modules are provided by Obsidian at runtime.
+   */
+  _registerLivePreviewLinks() {
+    let cm;
+    try {
+      cm = { ...require('@codemirror/view'), ...require('@codemirror/language') };
+    } catch (error) {
+      console.error('JWL Linker: Live Preview links are not available', error);
+      return;
+    }
+    const { ViewPlugin, Decoration, EditorView, syntaxTree } = cm;
+    const plugin = this;
+    // Skip code, math, front matter, comments and existing links
+    const skipNode = /code|math|frontmatter|comment|link|url|hashtag|formatting/i;
+
+    const isSkipped = (state, pos) => {
+      let node = syntaxTree(state).resolveInner(pos, 1);
+      for (let depth = 0; node && depth < 4; depth++, node = node.parent) {
+        if (skipNode.test(node.name)) return true;
+      }
+      return false;
+    };
+
+    const build = (view) => {
+      const marks = [];
+      if (!plugin.settings.livePreviewLinks || !view.state.field(editorLivePreviewField, false)) {
+        return Decoration.none;
+      }
+      for (const { from, to } of view.visibleRanges) {
+        let pos = from;
+        while (pos <= to) {
+          const line = view.state.doc.lineAt(pos);
+          for (const range of scriptureLinkRanges(plugin, line.text)) {
+            const start = line.from + range.from;
+            if (isSkipped(view.state, start)) continue;
+            marks.push(
+              Decoration.mark({
+                class: 'jwl-lp-link',
+                attributes: { 'data-jwl-href': range.href },
+              }).range(start, line.from + range.to),
+            );
+          }
+          pos = line.to + 1;
+        }
+      }
+      return Decoration.set(marks, true);
+    };
+
+    const linkPlugin = ViewPlugin.fromClass(
+      class {
+        constructor(view) {
+          this.decorations = build(view);
+        }
+        update(update) {
+          const modeChanged =
+            update.startState.field(editorLivePreviewField, false) !== update.state.field(editorLivePreviewField, false);
+          if (update.docChanged || update.viewportChanged || modeChanged || update.transactions.some((tr) => tr.reconfigured)) {
+            this.decorations = build(update.view);
+          }
+        }
+      },
+      { decorations: (value) => value.decorations },
+    );
+
+    const clickHandler = EditorView.domEventHandlers({
+      mousedown(event) {
+        if (event.button !== 0 || !(event.metaKey || event.ctrlKey)) return false;
+        const el = event.target instanceof Element ? event.target.closest('[data-jwl-href]') : null;
+        if (!el) return false;
+        event.preventDefault();
+        window.open(el.getAttribute('data-jwl-href'));
+        return true;
+      },
+    });
+
+    this.registerEditorExtension([linkPlugin, clickHandler]);
   }
 
   /**
@@ -1462,6 +1646,9 @@ class JWLLinkerPlugin extends Plugin {
 
     // Desktop: verse text in a popup when hovering a scripture link
     this._registerVersePreview();
+
+    // Live Preview: scripture references are underlined; Cmd/Ctrl+click opens JW Library
+    this._registerLivePreviewLinks();
 
     debugLog(`${this.manifest.name} ${this.manifest.version} loaded`);
   }
@@ -2938,6 +3125,7 @@ class JWLLinkerPlugin extends Plugin {
       let reference = {
         original: original,
         index: match.index,
+        bookLength: match[2].length + match[3].length, // plain text marker + book name as typed
         book: match[3],
         passages: [],
         isPlainText: Boolean(match[2]), // ' => skip this verse, no link
@@ -3758,6 +3946,17 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           });
         });
     }
+
+    new Setting(containerEl)
+      .setName(Lang.settingsLivePreviewLinks)
+      .setDesc(Lang.settingsLivePreviewLinksDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.livePreviewLinks).onChange(async (value) => {
+          this.plugin.settings.livePreviewLinks = value;
+          await this.plugin.saveSettings();
+          this.app.workspace.updateOptions(); // redraw open editors
+        });
+      });
 
     new Setting(containerEl)
       .setName(Lang.settingsCitationLink)

@@ -31,6 +31,7 @@ const obsidianStub = {
   PluginSettingTab: Base,
   Setting: Base,
   Platform: { isMobile: false },
+  editorLivePreviewField: {},
 };
 
 const EXPORTS = [
@@ -54,6 +55,7 @@ const EXPORTS = [
   'isLikelyPublication',
   'fillCitationTemplate',
   'parseJwlBibleHref',
+  'scriptureLinkRanges',
 ];
 
 function loadPlugin() {

@@ -314,3 +314,22 @@ test('links to a paragraph range cite the whole range', async () => {
   await plugin._fetchParagraphCitation('https://wol.jw.org/en/wol/d/r1/lp-e/2024560#h=5-7', null, 0, 'citeParagraph', 1);
   assert.deepEqual(selectors.filter((s) => /^#p\d/.test(s)), ['#p5', '#p6', '#p7']);
 });
+
+test('Live Preview links cover each passage as typed, without changing the text', () => {
+  const plugin = createPlugin(jwl);
+  const ranges = (text) =>
+    jwl.scriptureLinkRanges(plugin, text).map((r) => [text.slice(r.from, r.to), r.href.replace(/^.*bible=/, '')]);
+  assert.deepEqual(ranges('Read Ps 23:1-3, 5; 24:1 today'), [
+    ['Ps 23:1-3', '19023001-19023003&wtlocale=E'],
+    ['5', '19023005&wtlocale=E'],
+    ['24:1', '19024001&wtlocale=E'],
+  ]);
+  assert.deepEqual(ranges('John 3:16, 17 and Jude 3'), [
+    ['John 3:16, 17', '43003016-43003017&wtlocale=E'], // consecutive verses are one passage
+    ['Jude 3', '65001003&wtlocale=E'],
+  ]);
+  assert.deepEqual(ranges('См. w25.01 28, абз. 11 и Рим 1:20'), [['Рим 1:20', '45001020&wtlocale=U']]);
+  assert.deepEqual(ranges('[Rom 1:20](x) and Rom 8:28'), [['Rom 8:28', '45008028&wtlocale=E']]); // existing link skipped
+  assert.deepEqual(ranges("'Rom 1:20 is skipped"), []);
+  assert.deepEqual(ranges('no references here'), []);
+});
