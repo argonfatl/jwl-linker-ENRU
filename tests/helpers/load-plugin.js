@@ -32,6 +32,11 @@ const obsidianStub = {
   Setting: Base,
   Platform: { isMobile: false },
   editorLivePreviewField: {},
+  EditorSuggest: class {
+    constructor(app) {
+      this.app = app;
+    }
+  },
 };
 
 const EXPORTS = [
@@ -56,6 +61,8 @@ const EXPORTS = [
   'fillCitationTemplate',
   'parseJwlBibleHref',
   'scriptureLinkRanges',
+  'suggestionsFor',
+  'ReferenceSuggest',
 ];
 
 function loadPlugin() {

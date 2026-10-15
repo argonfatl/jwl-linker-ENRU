@@ -333,3 +333,26 @@ test('Live Preview links cover each passage as typed, without changing the text'
   assert.deepEqual(ranges("'Rom 1:20 is skipped"), []);
   assert.deepEqual(ranges('no references here'), []);
 });
+
+test('suggestions list Bible books and publication codes after the trigger', () => {
+  const books = (q, lang) => jwl.suggestionsFor(q, lang).filter((s) => s.kind === 'book').map((s) => `${s.label} ${s.lang}`);
+  assert.deepEqual(books('рим', 'RU'), ['Римлянам RU']);
+  assert.deepEqual(books('rom', 'EN'), ['Romans EN', 'Romanos ES']); // preferred language first
+  assert.deepEqual(books('1 co', 'EN'), ['1 Corinthians EN', '1 Corintios ES']);
+  assert.deepEqual(books('juan', 'RU'), ['Juan ES']);
+  const od = jwl.suggestionsFor('od', 'RU').find((s) => s.kind === 'publication');
+  assert.equal(od.insert, 'od ');
+  assert.equal(od.detail, 'Организованы исполнять волю Иеговы');
+  assert.deepEqual(jwl.suggestionsFor('', 'EN'), []);
+
+  // trigger detection
+  const plugin = createPlugin(jwl, { suggestions: true, suggestTrigger: '@' });
+  const suggest = new jwl.ReferenceSuggest({}, plugin);
+  const trigger = (line) => suggest.onTrigger({ line: 0, ch: line.length }, { getLine: () => line });
+  assert.deepEqual(trigger('see @rom'), { start: { line: 0, ch: 4 }, end: { line: 0, ch: 8 }, query: 'rom' });
+  assert.equal(trigger('@1 co').query, '1 co');
+  assert.equal(trigger('mail me at a@rom'), null); // not at the start of a word
+  assert.equal(trigger('see @'), null); // nothing typed yet
+  plugin.settings.suggestions = false;
+  assert.equal(trigger('see @rom'), null);
+});

@@ -143,3 +143,9 @@ body.is-phone .jwl-settings textarea {
 	text-decoration-style: dotted;
 	text-underline-offset: 2px;
 }
+
+/* Suggestions while typing */
+.jwl-suggestion-note {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}

@@ -11,6 +11,7 @@ const {
   Setting,
   Platform,
   editorLivePreviewField,
+  EditorSuggest,
 } = require('obsidian');
 
 const DEFAULT_SETTINGS = {
@@ -22,6 +23,8 @@ const DEFAULT_SETTINGS = {
   boldInitialNum: true,
   versePreview: true, // show the verse text in a popup when hovering a scripture link (desktop only)
   livePreviewLinks: true, // mark scripture references as links in Live Preview
+  suggestions: true, // suggest Bible books and publication codes after the trigger
+  suggestTrigger: '@', // typed at the start of a word to open the suggestions
   citationLink: true,
   spaceAfterPunct: true,
   paraCount: 1,
@@ -81,6 +84,12 @@ const InterfaceStrings = {
     settingsBoldNumbersDesc: 'Применять жирное форматирование к номерам стихов или абзацев в цитируемом тексте.',
     settingsVersePreview: 'Текст стиха при наведении',
     settingsVersePreviewDesc: 'Показывать текст стиха во всплывающем окне при наведении на ссылку (только на компьютере).',
+    settingsSuggestions: 'Подсказки при вводе',
+    settingsSuggestionsDesc: 'Введите триггер в начале слова и начало названия книги или кода публикации (например, @рим или @od), чтобы выбрать из списка.',
+    settingsSuggestTrigger: 'Триггер подсказок',
+    settingsSuggestTriggerDesc: 'Символы, которые открывают подсказки. По умолчанию @.',
+    suggestBible: 'Библия',
+    suggestPublication: 'Публикация',
     settingsLivePreviewLinks: 'Ссылки на стихи в режиме редактирования',
     settingsLivePreviewLinksDesc: 'Подчёркивать ссылки на стихи в режиме Live Preview. Cmd/Ctrl+щелчок открывает стих в JW Library, текст заметки не меняется.',
     versePreviewLoading: 'Загрузка…',
@@ -179,6 +188,12 @@ const InterfaceStrings = {
     settingsBoldNumbersDesc: 'Apply bold markup to initial numbers in verses or paragraphs in the cited text.',
     settingsVersePreview: 'Verse text on hover',
     settingsVersePreviewDesc: 'Show the verse text in a popup when you hover over a scripture link (desktop only).',
+    settingsSuggestions: 'Suggestions while typing',
+    settingsSuggestionsDesc: 'Type the trigger at the start of a word, then the start of a book name or publication code (for example @rom or @od), and pick from the list.',
+    settingsSuggestTrigger: 'Suggestion trigger',
+    settingsSuggestTriggerDesc: 'Characters that open the suggestions. Default: @.',
+    suggestBible: 'Bible',
+    suggestPublication: 'Publication',
     settingsLivePreviewLinks: 'Scripture links while editing',
     settingsLivePreviewLinksDesc: 'Underline scripture references in Live Preview. Cmd/Ctrl+click opens the verse in JW Library; the note text is not changed.',
     versePreviewLoading: 'Loading…',
@@ -277,6 +292,12 @@ const InterfaceStrings = {
     settingsBoldNumbersDesc: 'Aplicar formato en negrita a los números iniciales en versículos o párrafos en el texto citado.',
     settingsVersePreview: 'Texto del versículo al pasar el cursor',
     settingsVersePreviewDesc: 'Muestra el texto del versículo en una ventana emergente al pasar el cursor sobre un enlace bíblico (solo escritorio).',
+    settingsSuggestions: 'Sugerencias al escribir',
+    settingsSuggestionsDesc: 'Escriba el activador al inicio de una palabra y el comienzo de un libro o código de publicación (por ejemplo @rom u @od) para elegir de la lista.',
+    settingsSuggestTrigger: 'Activador de sugerencias',
+    settingsSuggestTriggerDesc: 'Caracteres que abren las sugerencias. Predeterminado: @.',
+    suggestBible: 'Biblia',
+    suggestPublication: 'Publicación',
     settingsLivePreviewLinks: 'Enlaces bíblicos al editar',
     settingsLivePreviewLinksDesc: 'Subraya las referencias bíblicas en Vista previa en vivo. Cmd/Ctrl+clic abre el versículo en JW Library; el texto de la nota no cambia.',
     versePreviewLoading: 'Cargando…',
@@ -1327,6 +1348,93 @@ function passageSegments(original, bookLength) {
   }
 }
 
+/* ---------------------------------------------------------------------------
+ * Suggestions while typing (Bible books and publication codes)
+ * ------------------------------------------------------------------------- */
+
+const MaxSuggestions = 12;
+
+/**
+ * Bible books and publication codes that start with the query
+ * Books of the preferred language come first, then the other languages, then publications.
+ * @param {string} query - typed after the trigger, e.g. "рим", "1 co", "juan", "od"
+ * @param {string} preferredLang - EN | RU | ES
+ * @returns {Array<{kind: 'book'|'publication', insert: string, label: string, detail: string, lang: string}>}
+ */
+function suggestionsFor(query, preferredLang) {
+  const key = String(query ?? '').replace(/[\s .]/g, '').toLowerCase();
+  if (!key) return [];
+  const results = [];
+  const langs = [preferredLang, 'EN', 'RU', 'ES'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+
+  for (const lang of langs) {
+    Bible[lang].Abbreviation.forEach((abbr, index) => {
+      const name = Bible[lang].Book[index];
+      const names = [name.replace(/[\s.]/g, '').toLowerCase(), ...abbr.split(' ')];
+      if (names.some((n) => n.startsWith(key))) {
+        results.push({ kind: 'book', insert: `${name} `, label: name, detail: lang, lang });
+      }
+    });
+  }
+
+  for (const lang of langs.filter((l) => PublicationTitles[l])) {
+    for (const [code, title] of Object.entries(PublicationTitles[lang])) {
+      if (code.replace('-', '').startsWith(key.replace('-', '')) && !results.some((r) => r.kind === 'publication' && r.insert === `${code} `)) {
+        results.push({ kind: 'publication', insert: `${code} `, label: code, detail: title, lang });
+      }
+    }
+  }
+  return results.slice(0, MaxSuggestions);
+}
+
+/**
+ * Editor suggestions after the trigger (default "@" at the start of a word)
+ */
+class ReferenceSuggest extends EditorSuggest {
+  /** @param {Plugin} plugin */
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+
+  onTrigger(cursor, editor) {
+    const settings = this.plugin.settings;
+    const trigger = settings.suggestTrigger || '@';
+    if (!settings.suggestions) return null;
+    const before = editor.getLine(cursor.line).slice(0, cursor.ch);
+    const escaped = trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // trigger at the start of a word, then up to 25 characters of a name ("1 co", "song of")
+    const m = new RegExp(`(?:^|[\\s(\\[])${escaped}([\\p{L}\\d][\\p{L}\\d .-]{0,24})$`, 'u').exec(before);
+    if (!m) return null;
+    return {
+      start: { line: cursor.line, ch: cursor.ch - m[1].length - trigger.length },
+      end: cursor,
+      query: m[1],
+    };
+  }
+
+  getSuggestions(context) {
+    return suggestionsFor(context.query, this.plugin._suggestionLanguage());
+  }
+
+  renderSuggestion(item, el) {
+    el.addClass('jwl-suggestion');
+    el.createDiv({ cls: 'jwl-suggestion-title', text: item.label });
+    const kind = item.kind === 'book' ? Lang.suggestBible : Lang.suggestPublication;
+    el.createDiv({
+      cls: 'jwl-suggestion-note',
+      text: item.kind === 'book' ? `${kind} · ${item.lang}` : `${kind} · ${item.detail}`,
+    });
+  }
+
+  selectSuggestion(item) {
+    const context = this.context;
+    if (!context) return;
+    context.editor.replaceRange(item.insert, context.start, context.end);
+    context.editor.setCursor({ line: context.start.line, ch: context.start.ch + item.insert.length });
+  }
+}
+
 /**
  * Update interface language
  * @param {string} interfaceLang - Interface language (Russian, English, Spanish)
@@ -1563,6 +1671,17 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
+   * Language whose book names are suggested first: the fixed citation language,
+   * otherwise the interface language
+   * @returns {string} EN | RU | ES
+   */
+  _suggestionLanguage() {
+    const fixed = Languages[this.settings?.lang];
+    if (fixed && Bible[fixed] && fixed !== 'AUTO') return fixed;
+    return { Russian: 'RU', Spanish: 'ES', English: 'EN' }[this.settings?.interfaceLang] ?? 'EN';
+  }
+
+  /**
    * Language of a piece of text: the fixed language setting, or auto-detected
    * @param {string} text
    * @returns {string} Language key: 'EN', 'RU', 'ES', ...
@@ -1649,6 +1768,9 @@ class JWLLinkerPlugin extends Plugin {
 
     // Live Preview: scripture references are underlined; Cmd/Ctrl+click opens JW Library
     this._registerLivePreviewLinks();
+
+    // Suggestions for Bible books and publication codes after the trigger ("@rom", "@od")
+    this.registerEditorSuggest(new ReferenceSuggest(this.app, this));
 
     debugLog(`${this.manifest.name} ${this.manifest.version} loaded`);
   }
@@ -3956,6 +4078,29 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           this.app.workspace.updateOptions(); // redraw open editors
         });
+      });
+
+    new Setting(containerEl)
+      .setName(Lang.settingsSuggestions)
+      .setDesc(Lang.settingsSuggestionsDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.suggestions).onChange(async (value) => {
+          this.plugin.settings.suggestions = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(Lang.settingsSuggestTrigger)
+      .setDesc(Lang.settingsSuggestTriggerDesc)
+      .addText((text) => {
+        text
+          .setPlaceholder('@')
+          .setValue(this.plugin.settings.suggestTrigger)
+          .onChange(async (value) => {
+            this.plugin.settings.suggestTrigger = value.trim() || '@';
+            await this.plugin.saveSettings();
+          });
       });
 
     new Setting(containerEl)
