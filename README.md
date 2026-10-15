@@ -7,6 +7,10 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 ## ✨ Key Features
 
 - 📖 **Bible References**: Automatic conversion to JW Library links with verse text extraction
+- 👁️ **Verse Preview**: Hover over a scripture link to see the verse text (desktop)
+- ✏️ **Links While Editing**: Scripture references are underlined in Live Preview; Cmd/Ctrl+click opens JW Library
+- ⌨️ **Suggestions**: Type `@` and the start of a book name or publication code to pick it from a list
+- 📑 **Several Paragraphs**: Cite `par. 7, 8` or `pars. 7-9` in one go
 - 📚 **Publication Support**: Watchtower, Awake!, books (od, it-1, cl, si, etc.) in multiple formats
 - 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
 - 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names (English/Russian/Spanish)
@@ -34,7 +38,7 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 ## Bible References
 - **English**: `Rom 1:20`, `1 Cor 9:26`, `Psalm 89:18`
 - **Russian**: `Рим 1:20`, `1 Кор 9:26`, `Псалом 89:18`
-- **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`
+- **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`, `Juan 3:16`
 
 ## Watchtower Publications
 ![Plugin in action](demo/RunW.gif)
@@ -55,6 +59,14 @@ WOL resolves `ws` references in English only.
 - **English**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
 - **Russian**: `od 15 абз. 3`, `cl глава 8 с. 77 абз. 2`
 - **Spanish**: `od 15 párr. 3`, `cl cap. 8 pág. 77 párr. 2`
+
+## Several Paragraphs
+List or range the paragraphs; up to 10 are cited at once:
+- **English**: `w23.12 p. 20 par. 7, 8`, `w23.12 p. 20 pars. 7-9`, `od 15 par. 3, 4`
+- **Russian**: `w25.01 28, абз. 11, 12`, `w25.3 с. 8 абз. 2—4`
+- **Spanish**: `w23.12 pág. 20 párrs. 7, 8`, `od cap. 15 párr. 3-5`
+
+A wol.jw.org link to a paragraph range (`…#h=5-7`) also cites the whole range.
 
 ## Auto-formatting Examples
 
@@ -81,6 +93,8 @@ Without a day (`w10 January ...`) the issue is ambiguous, so add the day for iss
 Displays all valid scripture references as *JW Library* links with automatic language detection.
 Open any page with scripture references and switch to *Reading View* to see hyperlinks with full book names.
 
+On desktop, rest the mouse on a scripture link for half a second to see the verse text in a popup (up to 5 verses; longer passages show how many more there are). Clicking the link still opens *JW Library*. Turn it off in settings with *Verse text on hover*. There is no popup on phones and tablets: a tap opens *JW Library*.
+
 > Note: This only affects the *Reading View*, it does not modify the underlying Markdown text.
 > Headings, callouts, existing links and code are left as they are.
 
@@ -93,6 +107,16 @@ To access the commands:
 ![Menu](menu1.png)
 ![Menu2](menu2.png) 
 - On Mobile: add a toolbar item for the *JWL Linker* command.
+
+## Scripture links while editing
+In Live Preview, scripture references are underlined (the note text does not change). **Cmd/Ctrl+click** opens the passage in *JW Library*; a plain click places the cursor as usual. On desktop, hovering shows the verse text. Code, existing links and source mode are left alone. Turn it off in settings with *Scripture links while editing*.
+
+## Suggestions while typing
+Type `@` at the start of a word, then the start of a Bible book or publication code, and pick from the list:
+- `@рим` → `Римлянам`, `@rom` → `Romans` / `Romanos`, `@juan` → `Juan`
+- `@od` → `od` (*Organized to Do Jehovah's Will*), `@it` → `it-1`, `it-2`
+
+The trigger can be changed in settings (*Suggestion trigger*). Normal typing never opens the list, and an email address such as `a@b.com` does not trigger it.
 
 ## 📋 Available Commands
 
@@ -234,6 +258,9 @@ Spanish: "Esta es información importante"
 - **Bold Numbers**: Apply bold formatting to verse/paragraph numbers
 - **Citation Links**: Enable JW Library links for scripture references
 - **Paragraph Count**: Default number of paragraphs to cite
+- **Verse Text on Hover**: Popup with the verse text when hovering a scripture link (desktop)
+- **Scripture Links While Editing**: Underline scripture references in Live Preview
+- **Suggestions While Typing** and **Suggestion Trigger**: Book and publication suggestions after `@`
 
 # 🔗 Opening Links
 
@@ -270,7 +297,7 @@ Click any generated link to open directly in your installed *JW Library* app at 
 
 # 🔒 Privacy and permissions
 
-- **Network**: the plugin only contacts `www.jw.org` (Bible verse text) and `wol.jw.org` (publication paragraphs and article titles), and only when you run a citation command. Nothing is sent anywhere else, and there is no tracking or telemetry.
+- **Network**: the plugin only contacts `www.jw.org` (Bible verse text) and `wol.jw.org` (publication paragraphs and article titles), and only when you run a citation command or rest the mouse on a scripture link (verse preview, can be turned off). Nothing is sent anywhere else, and there is no tracking or telemetry.
 - **Clipboard**: the plugin only *writes* to the clipboard, and only when you click an item in the history sidebar to copy it. It never reads the clipboard.
 - **Files**: citations are inserted into the note you are editing; no other files are read or changed. Citation history is kept in Obsidian's workspace layout.
 - **Release files**: `main.js`, `manifest.json` and `styles.css` in each GitHub release are built by GitHub Actions with a signed build provenance attestation. You can check them with `gh attestation verify main.js -R argonfatl/jwl-linker-ENRU`.
@@ -285,4 +312,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.8.2 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.9.0 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile

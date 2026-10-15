@@ -9,6 +9,9 @@ const {
   requestUrl,
   PluginSettingTab,
   Setting,
+  Platform,
+  editorLivePreviewField,
+  EditorSuggest,
 } = require('obsidian');
 
 const DEFAULT_SETTINGS = {
@@ -18,6 +21,10 @@ const DEFAULT_SETTINGS = {
   pubCalloutTemplate: '> [!cite] PUB. — {title}\n> {text}\n',
   historySize: 20,
   boldInitialNum: true,
+  versePreview: true, // show the verse text in a popup when hovering a scripture link (desktop only)
+  livePreviewLinks: true, // mark scripture references as links in Live Preview
+  suggestions: true, // suggest Bible books and publication codes after the trigger
+  suggestTrigger: '@', // typed at the start of a word to open the suggestions
   citationLink: true,
   spaceAfterPunct: true,
   paraCount: 1,
@@ -75,6 +82,18 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'Сколько элементов истории показывать в боковой панели.',
     settingsBoldNumbers: 'Номера стихов жирным шрифтом',
     settingsBoldNumbersDesc: 'Применять жирное форматирование к номерам стихов или абзацев в цитируемом тексте.',
+    settingsVersePreview: 'Текст стиха при наведении',
+    settingsVersePreviewDesc: 'Показывать текст стиха во всплывающем окне при наведении на ссылку (только на компьютере).',
+    settingsSuggestions: 'Подсказки при вводе',
+    settingsSuggestionsDesc: 'Введите триггер в начале слова и начало названия книги или кода публикации (например, @рим или @od), чтобы выбрать из списка.',
+    settingsSuggestTrigger: 'Триггер подсказок',
+    settingsSuggestTriggerDesc: 'Символы, которые открывают подсказки. По умолчанию @.',
+    suggestBible: 'Библия',
+    suggestPublication: 'Публикация',
+    settingsLivePreviewLinks: 'Ссылки на стихи в режиме редактирования',
+    settingsLivePreviewLinksDesc: 'Подчёркивать ссылки на стихи в режиме Live Preview. Cmd/Ctrl+щелчок открывает стих в JW Library, текст заметки не меняется.',
+    versePreviewLoading: 'Загрузка…',
+    versePreviewMore: '… и ещё стихов: {count}',
     settingsCitationLink: 'Ссылка на цитируемые стихи',
     settingsCitationLinkDesc: 'Создавать ссылку на JW Library при цитировании стихов.',
     settingsDualMode: 'Двойной режим публикаций',
@@ -167,6 +186,18 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'How many history items to show in the sidebar.',
     settingsBoldNumbers: 'Initial numbers in bold',
     settingsBoldNumbersDesc: 'Apply bold markup to initial numbers in verses or paragraphs in the cited text.',
+    settingsVersePreview: 'Verse text on hover',
+    settingsVersePreviewDesc: 'Show the verse text in a popup when you hover over a scripture link (desktop only).',
+    settingsSuggestions: 'Suggestions while typing',
+    settingsSuggestionsDesc: 'Type the trigger at the start of a word, then the start of a book name or publication code (for example @rom or @od), and pick from the list.',
+    settingsSuggestTrigger: 'Suggestion trigger',
+    settingsSuggestTriggerDesc: 'Characters that open the suggestions. Default: @.',
+    suggestBible: 'Bible',
+    suggestPublication: 'Publication',
+    settingsLivePreviewLinks: 'Scripture links while editing',
+    settingsLivePreviewLinksDesc: 'Underline scripture references in Live Preview. Cmd/Ctrl+click opens the verse in JW Library; the note text is not changed.',
+    versePreviewLoading: 'Loading…',
+    versePreviewMore: '… and {count} more verses',
     settingsCitationLink: 'Link cited scripture',
     settingsCitationLinkDesc: 'Link scripture reference to JW Library when citing verses.',
     settingsDualMode: 'Dual publication mode',
@@ -259,6 +290,18 @@ const InterfaceStrings = {
     settingsHistorySizeDesc: 'Cuántos elementos del historial mostrar en la barra lateral.',
     settingsBoldNumbers: 'Números iniciales en negrita',
     settingsBoldNumbersDesc: 'Aplicar formato en negrita a los números iniciales en versículos o párrafos en el texto citado.',
+    settingsVersePreview: 'Texto del versículo al pasar el cursor',
+    settingsVersePreviewDesc: 'Muestra el texto del versículo en una ventana emergente al pasar el cursor sobre un enlace bíblico (solo escritorio).',
+    settingsSuggestions: 'Sugerencias al escribir',
+    settingsSuggestionsDesc: 'Escriba el activador al inicio de una palabra y el comienzo de un libro o código de publicación (por ejemplo @rom u @od) para elegir de la lista.',
+    settingsSuggestTrigger: 'Activador de sugerencias',
+    settingsSuggestTriggerDesc: 'Caracteres que abren las sugerencias. Predeterminado: @.',
+    suggestBible: 'Biblia',
+    suggestPublication: 'Publicación',
+    settingsLivePreviewLinks: 'Enlaces bíblicos al editar',
+    settingsLivePreviewLinksDesc: 'Subraya las referencias bíblicas en Vista previa en vivo. Cmd/Ctrl+clic abre el versículo en JW Library; el texto de la nota no cambia.',
+    versePreviewLoading: 'Cargando…',
+    versePreviewMore: '… y {count} versículos más',
     settingsCitationLink: 'Enlazar escritura citada',
     settingsCitationLinkDesc: 'Enlazar referencia bíblica a JW Library al citar versículos.',
     settingsDualMode: 'Modo dual de publicaciones',
@@ -468,7 +511,7 @@ const Config = {
   spanishPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
-  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:par\.|абз\.|párr\.)\s*(\d+))?/g,
+  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:pars?\.|абз\.|párrs?\.)\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -491,7 +534,7 @@ const KnownPubCodes = new Set([
 function isLikelyPublication(match) {
   const [full, pubCode] = match;
   if (KnownPubCodes.has(pubCode.toLowerCase())) return true;
-  return /(?:chap\.|глава|cap\.|pp?\.|сс?\.|págs?\.|par\.|абз\.|párr\.)/i.test(full);
+  return /(?:chap\.|глава|cap\.|pp?\.|сс?\.|págs?\.|pars?\.|абз\.|párrs?\.)/i.test(full);
 }
 
 /**
@@ -815,8 +858,8 @@ function normalizeInput(input) {
   // Pages: p., pp., с., сс., pág., págs.
   s = s.replace(/\b(págs?\.|pág\.|pp?\.|сс?\.)\s*(\d)/gi, '$1 $2');
   // Paragraph markers — \b only works for ASCII; абз. and párr. matched without it
-  s = s.replace(/\b(par\.)\s*(\d)/gi, '$1 $2');
-  s = s.replace(/(абз\.|párr\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/\b(pars?\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/(абз\.|párrs?\.)\s*(\d)/gi, '$1 $2');
   // Chapter markers — same: глава and cap. don't use \b
   s = s.replace(/\b(chap\.)\s*(\d)/gi, '$1 $2');
   s = s.replace(/(глава|cap\.)\s*(\d)/gi, '$1 $2');
@@ -975,7 +1018,7 @@ const PublicationTitles = {
  *         6 page marker, 7 page, 8 paragraph marker, 9 paragraph
  */
 const WatchtowerRegex =
-  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párr|par)\.\s*(\d+)/i;
+  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párrs?|pars?)\.\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?)/i;
 
 /**
  * Parse a Watchtower reference
@@ -993,7 +1036,7 @@ function parseWatchtowerReference(input) {
 function watchtowerFromMatch(m) {
   const [whole, study, year, dotMonth, a, b, pageMarker, page, parMarker, paragraph] = m;
   const marker = parMarker.toLowerCase();
-  const sourceLang = marker === 'абз' ? 'RU' : marker === 'párr' ? 'ES' : 'EN';
+  const sourceLang = marker === 'абз' ? 'RU' : marker.startsWith('párr') ? 'ES' : 'EN';
   let month;
   let day = null;
   if (dotMonth) {
@@ -1006,7 +1049,71 @@ function watchtowerFromMatch(m) {
     day = Number(b);
   }
   if (month < 1 || month > 12 || (day !== null && (day < 1 || day > 31))) return null;
-  return { whole, isStudy: Boolean(study), year, month, day, page, paragraph, sourceLang, pageMarker };
+  return {
+    whole, isStudy: Boolean(study), year, month, day, page, paragraph: limitParagraphSpec(normalizeParagraphSpec(paragraph)), sourceLang, pageMarker,
+  };
+}
+
+/** Most paragraphs cited at once (one WOL request per paragraph) */
+const MaxCitedParagraphs = 10;
+
+/**
+ * Paragraph list or range as typed ("8, 9", "8-10", "8—10") → normalised text ("8, 9" / "8-10")
+ * @param {string} spec
+ * @returns {string}
+ */
+function normalizeParagraphSpec(spec) {
+  return String(spec).replace(/\s*[-–—]\s*/g, '-').replace(/\s*,\s*/g, ', ').trim();
+}
+
+/**
+ * Paragraph numbers in a list or range: "8, 9" → [8, 9], "8-10" → [8, 9, 10]
+ * At most MaxCitedParagraphs numbers; a reversed range is read as a single paragraph.
+ * @param {string} spec
+ * @returns {number[]}
+ */
+function expandParagraphSpec(spec) {
+  const numbers = [];
+  for (const part of String(spec ?? '').split(',')) {
+    const [a, b] = part.split('-').map((n) => Number.parseInt(n, 10));
+    if (!Number.isFinite(a)) continue;
+    const last = Number.isFinite(b) && b >= a ? b : a;
+    for (let n = a; n <= last && numbers.length < MaxCitedParagraphs; n++) {
+      if (!numbers.includes(n)) numbers.push(n);
+    }
+  }
+  return numbers;
+}
+
+/**
+ * Keep a paragraph spec within MaxCitedParagraphs, so the title says what is cited:
+ * "1-30" → "1-10"
+ * @param {string} spec - normalised spec
+ * @returns {string}
+ */
+function limitParagraphSpec(spec) {
+  const all = [];
+  for (const part of spec.split(',')) {
+    const [a, b] = part.split('-').map((n) => Number.parseInt(n, 10));
+    if (Number.isFinite(a)) all.push(Number.isFinite(b) && b >= a ? b - a + 1 : 1);
+  }
+  if (all.reduce((sum, n) => sum + n, 0) <= MaxCitedParagraphs) return spec;
+  const cited = expandParagraphSpec(spec);
+  const isRun = cited.every((n, i) => i === 0 || n === cited[i - 1] + 1);
+  return isRun ? `${cited[0]}-${cited[cited.length - 1]}` : cited.join(', ');
+}
+
+/**
+ * One WOL query per paragraph: WOL resolves single paragraphs reliably, while lists
+ * ("par. 7, 8") often find nothing
+ * @param {Object} ref - parsed reference with a .paragraph spec
+ * @param {(ref: Object) => string} formatQuery
+ * @returns {string[]}
+ */
+function paragraphQueries(ref, formatQuery) {
+  const paragraphs = ref.paragraph ? expandParagraphSpec(ref.paragraph) : [];
+  if (paragraphs.length <= 1) return [formatQuery(ref)];
+  return paragraphs.map((n) => formatQuery({ ...ref, paragraph: String(n) }));
 }
 
 /** WOL search query for a Watchtower reference, in the citation language */
@@ -1046,7 +1153,7 @@ function parseOtherPublicationReference(input) {
   let sourceLang = 'EN';
   if (/абз\.|глава|(?:^|\s)сс?\./i.test(text) || /[Ѐ-ӿ]/.test(input)) {
     sourceLang = 'RU';
-  } else if (/párr\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
+  } else if (/párrs?\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
     sourceLang = 'ES';
   }
   return {
@@ -1054,7 +1161,7 @@ function parseOtherPublicationReference(input) {
     pubCode: pubCode.toLowerCase(),
     number,
     page,
-    paragraph,
+    paragraph: paragraph ? limitParagraphSpec(normalizeParagraphSpec(paragraph)) : undefined,
     hasChapter: /chap\.|глава|(?:^|\s)cap\./i.test(text),
     sourceLang,
   };
@@ -1089,6 +1196,243 @@ function formatOtherPublicationTitle(ref, lang) {
  */
 function isPublicationReference(input) {
   return Boolean(parseWatchtowerReference(input) || matchOtherPublication(input));
+}
+
+/* ---------------------------------------------------------------------------
+ * Verse preview on hover (desktop only)
+ * ------------------------------------------------------------------------- */
+
+/** Verses shown in the popup; longer ranges end with "… and N more verses" */
+const VersePreviewMaxVerses = 5;
+/** Hover time before the popup opens, so passing over a link loads nothing */
+const VersePreviewDelayMs = 500;
+/** Verse texts kept in memory between hovers */
+const VersePreviewCacheSize = 200;
+
+/**
+ * Bible passage behind a JW Library link, e.g.
+ * jwlibrary:///finder?bible=45001020-45001022&wtlocale=U
+ * @param {string|null} href
+ * @returns {{lang: string, ids: string[], url: string}|null} url = jw.org page with the verse text
+ */
+function parseJwlBibleHref(href) {
+  const prefix = Config.jwlFinder; // jwlibrary:///finder?
+  if (!href || !href.startsWith(prefix)) return null;
+  const params = new URLSearchParams(href.slice(prefix.length));
+  const bible = params.get('bible');
+  const m = /^(\d{7,8})(?:-(\d{7,8}))?$/.exec(bible ?? '');
+  if (!m) return null;
+  const first = Number(m[1]);
+  const last = m[2] ? Number(m[2]) : first;
+  // a passage is always within one chapter: same book + chapter part (all but the last 3 digits)
+  if (last < first || Math.floor(first / 1000) !== Math.floor(last / 1000)) return null;
+  const wtlocale = params.get('wtlocale') ?? 'E';
+  const lang = { U: 'RU', S: 'ES', E: 'EN', X: 'DE', F: 'FR', O: 'NL' }[wtlocale] ?? 'EN';
+  const ids = [];
+  for (let id = first; id <= last; id++) ids.push(String(id));
+  return { lang, ids, url: `${getFinderUrl(lang)}${Config.urlParam}${bible}` };
+}
+
+/**
+ * Find a Bible book by name or abbreviation (spaces and dots removed, lower case).
+ * The preferred language is tried first, then the other supported languages,
+ * so "Juan 3:16" is found even when auto-detection guessed English.
+ * @param {string} bookKey - e.g. "rom", "1cor", "juan", "пс"
+ * @param {string} preferredLang - EN | RU | ES | ...
+ * @returns {{index: number, lang: string}|null} index = book number - 1
+ */
+function findBibleBook(bookKey, preferredLang) {
+  if (!bookKey) return null;
+  const escaped = bookKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // (^| ) avoids matching inside book names, e.g. "eph" in "zephaniah"
+  const bookRgx = new RegExp(`(^| )${escaped}`, 'm');
+  const langs = [preferredLang, 'EN', 'ES', 'RU'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+  for (const lang of langs) {
+    const index = Bible[lang].Abbreviation.findIndex((elem) => bookRgx.test(elem));
+    if (index !== -1) return { index, lang };
+  }
+  return null;
+}
+
+/* ---------------------------------------------------------------------------
+ * Scripture links in Live Preview
+ * ------------------------------------------------------------------------- */
+
+/** Lines longer than this are not scanned (performance) */
+const LivePreviewMaxLineLength = 5000;
+
+/**
+ * Character ranges of the scripture passages in a line of text, with their JW Library links.
+ * The text itself is not changed: each passage ("Ps 23:1-3", "5", "24:1" in "Ps 23:1-3, 5; 24:1")
+ * gets its own range so the link and the hover preview match what is under the mouse.
+ * @param {Plugin} plugin
+ * @param {string} text - one line
+ * @returns {Array<{from: number, to: number, href: string}>} sorted, non-overlapping
+ */
+function scriptureLinkRanges(plugin, text) {
+  if (!text || text.length > LivePreviewMaxLineLength || !/\d/.test(text)) return [];
+  const references = plugin
+    ._parseScriptureLinks(text, DisplayType.href, plugin.settings.spaceAfterPunct)
+    .filter((ref) => !ref.isLinkAlready && !ref.isPlainText && ref.passages.some((p) => p.link))
+    .sort((a, b) => a.index - b.index);
+
+  const ranges = [];
+  let lastEnd = -1;
+  for (const ref of references) {
+    if (ref.index < lastEnd) continue; // overlapping match
+    const segments = passageSegments(ref.original, ref.bookLength);
+    if (segments && segments.length === ref.passages.length) {
+      ref.passages.forEach((passage, i) => {
+        if (passage.link) {
+          ranges.push({ from: ref.index + segments[i][0], to: ref.index + segments[i][1], href: passage.link.jwlib });
+        }
+      });
+    } else {
+      // could not split the reference into passages: link all of it to the first passage
+      const first = ref.passages.find((p) => p.link);
+      ranges.push({ from: ref.index, to: ref.index + ref.original.length, href: first.link.jwlib });
+    }
+    lastEnd = ref.index + ref.original.length;
+  }
+  return ranges;
+}
+
+/**
+ * Split a scripture reference as typed into one [start, end) range per passage, in the same
+ * order as _parseScriptureLinks creates passages: chapters are separated by ";", verses by ",",
+ * and two consecutive verses ("1, 2") form one passage.
+ * The first range includes the book name.
+ * @param {string} original - e.g. "Ps 23:1-3, 5; 24:1"
+ * @param {number} bookLength - length of the book name part (incl. a plain-text marker)
+ * @returns {Array<[number, number]>|null}
+ */
+function passageSegments(original, bookLength) {
+  if (!Number.isFinite(bookLength)) return null;
+  const segments = [];
+  let pos = bookLength;
+  const parts = original.slice(bookLength).split(';');
+  for (const [p, part] of parts.entries()) {
+    const partStart = pos;
+    pos += part.length + 1; // + ";"
+    const colon = part.indexOf(':');
+    if (colon === -1) {
+      segments.push([p === 0 ? 0 : partStart + leadingSpaces(part), partStart + trimmedEnd(part)]);
+      continue;
+    }
+    // verses after the colon, with their offsets in the part
+    const verses = [];
+    let vPos = colon + 1;
+    for (const verse of part.slice(colon + 1).split(',')) {
+      verses.push({ text: verse, start: vPos + leadingSpaces(verse), end: vPos + trimmedEnd(verse) });
+      vPos += verse.length + 1; // + ","
+    }
+    for (let i = 0; i < verses.length; i++) {
+      let end = verses[i].end;
+      const current = Number(verses[i].text);
+      const next = i < verses.length - 1 ? Number(verses[i + 1].text) : NaN;
+      if (current === next - 1) {
+        end = verses[i + 1].end; // two consecutive verses are one passage
+      }
+      const start = i === 0 ? (p === 0 ? 0 : leadingSpaces(part)) : verses[i].start;
+      segments.push([partStart + (p === 0 && i === 0 ? -partStart : start), partStart + end]);
+      if (current === next - 1) i++;
+    }
+  }
+  return segments;
+
+  function leadingSpaces(str) {
+    return str.length - str.trimStart().length;
+  }
+  function trimmedEnd(str) {
+    return str.trimEnd().length;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Suggestions while typing (Bible books and publication codes)
+ * ------------------------------------------------------------------------- */
+
+const MaxSuggestions = 12;
+
+/**
+ * Bible books and publication codes that start with the query
+ * Books of the preferred language come first, then the other languages, then publications.
+ * @param {string} query - typed after the trigger, e.g. "рим", "1 co", "juan", "od"
+ * @param {string} preferredLang - EN | RU | ES
+ * @returns {Array<{kind: 'book'|'publication', insert: string, label: string, detail: string, lang: string}>}
+ */
+function suggestionsFor(query, preferredLang) {
+  const key = String(query ?? '').replace(/[\s .]/g, '').toLowerCase();
+  if (!key) return [];
+  const results = [];
+  const langs = [preferredLang, 'EN', 'RU', 'ES'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+
+  for (const lang of langs) {
+    Bible[lang].Abbreviation.forEach((abbr, index) => {
+      const name = Bible[lang].Book[index];
+      const names = [name.replace(/[\s.]/g, '').toLowerCase(), ...abbr.split(' ')];
+      if (names.some((n) => n.startsWith(key))) {
+        results.push({ kind: 'book', insert: `${name} `, label: name, detail: lang, lang });
+      }
+    });
+  }
+
+  for (const lang of langs.filter((l) => PublicationTitles[l])) {
+    for (const [code, title] of Object.entries(PublicationTitles[lang])) {
+      if (code.replace('-', '').startsWith(key.replace('-', '')) && !results.some((r) => r.kind === 'publication' && r.insert === `${code} `)) {
+        results.push({ kind: 'publication', insert: `${code} `, label: code, detail: title, lang });
+      }
+    }
+  }
+  return results.slice(0, MaxSuggestions);
+}
+
+/**
+ * Editor suggestions after the trigger (default "@" at the start of a word)
+ */
+class ReferenceSuggest extends EditorSuggest {
+  /** @param {Plugin} plugin */
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+
+  onTrigger(cursor, editor) {
+    const settings = this.plugin.settings;
+    const trigger = settings.suggestTrigger || '@';
+    if (!settings.suggestions) return null;
+    const before = editor.getLine(cursor.line).slice(0, cursor.ch);
+    const escaped = trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // trigger at the start of a word, then up to 25 characters of a name ("1 co", "song of")
+    const m = new RegExp(`(?:^|[\\s(\\[])${escaped}([\\p{L}\\d][\\p{L}\\d .-]{0,24})$`, 'u').exec(before);
+    if (!m) return null;
+    return {
+      start: { line: cursor.line, ch: cursor.ch - m[1].length - trigger.length },
+      end: cursor,
+      query: m[1],
+    };
+  }
+
+  getSuggestions(context) {
+    return suggestionsFor(context.query, this.plugin._suggestionLanguage());
+  }
+
+  renderSuggestion(item, el) {
+    el.addClass('jwl-suggestion');
+    el.createDiv({ cls: 'jwl-suggestion-title', text: item.label });
+    const kind = item.kind === 'book' ? Lang.suggestBible : Lang.suggestPublication;
+    el.createDiv({
+      cls: 'jwl-suggestion-note',
+      text: item.kind === 'book' ? `${kind} · ${item.lang}` : `${kind} · ${item.detail}`,
+    });
+  }
+
+  selectSuggestion(item) {
+    const context = this.context;
+    if (!context) return;
+    context.editor.replaceRange(item.insert, context.start, context.end);
+    context.editor.setCursor({ line: context.start.line, ch: context.start.ch + item.insert.length });
+  }
 }
 
 /**
@@ -1151,6 +1495,190 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     return { firstLang, secondLang };
+  }
+
+  /**
+   * Verse text for the hover popup (first VersePreviewMaxVerses verses of the passage)
+   * Successful results are cached; failures are not, so the next hover retries.
+   * @param {string} href - JW Library link
+   * @returns {Promise<{verses: string[], more: number, failed: boolean}|null>} null if not a Bible link
+   */
+  async _fetchVersePreview(href) {
+    const ref = parseJwlBibleHref(href);
+    if (!ref) return null;
+    this.versePreviewCache ??= new Map();
+    const cached = this.versePreviewCache.get(href);
+    if (cached) return cached;
+
+    const shown = ref.ids.slice(0, VersePreviewMaxVerses);
+    const verses = [];
+    const dom = await this._fetchDOM(ref.url);
+    if (dom) {
+      for (const [i, id] of shown.entries()) {
+        const text = this._getElementAsText(dom, `#v${id}`, TargetType.scripture, i > 0).trim();
+        if (text) verses.push(text);
+      }
+    }
+    if (verses.length === 0) return { verses: [], more: 0, failed: true };
+
+    const result = { verses, more: ref.ids.length - shown.length, failed: false };
+    this.versePreviewCache.set(href, result);
+    if (this.versePreviewCache.size > VersePreviewCacheSize) {
+      this.versePreviewCache.delete(this.versePreviewCache.keys().next().value); // oldest
+    }
+    return result;
+  }
+
+  /**
+   * Show the verse text in a popup when the mouse rests on a JW Library Bible link.
+   * Desktop only: on phones and tablets a tap opens JW Library as before.
+   */
+  _registerVersePreview() {
+    if (Platform.isMobile) return;
+    let openTimer = 0;
+    let closeTimer = 0;
+    let current = null; // link the popup belongs to
+    let popover = null;
+
+    const close = () => {
+      window.clearTimeout(openTimer);
+      window.clearTimeout(closeTimer);
+      popover?.remove();
+      popover = null;
+      current = null;
+    };
+    const closeSoon = () => {
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(close, 300); // time to move the mouse onto the popup
+    };
+    this.register(close);
+
+    this.registerDomEvent(document, 'mouseover', (evt) => {
+      if (!this.settings.versePreview) return;
+      const target = evt.target instanceof Element ? evt.target : null;
+      if (popover?.contains(target)) {
+        window.clearTimeout(closeTimer);
+        return;
+      }
+      // <a href> in reading view, <span data-jwl-href> in Live Preview
+      const link = target?.closest('a[href], [data-jwl-href]');
+      const href = link?.getAttribute('data-jwl-href') ?? link?.getAttribute('href');
+      if (!link || !parseJwlBibleHref(href)) {
+        if (current) closeSoon();
+        return;
+      }
+      if (link === current) {
+        window.clearTimeout(closeTimer);
+        return;
+      }
+      close();
+      current = link;
+      openTimer = window.setTimeout(async () => {
+        if (current !== link) return;
+        popover = createVersePopover(link);
+        const data = await this._fetchVersePreview(href);
+        if (current === link && popover) fillVersePopover(popover, data);
+      }, VersePreviewDelayMs);
+    });
+    this.registerDomEvent(document, 'mousedown', (evt) => {
+      if (!popover?.contains(evt.target)) close();
+    });
+    this.registerDomEvent(document, 'keydown', (evt) => {
+      if (evt.key === 'Escape') close();
+    });
+    this.registerDomEvent(window, 'scroll', close, { capture: true });
+  }
+
+  /**
+   * Live Preview: mark scripture passages as links (the note text is not changed).
+   * Cmd/Ctrl+click opens JW Library; a plain click places the cursor as usual.
+   * CodeMirror modules are provided by Obsidian at runtime.
+   */
+  _registerLivePreviewLinks() {
+    let cm;
+    try {
+      cm = { ...require('@codemirror/view'), ...require('@codemirror/language') };
+    } catch (error) {
+      console.error('JWL Linker: Live Preview links are not available', error);
+      return;
+    }
+    const { ViewPlugin, Decoration, EditorView, syntaxTree } = cm;
+    const plugin = this;
+    // Skip code, math, front matter, comments and existing links
+    const skipNode = /code|math|frontmatter|comment|link|url|hashtag|formatting/i;
+
+    const isSkipped = (state, pos) => {
+      let node = syntaxTree(state).resolveInner(pos, 1);
+      for (let depth = 0; node && depth < 4; depth++, node = node.parent) {
+        if (skipNode.test(node.name)) return true;
+      }
+      return false;
+    };
+
+    const build = (view) => {
+      const marks = [];
+      if (!plugin.settings.livePreviewLinks || !view.state.field(editorLivePreviewField, false)) {
+        return Decoration.none;
+      }
+      for (const { from, to } of view.visibleRanges) {
+        let pos = from;
+        while (pos <= to) {
+          const line = view.state.doc.lineAt(pos);
+          for (const range of scriptureLinkRanges(plugin, line.text)) {
+            const start = line.from + range.from;
+            if (isSkipped(view.state, start)) continue;
+            marks.push(
+              Decoration.mark({
+                class: 'jwl-lp-link',
+                attributes: { 'data-jwl-href': range.href },
+              }).range(start, line.from + range.to),
+            );
+          }
+          pos = line.to + 1;
+        }
+      }
+      return Decoration.set(marks, true);
+    };
+
+    const linkPlugin = ViewPlugin.fromClass(
+      class {
+        constructor(view) {
+          this.decorations = build(view);
+        }
+        update(update) {
+          const modeChanged =
+            update.startState.field(editorLivePreviewField, false) !== update.state.field(editorLivePreviewField, false);
+          if (update.docChanged || update.viewportChanged || modeChanged || update.transactions.some((tr) => tr.reconfigured)) {
+            this.decorations = build(update.view);
+          }
+        }
+      },
+      { decorations: (value) => value.decorations },
+    );
+
+    const clickHandler = EditorView.domEventHandlers({
+      mousedown(event) {
+        if (event.button !== 0 || !(event.metaKey || event.ctrlKey)) return false;
+        const el = event.target instanceof Element ? event.target.closest('[data-jwl-href]') : null;
+        if (!el) return false;
+        event.preventDefault();
+        window.open(el.getAttribute('data-jwl-href'));
+        return true;
+      },
+    });
+
+    this.registerEditorExtension([linkPlugin, clickHandler]);
+  }
+
+  /**
+   * Language whose book names are suggested first: the fixed citation language,
+   * otherwise the interface language
+   * @returns {string} EN | RU | ES
+   */
+  _suggestionLanguage() {
+    const fixed = Languages[this.settings?.lang];
+    if (fixed && Bible[fixed] && fixed !== 'AUTO') return fixed;
+    return { Russian: 'RU', Spanish: 'ES', English: 'EN' }[this.settings?.interfaceLang] ?? 'EN';
   }
 
   /**
@@ -1234,6 +1762,15 @@ class JWLLinkerPlugin extends Plugin {
     }
 
     this.addSettingTab(new JWLLinkerSettingTab(this.app, this));
+
+    // Desktop: verse text in a popup when hovering a scripture link
+    this._registerVersePreview();
+
+    // Live Preview: scripture references are underlined; Cmd/Ctrl+click opens JW Library
+    this._registerLivePreviewLinks();
+
+    // Suggestions for Bible books and publication codes after the trigger ("@rom", "@od")
+    this.registerEditorSuggest(new ReferenceSuggest(this.app, this));
 
     debugLog(`${this.manifest.name} ${this.manifest.version} loaded`);
   }
@@ -2262,32 +2799,40 @@ class JWLLinkerPlugin extends Plugin {
   }
 
   /**
-   * Fetch a paragraph from the WOL lookup page and format it with the citation template
-   * @param {{lang: string, query: string, title: string, command: string, view: Object}} options
+   * Fetch paragraphs from the WOL lookup page and format them with the citation template
+   * @param {{lang: string, queries: string[], title: string, command: string, view: Object}} options
+   *   queries: one WOL search per paragraph (see paragraphQueries)
    * @returns {Promise<string>} the formatted citation (without the original reference line)
    */
-  async _citeFromWol({ lang, query, title, command, view }) {
+  async _citeFromWol({ lang, queries, title, command, view }) {
     const L = PubLangs[lang] ?? PubLangs.EN;
-    const url = `${getConfigForLanguage(lang).wolLookup}${encodeURIComponent(query)}`;
+    const lookup = getConfigForLanguage(lang).wolLookup;
+    const urls = queries.map((query) => `${lookup}${encodeURIComponent(query)}`);
 
-    let text = '';
-    const cache = view?.getFromHistory?.(url);
-    if (cache) {
-      text = cache.content.join('');
-    } else {
-      const dom = await this._fetchDOM(url);
-      if (dom) {
-        text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
-        if (text) text = this._boldInitialNumber(text);
+    const texts = [];
+    for (const url of urls) {
+      let text = '';
+      const cache = view?.getFromHistory?.(url);
+      if (cache) {
+        text = cache.content.join('');
+      } else {
+        const dom = await this._fetchDOM(url);
+        if (dom) {
+          text = this._getElementAsText(dom, '.resultItems', TargetType.jwonline);
+          if (text) text = this._boldInitialNumber(text);
+        }
       }
+      if (text) texts.push(text);
     }
 
-    const linkedTitle = this.settings.citationLink ? `[${title}](${url})` : title;
-    if (text) {
-      view?.addToHistory?.(url, linkedTitle, [text]);
+    const linkedTitle = this.settings.citationLink ? `[${title}](${urls[0]})` : title;
+    let text;
+    if (texts.length > 0) {
+      text = texts.join('\n');
+      view?.addToHistory?.(urls.join(' '), linkedTitle, [text]);
       view?.showHistory?.();
     } else {
-      text = `${L.notFound} [${query}](${url})`;
+      text = `${L.notFound} [${queries[0]}](${urls[0]})`;
     }
 
     let template = command === Cmd.citeVerse ? this.settings.pubTemplate : this.settings.pubCalloutTemplate;
@@ -2317,7 +2862,7 @@ class JWLLinkerPlugin extends Plugin {
     if (availability.isOffline) return `${input}\n${availability.message}`;
     const citation = await this._citeFromWol({
       lang,
-      query: formatWatchtowerQuery(ref, lang),
+      queries: paragraphQueries(ref, (r) => formatWatchtowerQuery(r, lang)),
       title: formatWatchtowerTitle(ref, lang),
       command,
       view,
@@ -2340,7 +2885,7 @@ class JWLLinkerPlugin extends Plugin {
     if (availability.isOffline) return `${input}\n${availability.message}`;
     const citation = await this._citeFromWol({
       lang,
-      query: formatOtherPublicationQuery(ref, lang),
+      queries: paragraphQueries(ref, (r) => formatOtherPublicationQuery(r, lang)),
       title: formatOtherPublicationTitle(ref, lang),
       command,
       view,
@@ -2377,7 +2922,9 @@ class JWLLinkerPlugin extends Plugin {
       }
       output.push(await this._citeFromWol({
         lang,
-        query: watchtower ? formatWatchtowerQuery(watchtower, lang) : formatOtherPublicationQuery(other, lang),
+        queries: watchtower
+          ? paragraphQueries(watchtower, (r) => formatWatchtowerQuery(r, lang))
+          : paragraphQueries(other, (r) => formatOtherPublicationQuery(r, lang)),
         title: watchtower ? formatWatchtowerTitle(watchtower, lang) : formatOtherPublicationTitle(other, lang),
         command: citeCommand,
         view,
@@ -2392,13 +2939,17 @@ class JWLLinkerPlugin extends Plugin {
    * @param {View} view
    * @param {number} caret position of the caret in the input
    * @param {Cmd} command full paragraph, inline or title only
-   * @param {number} pars number of paragraphs to extract (1-3 right now)
+   * @param {number} pars number of paragraphs to extract (the "paragraph count" setting; a range link overrides it)
    * @returns {string}
    */
   async _fetchParagraphCitation(input, view, caret, command, pars) {
     const match = this._getLinkAtCaret(input, caret);
     if (!match || !isValidUrl(match.url)) {
       return `${input} | ${Lang[OutputError.invalidUrl]}`;
+    }
+    // A link to a paragraph range (#h=5-7, par=5-7) cites the whole range
+    if (match.parEnd && Number(match.parEnd) > Number(match.parId)) {
+      pars = Math.min(Number(match.parEnd) - Number(match.parId) + 1, MaxCitedParagraphs);
     }
     let link = '';
     let content = [];
@@ -2696,6 +3247,7 @@ class JWLLinkerPlugin extends Plugin {
       let reference = {
         original: original,
         index: match.index,
+        bookLength: match[2].length + match[3].length, // plain text marker + book name as typed
         book: match[3],
         passages: [],
         isPlainText: Boolean(match[2]), // ' => skip this verse, no link
@@ -2838,6 +3390,7 @@ class JWLLinkerPlugin extends Plugin {
     function validateReference(reference, displayType) {
       // Auto-detect language or use setting
       let lang = this.settings?.lang || DEFAULT_SETTINGS.lang;
+      const autoLang = lang === 'Auto';
       debugLog('validateReference - initial lang setting:', lang);
       debugLog('validateReference - reference.book:', reference.book);
       if (lang === 'Auto') {
@@ -2858,14 +3411,15 @@ class JWLLinkerPlugin extends Plugin {
       let bookNum = 0;
 
       // Check if Bible data exists for this language, fallback to English if not
-      const bibleData = Bible[lang] || Bible['EN'];
-      debugLog('validateReference - using Bible data for:', lang, 'exists:', !!Bible[lang]);
-
-      const bookRgx = new RegExp(`(^| )${reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase()}`, 'm'); // no spaces, &nbsp; or .
-      const bookMatch = bibleData.Abbreviation.findIndex((elem) => elem.search(bookRgx) !== -1);
-      if (bookMatch !== -1) {
-        reference.book = bibleData.Book[bookMatch].replaceAll(' ', '\u00A0'); // avoid page breaks in book name
-        bookNum = bookMatch + 1;
+      if (!Bible[lang]) lang = 'EN';
+      const bookKey = reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase(); // no spaces, &nbsp; or .
+      const found = findBibleBook(bookKey, lang);
+      if (found) {
+        bookNum = found.index + 1;
+        // Auto-detection only looks at a few names (e.g. "Juan" is not recognised as Spanish):
+        // when the book is only found in another language, use that language
+        if (autoLang) lang = found.lang;
+        reference.book = Bible[lang].Book[found.index].replaceAll(' ', '\u00A0'); // avoid page breaks in book name
       }
 
       // Now handle each chapter:verse(s) passage
@@ -2980,11 +3534,13 @@ class JWLLinkerPlugin extends Plugin {
     let parId = '';
     let wtlocale = 'E';
     // Any language: https://wol.jw.org/<lang>/wol/d/<r>/<lp>/<docid>#h=<par>
-    const wolMatch = /^https:\/\/wol\.jw\.org\/([a-z-]+)\/wol\/d\/[^/]+\/[^/]+\/(\d+)(?:#h=(\d+))?/i.exec(url);
+    let parEnd = '';
+    const wolMatch = /^https:\/\/wol\.jw\.org\/([a-z-]+)\/wol\/d\/[^/]+\/[^/]+\/(\d+)(?:#h=(\d+)(?:-(\d+))?)?/i.exec(url);
     if (wolMatch) {
       wtlocale = { ru: 'U', es: 'S', en: 'E', de: 'X', fr: 'F', nl: 'O' }[wolMatch[1].toLowerCase()] ?? 'E';
       docId = wolMatch[2];
       parId = wolMatch[3] ?? '';
+      parEnd = wolMatch[4] ?? '';
     } else if (/^https:\/\/www\.jw\.org\/finder\?/i.test(url)) {
       let params;
       try {
@@ -2993,14 +3549,16 @@ class JWLLinkerPlugin extends Plugin {
         return null;
       }
       docId = params.get('docid') ?? '';
-      // par may be a range ("5-7"); the first paragraph id is enough to locate it
-      parId = (params.get('par') ?? '').match(/^\d+/)?.[0] ?? '';
+      // par may be a range ("5-7")
+      const par = /^(\d+)(?:-(\d+))?/.exec(params.get('par') ?? '');
+      parId = par?.[1] ?? '';
+      parEnd = par?.[2] ?? '';
       wtlocale = params.get('wtlocale') ?? 'E';
       if (!docId) return null;
       // switch the link style from finder to wol
       // so that we can scrape the paragraph content later if needed
       const lang = { U: 'RU', S: 'ES' }[wtlocale] ?? 'EN';
-      url = `${getConfigForLanguage(lang).wolPublications}${docId}${parId ? `#h=${parId}` : ''}`;
+      url = `${getConfigForLanguage(lang).wolPublications}${docId}${parId ? `#h=${parId}${parEnd ? `-${parEnd}` : ''}` : ''}`;
     } else {
       return null;
     }
@@ -3010,6 +3568,7 @@ class JWLLinkerPlugin extends Plugin {
       url: url,
       docId: docId,
       parId: parId,
+      parEnd: parEnd,
       wtlocale: wtlocale,
     };
   }
@@ -3254,6 +3813,62 @@ function linkScripturesInTextNode(plugin, node) {
   return true;
 }
 
+/**
+ * Create the (still empty) verse popup next to a link
+ * @param {HTMLElement} link
+ * @returns {HTMLElement}
+ */
+function createVersePopover(link) {
+  const doc = link.ownerDocument;
+  const popover = doc.body.createDiv({ cls: 'jwl-verse-popover' });
+  popover.createDiv({ cls: 'jwl-verse-popover-title', text: link.textContent ?? '' });
+  popover.createDiv({ cls: 'jwl-verse-popover-status', text: Lang.versePreviewLoading });
+
+  // Below the link, or above it when the link is in the lower part of the window
+  const rect = link.getBoundingClientRect();
+  const win = doc.defaultView ?? window;
+  const left = Math.max(8, Math.min(rect.left, win.innerWidth - 416));
+  const above = rect.bottom > win.innerHeight * 0.6;
+  popover.toggleClass('is-above', above);
+  popover.setCssProps({
+    '--jwl-popover-left': `${left}px`,
+    '--jwl-popover-top': `${rect.bottom + 6}px`,
+    '--jwl-popover-bottom': `${win.innerHeight - rect.top + 6}px`,
+  });
+  return popover;
+}
+
+/**
+ * Put the fetched verses into the popup (DOM API only)
+ * @param {HTMLElement} popover
+ * @param {{verses: string[], more: number, failed: boolean}|null} data
+ */
+function fillVersePopover(popover, data) {
+  popover.querySelector('.jwl-verse-popover-status')?.remove();
+  if (!data || data.failed) {
+    popover.createDiv({ cls: 'jwl-verse-popover-status', text: Lang.onlineLookupFailed });
+    return;
+  }
+  const body = popover.createDiv({ cls: 'jwl-verse-popover-body' });
+  for (const verse of data.verses) {
+    const lines = verse.split('\n').filter((line) => line.trim() !== '');
+    lines.forEach((line, i) => {
+      const p = body.createEl('p');
+      const num = i === 0 ? /^(\d{1,3})\s+(.*)$/s.exec(line.trim()) : null;
+      if (num) {
+        p.createEl('strong', { text: num[1] });
+        p.appendText(` ${num[2]}`);
+      } else {
+        p.setText(line.trim());
+        if (i > 0) p.addClass('jwl-verse-popover-cont');
+      }
+    });
+  }
+  if (data.more > 0) {
+    popover.createDiv({ cls: 'jwl-verse-popover-more', text: Lang.versePreviewMore.replace('{count}', data.more) });
+  }
+}
+
 class JWLLinkerSettingTab extends PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -3440,6 +4055,52 @@ class JWLLinkerSettingTab extends PluginSettingTab {
           this.plugin.settings.boldInitialNum = value;
           await this.plugin.saveSettings();
         });
+      });
+
+    if (!Platform.isMobile) {
+      new Setting(containerEl)
+        .setName(Lang.settingsVersePreview)
+        .setDesc(Lang.settingsVersePreviewDesc)
+        .addToggle((tog) => {
+          tog.setValue(this.plugin.settings.versePreview).onChange(async (value) => {
+            this.plugin.settings.versePreview = value;
+            await this.plugin.saveSettings();
+          });
+        });
+    }
+
+    new Setting(containerEl)
+      .setName(Lang.settingsLivePreviewLinks)
+      .setDesc(Lang.settingsLivePreviewLinksDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.livePreviewLinks).onChange(async (value) => {
+          this.plugin.settings.livePreviewLinks = value;
+          await this.plugin.saveSettings();
+          this.app.workspace.updateOptions(); // redraw open editors
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(Lang.settingsSuggestions)
+      .setDesc(Lang.settingsSuggestionsDesc)
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.suggestions).onChange(async (value) => {
+          this.plugin.settings.suggestions = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(Lang.settingsSuggestTrigger)
+      .setDesc(Lang.settingsSuggestTriggerDesc)
+      .addText((text) => {
+        text
+          .setPlaceholder('@')
+          .setValue(this.plugin.settings.suggestTrigger)
+          .onChange(async (value) => {
+            this.plugin.settings.suggestTrigger = value.trim() || '@';
+            await this.plugin.saveSettings();
+          });
       });
 
     new Setting(containerEl)

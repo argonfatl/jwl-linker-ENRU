@@ -30,6 +30,13 @@ const obsidianStub = {
   requestUrl: async () => ({ status: 0, text: '' }),
   PluginSettingTab: Base,
   Setting: Base,
+  Platform: { isMobile: false },
+  editorLivePreviewField: {},
+  EditorSuggest: class {
+    constructor(app) {
+      this.app = app;
+    }
+  },
 };
 
 const EXPORTS = [
@@ -52,6 +59,10 @@ const EXPORTS = [
   'matchOtherPublication',
   'isLikelyPublication',
   'fillCitationTemplate',
+  'parseJwlBibleHref',
+  'scriptureLinkRanges',
+  'suggestionsFor',
+  'ReferenceSuggest',
 ];
 
 function loadPlugin() {

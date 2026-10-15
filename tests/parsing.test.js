@@ -230,3 +230,129 @@ test('callout templates keep every line inside the callout without doubling ">"'
   // plain templates are left as they are
   assert.equal(jwl.fillCitationTemplate('{title}\n“*{text}*”', 'T', 'a\nb'), 'T\n“*a\nb*”');
 });
+
+test('JW Library Bible links are parsed for the verse preview', () => {
+  const ru = jwl.parseJwlBibleHref('jwlibrary:///finder?bible=45001020-45001022&wtlocale=U');
+  assert.deepEqual(ru.ids, ['45001020', '45001021', '45001022']);
+  assert.equal(ru.lang, 'RU');
+  assert.equal(ru.url, 'https://www.jw.org/finder?wtlocale=U&bible=45001020-45001022');
+  assert.deepEqual(jwl.parseJwlBibleHref('jwlibrary:///finder?bible=1001001&wtlocale=E').ids, ['1001001']); // Genesis
+  assert.equal(jwl.parseJwlBibleHref('jwlibrary:///finder?wtlocale=E&docid=2024560&par=5'), null); // publication link
+  assert.equal(jwl.parseJwlBibleHref('https://www.jw.org/finder?bible=45001020'), null);
+  assert.equal(jwl.parseJwlBibleHref(null), null);
+});
+
+test('verse preview shows at most 5 verses, caches results and retries failures', async () => {
+  const plugin = createPlugin(jwl);
+  let fetches = 0;
+  plugin._fetchDOM = async () => { fetches++; return {}; };
+  plugin._getElementAsText = (_dom, selector) => `${Number(selector.slice(-3))} verse text`;
+  const href = 'jwlibrary:///finder?bible=19119001-19119040&wtlocale=E'; // Ps 119:1-40
+  const first = await plugin._fetchVersePreview(href);
+  assert.equal(first.verses.length, 5);
+  assert.equal(first.verses[0], '1 verse text');
+  assert.equal(first.more, 35);
+  await plugin._fetchVersePreview(href);
+  assert.equal(fetches, 1); // second hover served from the cache
+
+  plugin._fetchDOM = async () => { fetches++; return null; }; // offline
+  const offline = 'jwlibrary:///finder?bible=43003016&wtlocale=E';
+  assert.equal((await plugin._fetchVersePreview(offline)).failed, true);
+  await plugin._fetchVersePreview(offline);
+  assert.equal(fetches, 3); // failures are not cached
+  assert.equal(await plugin._fetchVersePreview('jwlibrary:///finder?docid=1'), null);
+});
+
+test('Spanish book names are recognised even when auto-detection guesses English', () => {
+  const plugin = createPlugin(jwl);
+  const link = (text) => plugin._parseScriptureLinks(text, DisplayType.md)[0]?.passages[0]?.link?.jwlib;
+  assert.equal(link('Juan 3:16'), 'jwlibrary:///finder?bible=43003016&wtlocale=S');
+  assert.equal(link('Mateo 24:14'), 'jwlibrary:///finder?bible=40024014&wtlocale=S');
+  assert.equal(link('Salmo 89:18'), 'jwlibrary:///finder?bible=19089018&wtlocale=S');
+  assert.equal(link('John 3:16'), 'jwlibrary:///finder?bible=43003016&wtlocale=E'); // English stays English
+  // a fixed citation language keeps its own locale and book name
+  const ru = createPlugin(jwl, { lang: 'Russian' })._parseScriptureLinks('Juan 3:16', DisplayType.md)[0].passages[0];
+  assert.equal(ru.displayFull, 'Иоанна 3:16');
+  assert.equal(ru.link.jwlib, 'jwlibrary:///finder?bible=43003016&wtlocale=U');
+});
+
+test('paragraph lists and ranges are cited one WOL request per paragraph', async () => {
+  const plugin = createPlugin(jwl, { pubCalloutTemplate: '> [!cite] PUB. — {title}\n> {text}\n' });
+  const queries = [];
+  plugin._fetchDOM = async (url) => {
+    queries.push(decodeURIComponent(url).replace(/^.*\?q=/, ''));
+    const n = queries.length;
+    return { querySelector: (sel) => (sel === '.resultItems' ? { textContent: `${n} paragraph ${n}` } : null) };
+  };
+  const out = await plugin._fetchPublicationCitation('w23.12 p. 20 pars. 7-9', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['w23.12 p. 20 par. 7', 'w23.12 p. 20 par. 8', 'w23.12 p. 20 par. 9']);
+  assert.match(out, /The Watchtower 2023 December p\. 20 par\. 7-9\]/);
+  assert.match(out, /^> \*\*1\*\* paragraph 1\n> \*\*2\*\* paragraph 2\n> \*\*3\*\* paragraph 3$/m);
+
+  queries.length = 0;
+  await plugin._fetchPublicationCitation('w25.01 28, абз. 11, 12', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['w25.01 28, абз. 11', 'w25.01 28, абз. 12']);
+
+  queries.length = 0;
+  await plugin._fetchPublicationCitation('od cap. 15 párr. 3—4', null, 'citeVerseCallout');
+  assert.deepEqual(queries, ['od cap. 15 párr. 3', 'od cap. 15 párr. 4']);
+
+  // long ranges are limited to 10 paragraphs, and the title says so
+  assert.equal(jwl.parseWatchtowerReference('w23.12 p. 20 par. 1-30').paragraph, '1-10');
+});
+
+test('links to a paragraph range cite the whole range', async () => {
+  const plugin = createPlugin(jwl, { pubTemplate: '{title}\n{text}' });
+  const [wol] = plugin._getLinksInText('https://wol.jw.org/ru/wol/d/r2/lp-u/2024560#h=5-7');
+  assert.deepEqual([wol.parId, wol.parEnd], ['5', '7']);
+  const [finder] = plugin._getLinksInText('https://www.jw.org/finder?wtlocale=E&docid=1965402&par=8-9');
+  assert.equal(finder.url, 'https://wol.jw.org/en/wol/d/r1/lp-e/1965402#h=8-9');
+
+  const selectors = [];
+  plugin._fetchDOM = async () => ({});
+  plugin._getElementAsText = (_dom, selector) => { selectors.push(selector); return 'text'; };
+  await plugin._fetchParagraphCitation('https://wol.jw.org/en/wol/d/r1/lp-e/2024560#h=5-7', null, 0, 'citeParagraph', 1);
+  assert.deepEqual(selectors.filter((s) => /^#p\d/.test(s)), ['#p5', '#p6', '#p7']);
+});
+
+test('Live Preview links cover each passage as typed, without changing the text', () => {
+  const plugin = createPlugin(jwl);
+  const ranges = (text) =>
+    jwl.scriptureLinkRanges(plugin, text).map((r) => [text.slice(r.from, r.to), r.href.replace(/^.*bible=/, '')]);
+  assert.deepEqual(ranges('Read Ps 23:1-3, 5; 24:1 today'), [
+    ['Ps 23:1-3', '19023001-19023003&wtlocale=E'],
+    ['5', '19023005&wtlocale=E'],
+    ['24:1', '19024001&wtlocale=E'],
+  ]);
+  assert.deepEqual(ranges('John 3:16, 17 and Jude 3'), [
+    ['John 3:16, 17', '43003016-43003017&wtlocale=E'], // consecutive verses are one passage
+    ['Jude 3', '65001003&wtlocale=E'],
+  ]);
+  assert.deepEqual(ranges('См. w25.01 28, абз. 11 и Рим 1:20'), [['Рим 1:20', '45001020&wtlocale=U']]);
+  assert.deepEqual(ranges('[Rom 1:20](x) and Rom 8:28'), [['Rom 8:28', '45008028&wtlocale=E']]); // existing link skipped
+  assert.deepEqual(ranges("'Rom 1:20 is skipped"), []);
+  assert.deepEqual(ranges('no references here'), []);
+});
+
+test('suggestions list Bible books and publication codes after the trigger', () => {
+  const books = (q, lang) => jwl.suggestionsFor(q, lang).filter((s) => s.kind === 'book').map((s) => `${s.label} ${s.lang}`);
+  assert.deepEqual(books('рим', 'RU'), ['Римлянам RU']);
+  assert.deepEqual(books('rom', 'EN'), ['Romans EN', 'Romanos ES']); // preferred language first
+  assert.deepEqual(books('1 co', 'EN'), ['1 Corinthians EN', '1 Corintios ES']);
+  assert.deepEqual(books('juan', 'RU'), ['Juan ES']);
+  const od = jwl.suggestionsFor('od', 'RU').find((s) => s.kind === 'publication');
+  assert.equal(od.insert, 'od ');
+  assert.equal(od.detail, 'Организованы исполнять волю Иеговы');
+  assert.deepEqual(jwl.suggestionsFor('', 'EN'), []);
+
+  // trigger detection
+  const plugin = createPlugin(jwl, { suggestions: true, suggestTrigger: '@' });
+  const suggest = new jwl.ReferenceSuggest({}, plugin);
+  const trigger = (line) => suggest.onTrigger({ line: 0, ch: line.length }, { getLine: () => line });
+  assert.deepEqual(trigger('see @rom'), { start: { line: 0, ch: 4 }, end: { line: 0, ch: 8 }, query: 'rom' });
+  assert.equal(trigger('@1 co').query, '1 co');
+  assert.equal(trigger('mail me at a@rom'), null); // not at the start of a word
+  assert.equal(trigger('see @'), null); // nothing typed yet
+  plugin.settings.suggestions = false;
+  assert.equal(trigger('see @rom'), null);
+});
