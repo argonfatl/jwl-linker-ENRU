@@ -138,10 +138,8 @@ body.is-phone .jwl-settings textarea {
 /* Scripture links in Live Preview (Cmd/Ctrl+click opens JW Library) */
 .jwl-lp-link {
 	color: var(--link-external-color);
-	text-decoration: underline;
-	text-decoration-color: var(--link-external-color);
-	text-decoration-style: dotted;
-	text-underline-offset: 2px;
+	/* dotted bottom border: works in all Obsidian versions */
+	border-bottom: 1px dotted var(--link-external-color);
 }
 
 /* Suggestions while typing */
