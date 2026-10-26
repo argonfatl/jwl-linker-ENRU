@@ -356,3 +356,16 @@ test('suggestions list Bible books and publication codes after the trigger', () 
   plugin.settings.suggestions = false;
   assert.equal(trigger('see @rom'), null);
 });
+
+test('Live Preview link ranges are cached per line and follow setting changes', () => {
+  const plugin = createPlugin(jwl, { lang: 'Auto' });
+  const text = 'Read Rom 1:20 today';
+  const first = jwl.scriptureLinkRanges(plugin, text);
+  assert.equal(jwl.scriptureLinkRanges(plugin, text), first); // same line => cached result
+  assert.match(first[0].href, /wtlocale=E$/);
+
+  plugin.settings.lang = 'Russian'; // a setting that changes the links clears the cache
+  const russian = jwl.scriptureLinkRanges(plugin, text);
+  assert.notEqual(russian, first);
+  assert.match(russian[0].href, /wtlocale=U$/);
+});
