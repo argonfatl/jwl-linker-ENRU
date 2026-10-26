@@ -1,6 +1,6 @@
 # JWL Linker EN-RU-ES Plugin for [Obsidian](https://obsidian.md)
 
-**Comprehensive multilingual JW Library linker** supporting Bible references and JW publications in **English, Russian, and Spanish**. Features: auto-formatting (od 15 par. 3 → od chap. 15 par. 3).
+**Comprehensive multilingual JW Library linker** supporting Bible references and JW publications in **English, Russian, Spanish, Portuguese, French and German**. Features: auto-formatting (od 15 par. 3 → od chap. 15 par. 3).
 
 This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-linker)
 
@@ -12,9 +12,9 @@ This is a fork of Original plugin by [MrBertie](https://github.com/MrBertie/jwl-
 - ⌨️ **Suggestions**: Type `@` and the start of a book name or publication code to pick it from a list
 - 📑 **Several Paragraphs**: Cite `par. 7, 8` or `pars. 7-9` in one go
 - 📚 **Publication Support**: Watchtower, Awake!, books (od, it-1, cl, si, etc.) in multiple formats
-- 🌍 **Multilingual**: Full English, Russian, and Spanish support with auto-detection
-- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names (English/Russian/Spanish)
-- 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, English/Spanish: 1950+)
+- 🌍 **Multilingual**: English, Russian, Spanish, Portuguese (Brazil), French and German, with auto-detection
+- 🔄 **Auto-formatting**: `od 15 par. 3` → `od chap. 15 par. 3` + Watchtower month names in every language
+- 📅 **Year Filtering**: Watchtower availability (Russian: 1986+, other languages: 1950+)
 - 🎯 **Dual Language Mode**: Show Bible verses and publications in two languages simultaneously with separate toggles
 - 💬 **Smart Citations**: Extract paragraph text with callout formatting
 - 📝 **Text Quoting**: Convert selected text to citation callouts
@@ -39,15 +39,23 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 - **English**: `Rom 1:20`, `1 Cor 9:26`, `Psalm 89:18`
 - **Russian**: `Рим 1:20`, `1 Кор 9:26`, `Псалом 89:18`
 - **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`, `Juan 3:16`
+- **Portuguese**: `João 3:16`, `Atos 2:4`, `1 Co 13:4`, `Tg 1:5`
+- **French**: `Jean 3:16`, `Rm 8:28`, `Ré 21:4`, `Psaumes 83:18`
+- **German**: `Johannes 3:16`, `1. Mose 3:15`, `1Mo 3:15`, `Röm 8:28`
 
 ## Watchtower Publications
 ![Plugin in action](demo/RunW.gif)
 Issues before 2016 came out twice a month and are written with the day; from 2016 on, issues are monthly (`YY.MM`).
-English writes the date as month/day, Russian and Spanish as day/month.
+English writes the date as month/day, the other languages as day/month (German: `15. 1.`).
 
 - **English**: `w65 6/1 p. 329 par. 6`, `w23.12 p. 20 par. 7`
 - **Russian**: `w10 15/1 с. 3 абз. 1`, `w25.01 28, абз. 11`, `w25.3 с. 8 абз. 2`
 - **Spanish**: `w10 15/1 pág. 3 párr. 1`, `w23.12 pág. 20 párr. 7`
+- **Portuguese**: `w10 15/1 p. 3 par. 1`, `w23.12 p. 20 par. 7`
+- **French**: `w10 15/1 p. 3 § 1`, `w23.12 p. 20 § 7`
+- **German**: `w10 15. 1. S. 3 Abs. 1`, `w23.12 S. 20 Abs. 7`
+
+Portuguese uses the same markers as English (`p.`, `par.`), so these references are cited in Portuguese when the interface language or the citation language is Portuguese.
 
 ## Watchtower Study Edition (ws)
 The study edition existed until 2015; from 2016 on, study articles are in the monthly `w` issues.
@@ -59,6 +67,9 @@ WOL resolves `ws` references in English only.
 - **English**: `od 15 par. 3`, `it-1 332`, `cl chap. 8 p. 77 par. 2`
 - **Russian**: `od 15 абз. 3`, `cl глава 8 с. 77 абз. 2`
 - **Spanish**: `od 15 párr. 3`, `cl cap. 8 pág. 77 párr. 2`
+- **Portuguese**: `od cap. 15 par. 3`, `cl cap. 8 p. 77 par. 2`
+- **French**: `od chap. 15 § 3`, `cl chap. 8 p. 77 § 2`
+- **German**: `od Kap. 15 Abs. 3`, `cl Kap. 8 S. 77 Abs. 2`
 
 ## Several Paragraphs
 List or range the paragraphs; up to 10 are cited at once:
@@ -74,12 +85,17 @@ A wol.jw.org link to a paragraph range (`…#h=5-7`) also cites the whole range.
 - **English**: `od 15 par. 3` → `od chap. 15 par. 3`
 - **Russian**: `od 15 абз. 3` → `od глава 15 абз. 3`
 - **Spanish**: `od 15 párr. 3` → `od cap. 15 párr. 3`
+- **French**: `od 15 § 3` → `od chap. 15 § 3`
+- **German**: `od 15 Abs. 3` → `od Kap. 15 Abs. 3`
 
 ### Watchtower Month Names Auto-formatting
 **Pre-2016 (Two issues per month):**
 - **Russian**: `w10 15 Января с. 3 абз. 1` → `w10 15/1 с. 3 абз. 1`
 - **English**: `w10 15 January p. 3 par. 1` → `w10 01/15 p. 3 par. 1`
 - **Spanish**: `w10 15 Enero pág. 3 párr. 1` → `w10 15/1 pág. 3 párr. 1`
+- **Portuguese**: `w10 15 de janeiro p. 3 par. 1` → `w10 15/1 p. 3 par. 1`
+- **French**: `w10 15 janvier p. 3 § 1` → `w10 15/1 p. 3 § 1`
+- **German**: `w10 15. Januar S. 3 Abs. 1` → `w10 15. 1. S. 3 Abs. 1`
 
 Without a day (`w10 January ...`) the issue is ambiguous, so add the day for issues before 2016.
 
@@ -87,6 +103,9 @@ Without a day (`w10 January ...`) the issue is ambiguous, so add the day for iss
 - **Russian**: `w16 Январь с. 3 абз. 1` → `w16.01 3, абз. 1`
 - **English**: `w25 March p. 8 par. 2` → `w25.03 p. 8 par. 2`
 - **Spanish**: `w25 Marzo pág. 8 párr. 2` → `w25.03 pág. 8 párr. 2`
+- **Portuguese**: `w25 março p. 8 par. 2` → `w25.03 p. 8 par. 2`
+- **French**: `w25 mars p. 8 § 2` → `w25.03 p. 8 § 2`
+- **German**: `w25 März S. 8 Abs. 2` → `w25.03 S. 8 Abs. 2`
 
 # 🎯 How to Use In Reading View
 
@@ -140,23 +159,26 @@ The trigger can be changed in settings (*Suggestion trigger*). Normal typing nev
 # 🌍 Multilingual Support
 
 ## Language Detection
-- **Automatic**: Detects Cyrillic characters for Russian, Spanish Bible book names, defaults to English
-- **Manual**: Set the citation language in plugin settings (English/Russian/Spanish). Publication references typed in another language format are converted, e.g. `w23.12 p. 20 par. 7` is cited from the Russian edition as `w23.12 20, абз. 7`. Page numbers match across languages for recent issues; in very old issues (for example 1960s) they can differ, so a converted reference may point to another article
+- **Automatic**: Cyrillic text is Russian; otherwise the language is taken from the book name (`Juan` → Spanish, `João` → Portuguese, `Jean` → French, `Johannes` → German). Names that English or Spanish also use (`Daniel`, `Romanos`) stay English or Spanish; choose a fixed citation language to always cite in Portuguese, French or German
+- **Manual**: Set the citation language in plugin settings (English/Russian/Spanish/Portuguese/French/German). Publication references typed in another language format are converted, e.g. `w23.12 p. 20 par. 7` is cited from the Russian edition as `w23.12 20, абз. 7`. Page numbers match across languages for recent issues; in very old issues (for example 1960s) they can differ, so a converted reference may point to another article
 - **Dual Language Mode**: Show content in two languages simultaneously
   - Separate toggles for Bible verses and publications
-  - Configurable first and second language (ru, en, es)
-  - Language-specific headers: PUB. (English), ПУБЛ. (Russian), PUBL. (Spanish)
+  - Configurable first and second language (ru, en, es, pt, fr, de)
+  - Language-specific headers: PUB. (English, French), ПУБЛ. (Russian), PUBL. (Spanish, Portuguese, German)
 
 ## Publication Availability
 - **Russian Watchtower**: Available from 1986 onwards (`w86.01` and later)
-- **English/Spanish Watchtower**: Available from 1950 onwards (`w50 1/1` and later)
-- **Offline Publications**: Automatic detection with localized messages in all three languages
+- **Watchtower in other languages**: Available from 1950 onwards (`w50 1/1` and later)
+- **Offline Publications**: Automatic detection with localized messages in every language
 
 ## Language-Specific Features
 - **Auto-formatting**: 
   - English: `par.` ↔ `chap.` ↔ `p.`
   - Russian: `абз.` ↔ `глава` ↔ `с.`
   - Spanish: `párr.` ↔ `cap.` ↔ `pág.`
+  - Portuguese: `par.` ↔ `cap.` ↔ `p.`
+  - French: `§` ↔ `chap.` ↔ `p.`
+  - German: `Abs.` ↔ `Kap.` ↔ `S.`
 - **Publication Titles**: Displays in appropriate language
   - "The Watchtower" / "Сторожевая башня" / "La Atalaya"
   - "The Watchtower (Study Edition)" / "Сторожевая башня (выпуск для изучения)" / "La Atalaya (edición de estudio)"
@@ -244,13 +266,13 @@ Spanish: "Esta es información importante"
 ## Display Options
 - **Verse Template**: Customize format for Bible verse citations
 - **Callout Templates**: Customize format for callout-style citations  
-- **Language Settings**: Interface language (Russian/English/Spanish) and citation language
+- **Language Settings**: Interface language (Russian/English/Spanish/Portuguese/French/German) and citation language
 
 ## Dual Language Mode Settings
 - **Dual Mode for Verses**: Toggle dual language output for Bible verses
 - **Dual Mode for Publications**: Toggle dual language output for Watchtower and other publications
-- **First Language**: Select primary output language (Auto/Russian/English/Spanish)
-- **Second Language**: Select secondary output language (Russian/English/Spanish)
+- **First Language**: Select primary output language (Auto or any supported language)
+- **Second Language**: Select secondary output language (any supported language)
 - Language validation prevents selecting the same language for both
 
 ## Advanced Options
@@ -282,10 +304,16 @@ Click any generated link to open directly in your installed *JW Library* app at 
   - English: "chap.", "par.", "p."
   - Russian: "глава", "абз.", "с."
   - Spanish: "cap.", "párr.", "pág."
+  - Portuguese: "cap.", "par.", "p."
+  - French: "chap.", "§", "p."
+  - German: "Kap.", "Abs.", "S."
 - **Use natural month names** - plugin auto-converts Watchtower month names:
   - Russian: "Январь", "Февраль", "Март", etc.
   - English: "January", "February", "March", etc.
   - Spanish: "Enero", "Febrero", "Marzo", etc.
+  - Portuguese: "janeiro", "fevereiro", "março", etc.
+  - French: "janvier", "février", "mars", etc.
+  - German: "Januar", "Februar", "März", etc.
 - **Historical accuracy** - plugin respects pre-2016 two-issue format vs. post-2016 single-issue format
 
 ## Supported Publication Codes
@@ -312,4 +340,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.9.3 | **Languages**: English, Russian, Spanish | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.10.0 | **Languages**: English, Russian, Spanish, Portuguese, French, German | **Platform**: Obsidian Desktop & Mobile
