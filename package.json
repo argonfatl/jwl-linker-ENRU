@@ -1,8 +1,8 @@
 {
   "name": "jwl-linker-en-ru-es",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "private": true,
-  "description": "JW Library linker for Obsidian (English, Russian, Spanish)",
+  "description": "JW Library linker for Obsidian (English, Russian, Spanish, Portuguese, French, German)",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "check": "node --check main.js"
