@@ -362,4 +362,4 @@ If you find this plugin helpful and want to support its development:
 
 [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=zhhfyn5ympj&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/zhhfyn5ympj)
 
-**Version**: 0.10.0 | **Languages**: English, Russian, Spanish, Portuguese, French, German | **Platform**: Obsidian Desktop & Mobile
+**Version**: 0.10.1 | **Languages**: English, Russian, Spanish, Portuguese, French, German | **Platform**: Obsidian Desktop & Mobile

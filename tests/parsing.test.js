@@ -416,6 +416,8 @@ test('English, Spanish and Russian book names keep their language', () => {
   assert.equal(href('Fil 4:13'), '50004013&wtlocale=S'); // short Spanish form, also Portuguese
   assert.equal(href('Apo 21:4'), '66021004&wtlocale=S');
   assert.equal(href('Ис 41:10'), '23041010&wtlocale=U'); // Isaiah (Исх is Exodus)
+  assert.equal(href('Псалом 23:1'), '19023001&wtlocale=U'); // the singular is how people often write it
+  assert.equal(href('Пс 23:1'), '19023001&wtlocale=U');
   assert.equal(jwl.detectBookLanguage('jean'), 'FR');
   assert.equal(jwl.detectBookLanguage('jud'), 'EN'); // an English name starts with it
 });
