@@ -1,7 +1,7 @@
 {
 	"id": "jwl-linker-en-ru-es",
 	"name": "JWL Linker EN-RU-ES",
-	"version": "0.9.2",
+	"version": "0.9.3",
 	"minAppVersion": "1.7.2",
 	"description": "Link Bible references and publications of Jehovah's Witnesses to JW Library, and cite verses and paragraphs from jw.org in English, Russian, and Spanish.",
 	"author": "Argonfatl",

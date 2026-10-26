@@ -1243,6 +1243,21 @@ function parseJwlBibleHref(href) {
  */
 function findBibleBook(bookKey, preferredLang) {
   if (!bookKey) return null;
+  // Any word before a number ("week 42", "в 2020") is looked up, so remember the answers
+  const cacheKey = `${preferredLang}|${bookKey}`;
+  if (BookLookupCache.has(cacheKey)) return BookLookupCache.get(cacheKey);
+  if (BookLookupCache.size >= BookLookupCacheSize) BookLookupCache.clear();
+  const found = lookUpBibleBook(bookKey, preferredLang);
+  BookLookupCache.set(cacheKey, found);
+  return found;
+}
+
+/** Book lookups kept in memory (the Bible data never changes at runtime) */
+const BookLookupCacheSize = 2000;
+const BookLookupCache = new Map();
+
+/** Uncached search behind findBibleBook */
+function lookUpBibleBook(bookKey, preferredLang) {
   const escaped = bookKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // (^| ) avoids matching inside book names, e.g. "eph" in "zephaniah"
   const bookRgx = new RegExp(`(^| )${escaped}`, 'm');
@@ -1261,6 +1276,9 @@ function findBibleBook(bookKey, preferredLang) {
 /** Lines longer than this are not scanned (performance) */
 const LivePreviewMaxLineLength = 5000;
 
+/** Distinct lines whose link ranges are kept in memory (the cache restarts when full) */
+const LivePreviewCacheSize = 1000;
+
 /**
  * Character ranges of the scripture passages in a line of text, with their JW Library links.
  * The text itself is not changed: each passage ("Ps 23:1-3", "5", "24:1" in "Ps 23:1-3, 5; 24:1")
@@ -1271,6 +1289,23 @@ const LivePreviewMaxLineLength = 5000;
  */
 function scriptureLinkRanges(plugin, text) {
   if (!text || text.length > LivePreviewMaxLineLength || !/\d/.test(text)) return [];
+  // Live Preview rebuilds every visible line on each keystroke, but usually only one line
+  // has changed: reuse the ranges of the others. They depend on the text and these settings.
+  const signature = `${plugin.settings.lang}|${plugin.settings.spaceAfterPunct}`;
+  let cache = plugin._linkRangeCache;
+  if (!cache || cache.signature !== signature || cache.lines.size >= LivePreviewCacheSize) {
+    cache = plugin._linkRangeCache = { signature, lines: new Map() };
+  }
+  let ranges = cache.lines.get(text);
+  if (!ranges) {
+    ranges = computeScriptureLinkRanges(plugin, text);
+    cache.lines.set(text, ranges);
+  }
+  return ranges;
+}
+
+/** Uncached search behind scriptureLinkRanges */
+function computeScriptureLinkRanges(plugin, text) {
   const references = plugin
     ._parseScriptureLinks(text, DisplayType.href, plugin.settings.spaceAfterPunct)
     .filter((ref) => !ref.isLinkAlready && !ref.isPlainText && ref.passages.some((p) => p.link))
