@@ -1,331 +1,176 @@
-# JWL Linker EN-RU-ES — Code Walkthrough (`main.js`)
+# JWL Linker — Code Walkthrough (`main.js`)
 
-This document explains how the **JWL Linker EN-RU-ES** Obsidian plugin works and what the main functions/methods in `main.js` are responsible for.
+This document explains how the **JWL Linker** Obsidian plugin works and where to find each part of it in `main.js`. It describes version 0.10.0. A Russian version is in [PLUGIN_CODE_GUIDE.md](PLUGIN_CODE_GUIDE.md).
 
-## 1) High-level architecture
+## 1) Architecture
 
-The plugin is primarily implemented in a single file, `main.js`, containing:
+The whole plugin is one hand-written file, `main.js`, with no build step. Tests in `tests/` load it with a stub of the `obsidian` module (`tests/helpers/load-plugin.js`).
 
-- **Global constants / config**
-  - `DEFAULT_SETTINGS` — default settings (citation templates, language options, dual mode toggles, history, etc.)
-  - `InterfaceStrings` + `Lang` — UI strings for RU/EN/ES
-  - `Config` — regex patterns and URL templates for WOL / JW.org / Finder / JW Library
-  - month/book mappings and other lookup tables
+Top to bottom, the file contains:
 
-- **Global helper functions**
-  - language detection, Watchtower auto-formatting, URL builders, and small utilities
+| Part | What it is |
+|---|---|
+| `DEFAULT_SETTINGS` | Default settings: templates, languages, dual mode, history, toggles |
+| `InterfaceStrings`, `Lang` | Interface strings for Russian, English, Spanish, Portuguese, French and German; `Lang` is the active set |
+| Language tables | `Languages`, `LanguageInfo`, `WtLocales`, `LangByWtlocale`, `OfflinePublications`, `OfflineMessages` (section 3) |
+| `Config` | Regexes for scriptures, publications and links; base URLs |
+| Publication helpers | Month tables, Watchtower auto-formatting, `PubLangs`, `PublicationTitles`, parsing and query building (section 5) |
+| Editor helpers | Verse preview, Live Preview link ranges, suggestions (section 2) |
+| `JWLLinkerPlugin` | Main class: commands, parsing, fetching, formatting |
+| `JWLLinkerView` | History sidebar |
+| `ScripturePostProcessor` | Reading View: turns references into JW Library links |
+| `JWLLinkerSettingTab` | Settings screen |
+| `Bible`, `_BibleVerses` | Book names and abbreviations per language; verse counts per chapter |
 
-- **Classes**
-  - `JWLLinkerPlugin extends Plugin` — main plugin class: commands, parsing, network fetching, formatting, dual-mode output.
-  - `JWLLinkerView extends ItemView` — sidebar history (citation cache) + UI.
-  - `ScripturePostProcessor extends MarkdownRenderChild` — Reading View post-processor: turns scripture references into `jwlibrary://` links.
-  - `JWLLinkerSettingTab extends PluginSettingTab` — settings UI.
+## 2) Where each feature starts
 
-## 2) Execution flows (data flow)
+### 2.1 Commands in the editor
 
-### 2.1 Editing View (editor)
+1. A command from the context menu (`buildMenu`) or the Command Palette calls `insertCitation(editor, command, pars)`, `linkToJWLibrary`, `openInJWLibrary`, `openSelectedInWOL`, `citeSelectedText` or `batchConvertAllLinks`.
+2. `_getEditorSelection` returns the selection, or the current line and caret.
+3. `insertCitation` normalises the text (`normalizeInput`), converts Watchtower month names (`autoFormat*Watchtower`) and routes by command and content:
+   - a publication reference → `_fetchPublicationCitation` (or `_fetchDualPublicationCitation` in dual mode);
+   - a scripture → `_fetchBibleCitation` (or `_fetchDualBibleCitation`);
+   - a wol.jw.org / jw.org link → `_fetchParagraphCitation`.
+4. The result is inserted below the line, or replaces the selection.
 
-1. You run a command (context menu or Command Palette).
-2. The command reads:
-   - `selection` (if text is selected) or the current line/caret position.
-3. The plugin determines the input type:
-   - a WOL / JW.org / Finder URL,
-   - a Bible reference,
-   - a publication reference (Watchtower / Study Edition / books, etc.),
-   - arbitrary text (lookup on WOL).
-4. For citations:
-   - it builds a target URL (`wol.jw.org`, `jw.org/finder`, or `jwlibrary://`);
-   - if needed it downloads HTML (`requestUrl`) and extracts the paragraph/verse text.
-5. It formats the result using templates:
-   - plain text (`pubTemplate`, `verseTemplate`),
-   - callout (`pubCalloutTemplate`, `verseCalloutTemplate`),
-   - special callout for selected text (`citeSelectedText`).
-6. The result is inserted into or replaces text in the editor.
+`batchConvertAllLinks` finds every scripture and publication in the note (skipping callouts) and inserts callout citations under each line.
 
 ### 2.2 Reading View
 
-1. Obsidian calls the registered `MarkdownPostProcessor`.
-2. `ScripturePostProcessor` reads the rendered HTML, finds scripture references.
-3. It replaces them with `jwlibrary://` links.
+`onload` registers a Markdown post-processor that creates a `ScripturePostProcessor` for each rendered block. It skips headings and callouts, walks the plain text nodes (not links, code or math) and replaces each reference with an `<a>` element through `linkScripturesInTextNode`. Only the DOM API is used; the note text is not changed.
 
-### 2.3 History / cache
+### 2.3 Live Preview links
 
-- Successful citations are added to the sidebar history (`JWLLinkerView.addToHistory`).
-- The history is persisted in `workspace.json` (via `ItemView.getState`).
-- Repeated lookups for the same URL can be served from cache (`getFromHistory`) without a new network request.
+`_registerLivePreviewLinks` adds a CodeMirror `ViewPlugin`. On every document change, viewport change or mode switch it rebuilds the decorations for the visible lines:
 
-## 3) Formatting templates
+- `scriptureLinkRanges(plugin, text)` returns the character ranges of the passages in a line and their JW Library links. Results are cached per line text (`LivePreviewCacheSize` lines), so typing only re-parses the line that changed. The cache restarts when the citation language or punctuation spacing changes.
+- `computeScriptureLinkRanges` does the uncached work; `passageSegments` splits a reference like `Ps 23:1-3, 5; 24:1` into one range per passage.
+- Code, links, front matter and other syntax nodes are skipped. Cmd/Ctrl+click opens the link.
 
-Key settings:
+### 2.4 Verse preview (desktop)
 
-- `verseTemplate` / `pubTemplate` — non-callout output
-- `verseCalloutTemplate` / `pubCalloutTemplate` — callout output
+`_registerVersePreview` listens for the mouse resting on a JW Library link for `VersePreviewDelayMs`. `_fetchVersePreview` turns the link into a jw.org page (`parseJwlBibleHref`), loads up to `VersePreviewMaxVerses` verses and caches successful results. `createVersePopover` / `fillVersePopover` draw the popup.
 
-Placeholders:
+### 2.5 Suggestions while typing
 
-- `{title}` — title / link
-- `{text}` — citation text
+`ReferenceSuggest` (an `EditorSuggest`) opens after the trigger (default `@`) at the start of a word. `suggestionsFor(query, preferredLang)` lists Bible books (preferred language first, then the others) and publication codes from `PublicationTitles`.
 
-### Important note about callouts (`[!cite]`)
+### 2.6 History
 
-Obsidian callouts require a blockquote marker `>` before the bracket:
+Successful citations are added to the sidebar (`JWLLinkerView.addToHistory`) and kept in the workspace layout (`getState`). `getFromHistory` serves a repeated lookup without a new request.
+
+## 3) Languages
+
+Language keys are `EN`, `RU`, `ES`, `PT` (Portuguese, Brazil), `FR` and `DE`. Dutch (`NL`) only has a JW Library locale for links.
+
+| Table / function | Purpose |
+|---|---|
+| `Languages` | Setting value (`'Portuguese'`) → language key (`'PT'`) |
+| `LanguageInfo` | Per language: JW Library / finder code (`wtlocale`), WOL site and library (`r5/lp-t`), callout word for BIBLE |
+| `WtLocales`, `LangByWtlocale` | Language key ↔ `wtlocale` letter (`T`, `F`, `X`, …) |
+| `getConfigForLanguage(lang)` | WOL article, publication and search URLs and the finder URL for a language |
+| `getFinderUrl`, `getJWLibraryLocale` | jw.org finder base URL and `&wtlocale=` for links |
+| `Bible[lang]` | `Book`: names as displayed; `Abbreviation`: for each book, one string of lower-case names without spaces or dots — full name, WOL long and short abbreviation, spellings without diacritics |
+| `BibleSearchOrder` | Order in which languages are searched for a book name |
+| `PubLangs[lang]` | Publication conventions: chapter / page / paragraph markers, date order, Watchtower names, month and issue formatting |
+| `PublicationTitles[lang]` | Publication titles by code (`od`, `it-1`, `lff`, …) |
+| `OfflinePublications`, `OfflineMessages` | Print-only publications and the messages shown for them |
+| `InterfaceStrings[name]` | Interface text; every language has exactly the keys of English (checked by a test) |
+| `InterfaceLangCodes`, `DualLangCodes` | Interface language → dual-mode code (`pt`); languages offered in dual mode |
+
+### 3.1 Detecting the language
+
+With the citation language set to *Auto*:
+
+- **Scriptures**: `detectBookLanguage(bookKey)` decides from the book name. English, Spanish and Russian claim every key that starts one of their names (this keeps their earlier behaviour: `fil`, `apo` stay Spanish). Portuguese, French and German only claim their exact names and abbreviations (`joão`, `jean`, `1mo`). If no language matches, `detectLanguage(text)` is used.
+- **Other text** (WOL search): `detectLanguage(text)` — Cyrillic is Russian, then `LanguagePatterns` (words and markers only one language uses; built on first use).
+- **Publications**: the paragraph marker decides (`абз.` RU, `párr.` ES, `§` FR, `Abs.` DE). `p.` / `par.` are shared by English and Portuguese, so they map to `LatinFormatLang`: Portuguese when the interface is Portuguese, otherwise English (`updatePublicationFormatLanguage`).
+
+With a fixed citation language, that language is searched first and the reference is converted to it.
+
+### 3.2 Finding a book
+
+`findBibleBook(bookKey, preferredLang)` searches the preferred language, then `BibleSearchOrder`. Within each language an exact name or abbreviation wins over a longer name that starts with the key (Portuguese `jo` is João, not Josué). Results are cached (`BookLookupCache`).
+
+## 4) Bible references
+
+- **Regexes** (`Config`): `scriptureRegex` (book chapter:verse), `scriptureNoChpRegex` (one-chapter books: Obadiah, Philemon, 2 and 3 John, Jude — the number is the verse) and `scriptureNoVerseRegex` (chapter only). They also accept German `1. Mose` and multi-word names (`Song of Solomon`, `Hohes Lied`, `Chant de Salomon`, `Cântico de Salomão`).
+- **`_parseScriptureLinks(input, displayType, …)`** runs the regexes and builds references with passages. Inside, `validateReference` resolves the language and book, checks the chapter and verses against `maxVerse` (`_BibleVerses`) and builds the links.
+- **Link id**: book, chapter and verse as `BBCCCVVV` (`43003016` = John 3:16; a range is `first-last`). JW Library: `jwlibrary:///finder?bible=<id>&wtlocale=<code>`; verse text comes from `https://www.jw.org/finder?wtlocale=<code>&bible=<id>`.
+- **`_convertScriptureToJWLibrary`** writes Markdown links (*Convert scriptures to JW Library*).
+- **`_fetchBibleCitation`** loads the verses (`#v<id>` elements), fills `verseTemplate` / `verseCalloutTemplate` and translates the callout word BIBLE into the reference language (`translateBibleLabel`). Verses of one chapter go into one callout.
+- **Dual mode**: `_fetchDualBibleCitation` → `_fetchBibleVerseByLanguage` for each language; `localizeBookName` shows the book name in that language.
+
+## 5) Publications
+
+All publication citations follow the same three steps:
+
+1. **Parse** the reference in whatever language format it was typed:
+   - Watchtower: `parseWatchtowerReference` (`WatchtowerRegex`) → year, month, day (before 2016), page, paragraphs, source language. German writes the issue as `15. 1.`; a date like `15/1` in the English format is read as day/month.
+   - Other publications: `parseOtherPublicationReference` (`Config.otherPubRegex`, `matchOtherPublication`, `isLikelyPublication`, `KnownPubCodes`) → code, chapter or number, page, paragraphs, source language.
+2. **Build the WOL query and title in the citation language**: `formatWatchtowerQuery` / `formatWatchtowerTitle`, `formatOtherPublicationQuery` / `formatOtherPublicationTitle`, using `PubLangs`. `paragraphQueries` makes one query per paragraph (up to `MaxCitedParagraphs`), because WOL resolves single paragraphs reliably.
+3. **Fetch and format**: `_citeFromWol` loads each WOL search page, takes the paragraph from `.resultItems`, fills `pubTemplate` / `pubCalloutTemplate` and replaces the label `PUB.` with the language's label.
+
+Entry point: `_fetchPublicationCitation` → `_fetchWatchtowerCitation`, `_fetchOtherPublicationCitation` or, for anything else, `_fetchLookupCitation` (plain WOL search). `_publicationLanguage(detected)` chooses the citation language (fixed setting or the detected one). `checkPublicationAvailability` stops early for print-only publications and Watchtower years that are not online.
+
+Month names typed by hand are converted first: `autoFormatRussianWatchtower`, `autoFormatEnglishWatchtower`, `autoFormatSpanishWatchtower` and `autoFormatOtherWatchtower` (Portuguese, French, German; `MonthNameWatchtowerFormats`), all built on `autoFormatLatinWatchtower` except Russian.
+
+Query formats per language (checked on WOL):
+
+| Language | Watchtower 2016+ | Before 2016 | Other publications |
+|---|---|---|---|
+| English | `w23.12 p. 20 par. 7` | `w10 1/15 p. 3 par. 1` | `od chap. 15 par. 3` |
+| Russian | `w23.12 20, абз. 7` | `w10 15/1 с. 3 абз. 1` | `od глава 15 абз. 3` |
+| Spanish | `w23.12 pág. 20 párr. 7` | `w10 15/1 pág. 3 párr. 1` | `od cap. 15 párr. 3` |
+| Portuguese | `w23.12 p. 20 par. 7` | `w10 15/1 p. 3 par. 1` | `od cap. 15 par. 3` |
+| French | `w23.12 p. 20 § 7` | `w10 15/1 p. 3 § 1` | `od chap. 15 § 3` |
+| German | `w23.12 S. 20 Abs. 7` | `w10 15. 1. S. 3 Abs. 1` | `od Kap. 15 Abs. 3` |
+
+## 6) Links to jw.org and WOL
+
+- `_getLinksInText`, `_getLinkAtCaret`, `_extractLinkParts` find a wol.jw.org or jw.org link and its document and paragraph ids (`#h=5-7`, `par=5-7`).
+- `_fetchParagraphCitation` cites the paragraph(s) behind a link, with the page title as the link text (*Cite jw.org url*, *Add title to jw.org url*).
+- `_convertWebToJWLibrary` turns a jw.org link into a JW Library link.
+
+## 7) Fetching and cleaning text
+
+- `_fetchDOM(url)` — `requestUrl` plus `DOMParser`; returns `null` on failure.
+- `_getElementAsText(dom, selector, type, follows)` — text of a verse, paragraph or title, cleaned of footnote markers and extra spaces.
+- `_boldInitialNumber(text)` — `**4**` for the verse or paragraph number (setting *Initial numbers in bold*).
+- `fillCitationTemplate(template, title, text)` — fills `{title}` and `{text}`. In a callout template every line of a multi-line text stays inside the callout, without doubling `>`.
+
+## 8) Templates
+
+Settings `verseTemplate`, `verseCalloutTemplate`, `pubTemplate`, `pubCalloutTemplate` with the placeholders `{title}` (title or link) and `{text}` (cited text). Obsidian callouts need `>` before `[!cite]`:
 
 ```md
-> [!cite] ...
-> text
+> [!cite] PUB. — {title}
+> {text}
 ```
 
-The code contains a safeguard: if the template includes `[!cite]` but does not start with `>`, the plugin auto-prefixes the template with `> ` and normalizes the body so that each line starts with `> `.
+## 9) Sidebar and settings
 
-## 4) Global functions (outside classes)
+- `JWLLinkerView`: `renderView`, `showHistory`, `addToHistory(url, link, content, pars)`, `getFromHistory`, `clearHistory`, `getState` / `setState`.
+- `JWLLinkerSettingTab.display()` builds the settings screen. Lists of languages come from `Lang.citationLangOptions` and `Lang.dualLangOptions`; the dual-mode language choices appear only when a dual mode is on.
+- `loadSettings` / `saveSettings` also update the interface language (`updateInterfaceLanguage`) and `LatinFormatLang`.
 
-These functions are used by multiple parts of the plugin.
+## 10) Performance
 
-### 4.1 Publication availability
+- Startup is about 7 ms: about 5 ms is the engine compiling `main.js`, the rest is the top-level tables and `onload`. Nothing heavy is built at load time: `maxVerse` reads the compact `_BibleVerses` table directly, and `LanguagePatterns` is built on first use.
+- Typing in Live Preview costs about 0.04 ms per keystroke thanks to the per-line cache.
+- Caches: `BookLookupCache` and `BookLanguageCache` (book lookups), the per-line cache in `scriptureLinkRanges`, `VersePreviewCacheSize` verse previews, and the history sidebar for citations.
 
-- `checkPublicationAvailability(pubCode, lang = 'EN', year = null)`
-  - Checks whether a publication is available online.
-  - Especially relevant for Watchtower year gating (RU: from 1986, EN/ES: from 1950).
-  - Returns `{ isOffline, message }`.
+## 11) Adding a language
 
-### 4.2 Language and URLs
+1. `LanguageInfo` and `WtLocales` / `LangByWtlocale`: JW code and WOL library. Find them on wol.jw.org (the library path in a WOL address, e.g. `/pt/wol/l/r5/lp-t`).
+2. `Bible.<KEY>`: 66 `Book` names and `Abbreviation` strings from the WOL Bible index of that language (`https://wol.jw.org/<site>/wol/binav/<rsconf>/<lib>`). Add the key to `BibleSearchOrder` and to the language list in `suggestionsFor`; decide in `detectBookLanguage` whether the language may claim prefixes or only exact names.
+3. Book names with a space or a dot that the generic regex cannot match (like `1. Mose`, `Hohes Lied`) go into `scriptureRegex` / `scriptureNoVerseRegex`; one-chapter books into `scriptureNoChpRegex`. A new script (Greek, Japanese, …) needs its letters in the regexes.
+4. `PubLangs`, `PublicationTitles`, `OfflinePublications`, `OfflineMessages`, month names and an entry in `MonthNameWatchtowerFormats`. Check every query format on WOL before relying on it.
+5. Publication markers in `WatchtowerRegex`, `Config.otherPubRegex`, `isLikelyPublication`, `parseOtherPublicationReference` and `normalizeInput`; distinctive words in `LanguagePatterns`.
+6. `Languages`, `InterfaceStrings` (all keys, including `citationLangOptions` and `dualLangOptions` in every language), `InterfaceLangCodes`, `DualLangCodes`, the interface options in `JWLLinkerSettingTab.display`, and the word for BIBLE in `BibleLabelRegex`.
+7. Tests in `tests/parsing.test.js`, and the README.
 
-- `isRussianText(text)`
-  - Quick check for Cyrillic characters.
+## 12) Tests
 
-- `detectLanguage(text)`
-  - Detects input language (RU/ES/EN) using characters/keywords.
-  - Used when `settings.lang === 'Auto'`.
-
-- `getConfigForLanguage(lang = 'EN')`
-  - Returns per-language URL bases and locale values.
-
-- `getFinderUrl(lang)`
-  - Returns the base `jw.org/finder` URL for a language.
-
-- `getJWLibraryLocale(lang)`
-  - Returns `&wtlocale=...` for JW Library links.
-
-### 4.3 Watchtower auto-formatting
-
-These attempt to convert “human input” (e.g. `w25 March p. 8 par. 2`) into a canonical form that is easier to parse and search.
-
-- `autoFormatRussianWatchtower(input)`
-- `autoFormatEnglishWatchtower(input)`
-- `autoFormatSpanishWatchtower(input)`
-
-### 4.4 Switching UI language
-
-- `updateInterfaceLanguage(interfaceLang)`
-  - Sets the global `Lang` mapping from `InterfaceStrings`.
-
-### 4.5 Debug/test helpers (when `settings.debug`)
-
-- `testRussianPubRegex(input)`
-- `testEnglishPubRegex(input)`
-- `testScriptureRegex(input)`
-
-They print detailed regex match diagnostics to the console.
-
-## 5) `JWLLinkerPlugin` (main class)
-
-This is the “core” of the plugin: command handling, selection reading, parsing, network fetching, formatting, and editor insertion.
-
-### 5.1 Lifecycle
-
-- `constructor()`
-  - Initializes settings and the menu.
-
-- `onload()`
-  - Loads settings (`loadSettings`).
-  - Registers commands.
-  - Registers editor context-menu integration.
-  - Registers the view (`JWLLinkerView`).
-  - Registers the Reading View post processor (`MarkdownPostProcessor`).
-  - Attaches the settings tab.
-
-- `onunload()`
-  - Plugin unload hook (currently empty).
-
-- `loadSettings()` / `saveSettings()`
-  - Reads/writes plugin settings.
-
-- `activateView()`
-  - Opens the history sidebar view.
-
-### 5.2 Dual mode (two-language output)
-
-- `_resolveAutoLanguage()`
-  - Converts `Auto` into an actual language code (`en|ru|es`) based on interface language / system locale.
-
-- `_getDualLanguages()`
-  - Returns `{ firstLang, secondLang }`.
-  - Ensures the two languages are different.
-
-- `_getLanguageLabel(langCode)`
-  - Returns display labels like `**English:**` / `**Russian:**`.
-
-- `_fetchDualBibleCitation(input, view, caret, command)`
-  - Fetches Bible text in two languages.
-
-- `_fetchDualPublicationCitation(input, view, command)`
-  - Fetches publication citations in two languages.
-  - Parses multiple formats (month/number, month/day, other publications).
-  - For `wYY.MM ...` it accepts optional unit markers `с.` / `p.` / `pág.`.
-
-- `_fetchCitationByLanguage(input, langCode, view, command, paragraph, wolUrl)`
-  - Unified language routing: for a given language code it calls the correct `_fetch*` method.
-
-### 5.3 UI-level commands (what the user invokes)
-
-- `showMenu(editor)` / `buildMenu(menu)`
-  - Builds and shows the context menu.
-
-- `confirmEditor(editor)`
-  - Ensures there is an active editor.
-
-- `_getEditorSelection(editor, useSelection = true)`
-  - Returns selection/current line/caret.
-
-- `linkToJWLibrary(editor, command)`
-  - Converts references/URLs into JW Library links (Editing/Preview).
-
-- `citeSelectedText(editor)`
-  - Wraps selected text into a `[!cite]` callout.
-
-- `batchConvertAllLinks(editor)`
-  - Finds all references in a note and inserts citations under each matching line.
-
-### 5.4 Parsing, formatting and link generation
-
-(There are many methods; below are the key groups.)
-
-#### 5.4.1 Bible
-
-- `_parseScriptureLinks(...)`
-  - Finds Bible references using regex and returns structured references.
-
-- `_convertScriptureToJWLibrary(input, displayType, ...)`
-  - Generates `jwlibrary://` links and/or HTML output for Reading View.
-
-- `_fetchBibleCitation(input, view, caret, command)`
-  - Main entry point for “fetch verse text / range”.
-
-- `_fetchBibleVerseByLanguage(passage, langCode, langToWol, view, command)`
-  - Fetches Bible verses for a specific language.
-
-#### 5.4.2 Publications
-
-- `_fetchPublicationCitation(input, view, command)`
-  - Main router for publication references.
-  - Tries different regex formats and dispatches to the correct fetch function.
-
-- `_fetchRussianPublicationCitation(input, view, command)`
-  - RU publications (plain output).
-
-- `_fetchRussianPublicationCitationCallout(input, view, command)`
-  - RU publications (callout output).
-
-- `_fetchEnglishPublicationCitation(input, view, command)`
-  - EN format like `w65 6/1 p. ...`.
-
-- `_fetchEnglishMonthNumberPublicationCitation(input, view, command)`
-  - EN format like `w23.12 ... par. ...`.
-
-- `_fetchEnglishMonthPublicationCitation(input, view, command)`
-  - EN format with month name like `w20 August p. ...`.
-
-- `_fetchSpanishMonthPublicationCitation(input, view, command)`
-  - ES format with month name like `w20 Agosto pág. ...`.
-
-- `_fetchOtherPublicationCitation(input, view, command)`
-  - Other publications (`od`, `it-1`, `cl`, `si`, ...). Attempts to extract text, otherwise falls back to search links.
-
-- `_fetchOtherPublicationCitationForLang(input, langCode, view, command)`
-  - Same as above but forced language (used by dual mode).
-
-#### 5.4.3 URL-based citation (WOL/JW/Finder)
-
-- `_fetchParagraphCitation(input, view, caret, command, pars)`
-  - For URLs like `wol.jw.org/...#pNN` it extracts one/multiple paragraphs.
-
-- `_fetchLookupCitation(input, view)`
-  - Publication reference lookup via WOL search.
-
-### 5.5 HTML fetching and text extraction
-
-- `_fetchDOM(url)`
-  - Downloads a page via `requestUrl` and parses it into a DOM.
-
-- `_getElementAsText(dom, selector, type, follows = false)`
-  - Extracts text via CSS selectors and cleans it based on target type.
-
-- `_boldInitialNumber(text)`
-  - Makes the initial verse/paragraph number bold (`**N**`).
-
-### 5.6 Misc utilities
-
-`main.js` also contains smaller helper methods (callout detection, line-number calculations, caret link extraction, etc.) used by batch conversion, link conversion, and URL handlers.
-
-## 6) `JWLLinkerView` — history sidebar
-
-`JWLLinkerView` stores citation history and allows quick copy.
-
-- `getState()`
-  - Returns the view state including `history` for persistence.
-
-- `onOpen()` / `onClose()`
-  - Open/close hooks.
-
-- `renderView()`
-  - Builds the panel UI and click handlers.
-
-### History methods
-
-- `showHistory()`
-  - Re-renders the history list.
-
-- `addToHistory(url, link, content, pars = null)`
-  - Adds an item (dedupes by key) and enforces max size.
-
-- `getFromHistory(url, pars = null)`
-  - Returns cached entries.
-
-- `clearHistory()`
-  - Clears history.
-
-## 7) `ScripturePostProcessor` — Reading View
-
-- `constructor(containerEl, plugin)`
-  - Stores a reference to the plugin.
-
-- `onload()`
-  - Reads HTML, runs `_convertScriptureToJWLibrary(...)`, replaces HTML if changed.
-
-## 8) `JWLLinkerSettingTab` — settings
-
-- `display()`
-  - Renders the settings UI.
-  - Exposes:
-    - templates,
-    - interface language,
-    - citation language,
-    - dual mode,
-    - history,
-    - debug.
-
-- `_resolveAutoLanguage()`
-  - Similar logic to `JWLLinkerPlugin`, but used inside the settings tab.
-
-## 9) Where to look for specific implementations
-
-If you need to follow the code “top to bottom”, these are the main entry points:
-
-- **Config / Regex / URL**: near the top of the file
-- **`JWLLinkerPlugin`**: starts at `class JWLLinkerPlugin extends Plugin`
-- **Fetch methods**: search for `_fetch` (network/parsing/formatting)
-- **View/History**: `class JWLLinkerView extends ItemView`
-- **Reading View**: `ScripturePostProcessor`
-- **Settings**: `JWLLinkerSettingTab`
-
-
+`npm test` runs `tests/parsing.test.js` with Node's built-in test runner; `npm run check` checks the syntax of `main.js`. `tests/helpers/load-plugin.js` loads `main.js` with a stubbed `obsidian` module and exports the internal functions listed in `EXPORTS`, so new functions that tests need must be added there.

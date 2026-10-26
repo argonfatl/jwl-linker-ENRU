@@ -132,7 +132,8 @@ In Live Preview, scripture references are underlined (the note text does not cha
 
 ## Suggestions while typing
 Type `@` at the start of a word, then the start of a Bible book or publication code, and pick from the list:
-- `@рим` → `Римлянам`, `@rom` → `Romans` / `Romanos`, `@juan` → `Juan`
+- `@рим` → `Римлянам`, `@rom` → `Romans` / `Romanos` / `Romains` / `Römer`, `@juan` → `Juan`
+- `@joão` → `João`, `@jean` → `Jean`, `@joh` → `Johannes`
 - `@od` → `od` (*Organized to Do Jehovah's Will*), `@it` → `it-1`, `it-2`
 
 The trigger can be changed in settings (*Suggestion trigger*). Normal typing never opens the list, and an email address such as `a@b.com` does not trigger it.
@@ -180,9 +181,9 @@ The trigger can be changed in settings (*Suggestion trigger*). Normal typing nev
   - French: `§` ↔ `chap.` ↔ `p.`
   - German: `Abs.` ↔ `Kap.` ↔ `S.`
 - **Publication Titles**: Displays in appropriate language
-  - "The Watchtower" / "Сторожевая башня" / "La Atalaya"
-  - "The Watchtower (Study Edition)" / "Сторожевая башня (выпуск для изучения)" / "La Atalaya (edición de estudio)"
-  - "Awake!" / "Пробудитесь!" / "¡Despertad!"
+  - "The Watchtower" / "Сторожевая башня" / "La Atalaya" / "A Sentinela" / "La Tour de Garde" / "Der Wachtturm"
+  - "The Watchtower (Study Edition)" / "Сторожевая башня (выпуск для изучения)" / "La Atalaya (edición de estudio)" / "A Sentinela (Edição de Estudo)" / "La Tour de Garde (édition d’étude)" / "Der Wachtturm (Studienausgabe)"
+  - "Awake!" / "Пробудитесь!" / "¡Despertad!" / "Despertai!" / "Réveillez-vous !" / "Erwachet!"
 - **Interface**: Menu items and messages in selected interface language
 
 # 📝 Example Outputs
@@ -206,6 +207,27 @@ w25.3 с. 8 абз. 2
 od 15 párr. 3
 > [!cite] PUBL. — [Organizados para hacer la voluntad de Jehová cap. 15 párr. 3](https://wol.jw.org/...)
 > **3** La mayoría de las personas hoy no reconocen el principio de la jefatura...
+```
+
+## Bible Citation (German)
+```markdown
+Joh 3:16
+> [!verse] BIBEL — [Johannes 3:16](jwlibrary://...)
+> **16** Denn Gott hat die Welt so sehr geliebt, dass er seinen einziggezeugten Sohn gegeben hat...
+```
+
+## Publication Citation (French)
+```markdown
+w23.12 p. 20 § 7
+> [!cite] PUB. — [La Tour de Garde 2023 Décembre p. 20 § 7](https://wol.jw.org/...)
+> **7** La modestie est une autre qualité que manifestent les chrétiennes mûres...
+```
+
+## Publication Citation (Portuguese)
+```markdown
+od cap. 15 par. 3
+> [!cite] PUBL. — [Organizados para Fazer a Vontade de Jeová cap. 15 par. 3](https://wol.jw.org/...)
+> **3** A maioria das pessoas hoje não reconhece nem vive segundo o princípio...
 ```
 
 ## Dual Language Mode Output

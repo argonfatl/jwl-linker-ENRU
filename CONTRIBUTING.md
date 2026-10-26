@@ -11,14 +11,20 @@ npm run check     # syntax check of main.js
 
 Every pull request runs the tests on GitHub Actions.
 
+How the code is organised, and a checklist for adding a language: [PLUGIN_CODE_GUIDE_EN.md](PLUGIN_CODE_GUIDE_EN.md) (in Russian: [PLUGIN_CODE_GUIDE.md](PLUGIN_CODE_GUIDE.md)).
+
+Line endings: `main.js` uses CRLF; keep them when editing, so diffs show only real changes.
+
 ## Releasing a new version
 
-Replace `X.Y.Z` with the new version number, for example `0.9.0`.
+Replace `X.Y.Z` with the new version number, for example `0.10.0`.
 
 1. In a pull request, update the version in three files:
    - `manifest.json`: `"version": "X.Y.Z"`
    - `package.json`: `"version": "X.Y.Z"`
    - `versions.json`: add `"X.Y.Z": "<minAppVersion>"` (the `minAppVersion` from `manifest.json`)
+
+   Also update the version line at the end of `README.md`.
 
 2. Merge the pull request.
 
