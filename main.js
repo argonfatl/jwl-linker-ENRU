@@ -3454,8 +3454,8 @@ class JWLLinkerPlugin extends Plugin {
         // ******************
         // Does this chapter and verse range exist in this bible book? If so, create the link
         let link = {};
-        const bcLookup = `${bookNum} ${passage.chapter}`;
-        if (bcLookup in BibleDimensions && first <= BibleDimensions[bcLookup] && last <= BibleDimensions[bcLookup]) {
+        const verseMax = maxVerse(bookNum, passage.chapter);
+        if (verseMax !== undefined && first <= verseMax && last <= verseMax) {
           /** @type {TLink} */
           link = {
             jwlib: '',
@@ -4887,12 +4887,9 @@ const _BibleVerses = [
   [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 17, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21], // 66. Revelation
 ];
 
-// Reconstruct the flat lookup used by _parseScriptureLinks
-const BibleDimensions = Object.fromEntries(
-  _BibleVerses.flatMap((chapters, b) =>
-    chapters ? chapters.map((v, i) => [`${b} ${i + 1}`, v]) : []
-  )
-);
+// Highest verse number of a chapter (undefined if the book or chapter does not exist).
+// Reads _BibleVerses directly: building a flat lookup object at startup cost ~8 ms.
+const maxVerse = (book, chapter) => _BibleVerses[book]?.[chapter - 1];
 
 module.exports = {
   default: JWLLinkerPlugin,
