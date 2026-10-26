@@ -63,6 +63,14 @@ const EXPORTS = [
   'scriptureLinkRanges',
   'suggestionsFor',
   'ReferenceSuggest',
+  'detectBookLanguage',
+  'autoFormatOtherWatchtower',
+  'getConfigForLanguage',
+  'checkPublicationAvailability',
+  'translateBibleLabel',
+  'updatePublicationFormatLanguage',
+  'localizeBookName',
+  'InterfaceStrings',
 ];
 
 function loadPlugin() {

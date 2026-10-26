@@ -1,9 +1,9 @@
 {
 	"id": "jwl-linker-en-ru-es",
 	"name": "JWL Linker EN-RU-ES",
-	"version": "0.9.3",
+	"version": "0.10.0",
 	"minAppVersion": "1.7.2",
-	"description": "Link Bible references and publications of Jehovah's Witnesses to JW Library, and cite verses and paragraphs from jw.org in English, Russian, and Spanish.",
+	"description": "Link Bible references and publications of Jehovah's Witnesses to JW Library, and cite verses and paragraphs from jw.org in English, Russian, Spanish, Portuguese, French, and German.",
 	"author": "Argonfatl",
 	"authorUrl": "https://github.com/argonfatl",
 	"fundingUrl": "https://buymeacoffee.com/zhhfyn5ympj",

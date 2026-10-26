@@ -114,7 +114,10 @@ const InterfaceStrings = {
       'Auto': 'Автоматически',
       'ru': 'Русский',
       'en': 'Английский',
-      'es': 'Испанский'
+      'es': 'Испанский',
+      'pt': 'Португальский',
+      'fr': 'Французский',
+      'de': 'Немецкий'
     },
     settingsReset: 'Сброс',
     settingsResetDesc: 'Это действие нельзя отменить.',
@@ -146,6 +149,9 @@ const InterfaceStrings = {
     batchNoLinks: 'Ссылки не найдены в документе',
     menuParaCount: 'Количество абзацев для цитирования?',
     menuCitationLink: 'Ссылка на цитируемые стихи?',
+    quoteHeader: '> [!cite] ЦИТАТА',
+    quoteDone: 'Текст оформлен как цитата',
+    citationLangOptions: { 'Auto': 'Автоопределение', 'Russian': 'Русский', 'English': 'English', 'Spanish': 'Español', 'Portuguese': 'Português', 'French': 'Français', 'German': 'Deutsch', 'Dutch': 'Nederlands' },
   },
   English: {
     name: 'JWL Linker',
@@ -218,7 +224,10 @@ const InterfaceStrings = {
       'Auto': 'Auto-detect',
       'ru': 'Russian',
       'en': 'English',
-      'es': 'Spanish'
+      'es': 'Spanish',
+      'pt': 'Portuguese',
+      'fr': 'French',
+      'de': 'German'
     },
     settingsReset: 'Reset',
     settingsResetDesc: 'This cannot be undone.',
@@ -250,6 +259,9 @@ const InterfaceStrings = {
     batchNoLinks: 'No references found in document',
     menuParaCount: 'No. of paragraphs to cite?',
     menuCitationLink: 'Link cited scripture?',
+    quoteHeader: '> [!cite] QUOTE',
+    quoteDone: 'Text formatted as citation',
+    citationLangOptions: { 'Auto': 'Auto-detection', 'Russian': 'Russian', 'English': 'English', 'Spanish': 'Spanish', 'Portuguese': 'Portuguese', 'French': 'French', 'German': 'German', 'Dutch': 'Dutch' },
   },
   Spanish: {
     name: 'JWL Linker',
@@ -322,7 +334,10 @@ const InterfaceStrings = {
       'Auto': 'Automático',
       'ru': 'Ruso',
       'en': 'Inglés',
-      'es': 'Español'
+      'es': 'Español',
+      'pt': 'Portugués',
+      'fr': 'Francés',
+      'de': 'Alemán'
     },
     settingsReset: 'Restablecer',
     settingsResetDesc: 'Esto no se puede deshacer.',
@@ -354,7 +369,307 @@ const InterfaceStrings = {
     batchNoLinks: 'No se encontraron referencias en el documento',
     menuParaCount: '¿Número de párrafos a citar?',
     menuCitationLink: '¿Enlazar escritura citada?',
-  }
+    quoteHeader: '> [!cite] CITA',
+    quoteDone: 'Texto formateado como cita',
+    citationLangOptions: { 'Auto': 'Detección automática', 'Russian': 'Ruso', 'English': 'Inglés', 'Spanish': 'Español', 'Portuguese': 'Portugués', 'French': 'Francés', 'German': 'Alemán', 'Dutch': 'Holandés' },
+  },
+  Portuguese: {
+    name: 'JWL Linker',
+    invalidScripture: '⚠️ Esta não é uma referência bíblica válida.',
+    invalidUrl: '⚠️ Este não é um link válido do wol.jw.org.',
+    invalidPublication: '⚠️ Esta não é uma referência de publicação válida.',
+    onlineLookupFailed: '⚠️ Não foi possível obter o texto on-line. Tente novamente.',
+    noEditor: '⚠️ Nenhum editor ativo.',
+    noSelection: '⚠️ Não há texto na linha do cursor nem seleção.',
+    noHistoryYet: 'Nenhum histórico para mostrar.',
+    noTitle: 'Sem título',
+    loadingCitation: '⏳ Carregando citação:',
+    copiedHistoryMsg: 'Item do histórico copiado para a área de transferência',
+    helpIntro: 'Esta barra lateral mostra os versículos, parágrafos e publicações que você citou recentemente com o plugin.',
+    helpCopy: 'Clique em qualquer item acima para copiá-lo para a área de transferência.',
+    helpClear: 'Clique aqui para limpar o histórico.',
+    hideTip: 'Clique para ocultar',
+    help: 'Ajuda',
+    emptyPara: '*⟪ Parágrafo vazio ⟫*',
+    paragraphOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10' },
+    historySize: { 0: '0', 10: 10, 20: 20, 30: 30, 40: 40, 50: 50, 75: 75, 100: 100 },
+    settingsDisplay: 'Exibição',
+    settingsDisplayDesc: 'Você pode usar estas substituições nos modelos: {title}, {text}',
+    settingsVerseTemplate: 'Modelo para citar versículos',
+    settingsVerseTemplateDesc: 'Usado ao citar versículos bíblicos em texto normal',
+    settingsVerseCallout: 'Modelo para citar versículos em destaque',
+    settingsVerseCalloutDesc: 'Usado ao citar versículos bíblicos em formato de destaque (callout)',
+    settingsPubTemplate: 'Modelo para citar publicações',
+    settingsPubTemplateDesc: 'Usado ao citar uma publicação em texto normal (jw.org ou pesquisa de artigo)',
+    settingsPubCallout: 'Modelo para citar publicações em destaque',
+    settingsPubCalloutDesc: 'Usado ao citar uma publicação em formato de destaque (jw.org ou pesquisa de artigo)',
+    settingsInterfaceLang: 'Idioma da interface',
+    settingsInterfaceLangDesc: 'Escolha o idioma da interface do plugin.',
+    settingsCitationLang: 'Idioma das citações',
+    settingsCitationLangDesc: 'Escolha o idioma das citações ou use a detecção automática.',
+    settingsHistorySize: 'Nº de itens no histórico',
+    settingsHistorySizeDesc: 'Quantos itens do histórico mostrar na barra lateral.',
+    settingsBoldNumbers: 'Números iniciais em negrito',
+    settingsBoldNumbersDesc: 'Coloca em negrito os números no início dos versículos ou parágrafos citados.',
+    settingsVersePreview: 'Texto do versículo ao passar o mouse',
+    settingsVersePreviewDesc: 'Mostra o texto do versículo numa janela ao passar o mouse sobre um link bíblico (só no computador).',
+    settingsSuggestions: 'Sugestões ao digitar',
+    settingsSuggestionsDesc: 'Digite o gatilho no início de uma palavra e depois o começo do nome de um livro ou o código de uma publicação (por exemplo @rom ou @od) e escolha na lista.',
+    settingsSuggestTrigger: 'Gatilho das sugestões',
+    settingsSuggestTriggerDesc: 'Caracteres que abrem as sugestões. Padrão: @.',
+    suggestBible: 'Bíblia',
+    suggestPublication: 'Publicação',
+    settingsLivePreviewLinks: 'Links bíblicos durante a edição',
+    settingsLivePreviewLinksDesc: 'Sublinha as referências bíblicas no Live Preview. Cmd/Ctrl+clique abre o versículo no JW Library; o texto da nota não é alterado.',
+    versePreviewLoading: 'Carregando…',
+    versePreviewMore: '… e mais {count} versículos',
+    settingsCitationLink: 'Link no texto citado',
+    settingsCitationLinkDesc: 'Coloca na referência bíblica um link para o JW Library ao citar versículos.',
+    settingsDualMode: 'Modo duplo de publicações',
+    settingsDualModeDesc: 'Mostrar publicações em dois idiomas ao mesmo tempo.',
+    settingsDualModeSection: 'Modo bilíngue',
+    settingsDualModeSectionDesc: 'Configurações para mostrar citações em dois idiomas ao mesmo tempo',
+    settingsDualModeVerses: 'Modo bilíngue para versículos bíblicos',
+    settingsDualModeVersesDesc: 'Mostra os textos bíblicos em dois idiomas ao mesmo tempo',
+    settingsDualModePublications: 'Modo bilíngue para publicações',
+    settingsDualModePublicationsDesc: 'Mostra as publicações em dois idiomas ao mesmo tempo',
+    settingsDualLangFirst: 'Primeiro idioma',
+    settingsDualLangFirstDesc: 'Idioma mostrado primeiro no modo bilíngue',
+    settingsDualLangSecond: 'Segundo idioma',
+    settingsDualLangSecondDesc: 'Idioma mostrado em segundo lugar no modo bilíngue',
+    settingsDualLangSameError: 'O primeiro e o segundo idioma não podem ser iguais',
+    dualLangOptions: { 'Auto': 'Detecção automática', 'ru': 'Russo', 'en': 'Inglês', 'es': 'Espanhol', 'pt': 'Português', 'fr': 'Francês', 'de': 'Alemão' },
+    settingsReset: 'Redefinir',
+    settingsResetDesc: 'Isso não pode ser desfeito.',
+    settingsResetDefault: 'Restaurar padrões',
+    settingsResetDefaultDesc: 'Volta todas as configurações aos valores originais.',
+    settingsClearHistory: 'Limpar histórico',
+    settingsClearHistoryDesc: 'Limpa a lista de itens da barra lateral de histórico.',
+    settingsOpenSidebarOnStartup: 'Abrir barra lateral ao iniciar',
+    settingsOpenSidebarOnStartupDesc: 'Se ativado, a barra lateral do JWL Linker abre automaticamente quando o Obsidian inicia.',
+    settingsDebug: 'Modo de depuração',
+    settingsDebugDesc: 'Se ativado, o plugin registra detalhes do seu trabalho no console do desenvolvedor.',
+    menuCiteVerses: 'Citar versículos',
+    menuCiteVersesCallout: 'Citar versículos em destaque',
+    menuCiteJworgUrl: 'Citar link do jw.org',
+    menuCiteJworgCallout: 'Citar link do jw.org em destaque',
+    menuCitePublication: 'Citar publicação',
+    menuLookupWOL: 'Pesquisar texto selecionado no WOL',
+    menuCiteSelectedText: 'Citar texto selecionado',
+    menuAddTitle: 'Adicionar título ao link do jw.org',
+    menuConvertScripture: 'Converter textos bíblicos em links do JW Library',
+    menuConvertJworg: 'Converter link do jw.org em link do JW Library',
+    menuOpenJWLibrary: 'Abrir no JW Library o texto no cursor',
+    menuOpenSidebar: 'Abrir barra lateral',
+    menuOpenMenu: 'Abrir menu',
+    menuBatchConvert: 'Citar todas as referências do documento',
+    batchProcessing: 'Carregando citações...',
+    batchComplete: 'Citações adicionadas: {count}',
+    batchNoLinks: 'Nenhuma referência encontrada no documento',
+    menuParaCount: 'Nº de parágrafos para citar?',
+    menuCitationLink: 'Link no texto citado?',
+    quoteHeader: '> [!cite] CITAÇÃO',
+    quoteDone: 'Texto formatado como citação',
+    citationLangOptions: { 'Auto': 'Detecção automática', 'Russian': 'Russo', 'English': 'Inglês', 'Spanish': 'Espanhol', 'Portuguese': 'Português', 'French': 'Francês', 'German': 'Alemão', 'Dutch': 'Holandês' },
+  },
+  French: {
+    name: 'JWL Linker',
+    invalidScripture: '⚠️ Ce n’est pas une référence biblique valide.',
+    invalidUrl: '⚠️ Ce n’est pas un lien wol.jw.org valide.',
+    invalidPublication: '⚠️ Ce n’est pas une référence de publication valide.',
+    onlineLookupFailed: '⚠️ Impossible de récupérer le texte en ligne. Réessayez.',
+    noEditor: '⚠️ Aucun éditeur actif.',
+    noSelection: '⚠️ Rien sur la ligne du curseur ou aucune sélection.',
+    noHistoryYet: 'Aucun historique à afficher.',
+    noTitle: 'Titre manquant',
+    loadingCitation: '⏳ Chargement de la citation :',
+    copiedHistoryMsg: 'Élément de l’historique copié dans le presse-papiers',
+    helpIntro: 'Ce panneau latéral affiche les versets, paragraphes et publications que vous avez cités récemment avec le plugin.',
+    helpCopy: 'Cliquez sur un élément ci-dessus pour le copier dans le presse-papiers.',
+    helpClear: 'Cliquez ici pour effacer l’historique.',
+    hideTip: 'Cliquez pour masquer',
+    help: 'Aide',
+    emptyPara: '*⟪ Paragraphe vide ⟫*',
+    paragraphOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10' },
+    historySize: { 0: '0', 10: 10, 20: 20, 30: 30, 40: 40, 50: 50, 75: 75, 100: 100 },
+    settingsDisplay: 'Affichage',
+    settingsDisplayDesc: 'Vous pouvez utiliser ces substitutions dans les modèles : {title}, {text}',
+    settingsVerseTemplate: 'Modèle de citation de versets',
+    settingsVerseTemplateDesc: 'Utilisé pour citer des versets bibliques en texte normal',
+    settingsVerseCallout: 'Modèle de citation de versets en encadré',
+    settingsVerseCalloutDesc: 'Utilisé pour citer des versets bibliques sous forme d’encadré (callout)',
+    settingsPubTemplate: 'Modèle de citation de publication',
+    settingsPubTemplateDesc: 'Utilisé pour citer une publication en texte normal (jw.org ou recherche d’article)',
+    settingsPubCallout: 'Modèle de citation de publication en encadré',
+    settingsPubCalloutDesc: 'Utilisé pour citer une publication sous forme d’encadré (jw.org ou recherche d’article)',
+    settingsInterfaceLang: 'Langue de l’interface',
+    settingsInterfaceLangDesc: 'Choisissez la langue de l’interface du plugin.',
+    settingsCitationLang: 'Langue des citations',
+    settingsCitationLangDesc: 'Choisissez la langue des citations ou utilisez la détection automatique.',
+    settingsHistorySize: 'Nombre d’éléments dans l’historique',
+    settingsHistorySizeDesc: 'Nombre d’éléments de l’historique affichés dans le panneau latéral.',
+    settingsBoldNumbers: 'Numéros initiaux en gras',
+    settingsBoldNumbersDesc: 'Met en gras les numéros au début des versets ou des paragraphes cités.',
+    settingsVersePreview: 'Texte du verset au survol',
+    settingsVersePreviewDesc: 'Affiche le texte du verset dans une fenêtre au survol d’un lien biblique (ordinateur uniquement).',
+    settingsSuggestions: 'Suggestions pendant la saisie',
+    settingsSuggestionsDesc: 'Tapez le déclencheur au début d’un mot, puis le début d’un nom de livre ou d’un code de publication (par exemple @rom ou @od), et choisissez dans la liste.',
+    settingsSuggestTrigger: 'Déclencheur des suggestions',
+    settingsSuggestTriggerDesc: 'Caractères qui ouvrent les suggestions. Par défaut : @.',
+    suggestBible: 'Bible',
+    suggestPublication: 'Publication',
+    settingsLivePreviewLinks: 'Liens bibliques pendant l’édition',
+    settingsLivePreviewLinksDesc: 'Souligne les références bibliques en Live Preview. Cmd/Ctrl+clic ouvre le verset dans JW Library ; le texte de la note n’est pas modifié.',
+    versePreviewLoading: 'Chargement…',
+    versePreviewMore: '… et {count} versets de plus',
+    settingsCitationLink: 'Lien sur le texte cité',
+    settingsCitationLinkDesc: 'Ajoute un lien vers JW Library à la référence biblique lors de la citation de versets.',
+    settingsDualMode: 'Mode double pour les publications',
+    settingsDualModeDesc: 'Afficher les publications dans deux langues en même temps.',
+    settingsDualModeSection: 'Mode bilingue',
+    settingsDualModeSectionDesc: 'Paramètres pour afficher les citations dans deux langues en même temps',
+    settingsDualModeVerses: 'Mode bilingue pour les versets bibliques',
+    settingsDualModeVersesDesc: 'Affiche les textes bibliques dans deux langues en même temps',
+    settingsDualModePublications: 'Mode bilingue pour les publications',
+    settingsDualModePublicationsDesc: 'Affiche les publications dans deux langues en même temps',
+    settingsDualLangFirst: 'Première langue',
+    settingsDualLangFirstDesc: 'Langue affichée en premier en mode bilingue',
+    settingsDualLangSecond: 'Deuxième langue',
+    settingsDualLangSecondDesc: 'Langue affichée en second en mode bilingue',
+    settingsDualLangSameError: 'La première et la deuxième langue ne peuvent pas être identiques',
+    dualLangOptions: { 'Auto': 'Détection automatique', 'ru': 'Russe', 'en': 'Anglais', 'es': 'Espagnol', 'pt': 'Portugais', 'fr': 'Français', 'de': 'Allemand' },
+    settingsReset: 'Réinitialiser',
+    settingsResetDesc: 'Cette action est irréversible.',
+    settingsResetDefault: 'Valeurs par défaut',
+    settingsResetDefaultDesc: 'Rétablit tous les paramètres à leurs valeurs d’origine.',
+    settingsClearHistory: 'Effacer l’historique',
+    settingsClearHistoryDesc: 'Efface la liste des éléments du panneau d’historique.',
+    settingsOpenSidebarOnStartup: 'Ouvrir le panneau au démarrage',
+    settingsOpenSidebarOnStartupDesc: 'Si activé, le panneau JWL Linker s’ouvre automatiquement au démarrage d’Obsidian.',
+    settingsDebug: 'Mode débogage',
+    settingsDebugDesc: 'Si activé, le plugin écrit des détails de son fonctionnement dans la console de développement.',
+    menuCiteVerses: 'Citer les versets',
+    menuCiteVersesCallout: 'Citer les versets en encadré',
+    menuCiteJworgUrl: 'Citer le lien jw.org',
+    menuCiteJworgCallout: 'Citer le lien jw.org en encadré',
+    menuCitePublication: 'Citer une publication',
+    menuLookupWOL: 'Rechercher la sélection sur WOL',
+    menuCiteSelectedText: 'Citer le texte sélectionné',
+    menuAddTitle: 'Ajouter un titre au lien jw.org',
+    menuConvertScripture: 'Convertir les versets en liens JW Library',
+    menuConvertJworg: 'Convertir le lien jw.org en lien JW Library',
+    menuOpenJWLibrary: 'Ouvrir le verset du curseur dans JW Library',
+    menuOpenSidebar: 'Ouvrir le panneau latéral',
+    menuOpenMenu: 'Ouvrir le menu',
+    menuBatchConvert: 'Citer toutes les références du document',
+    batchProcessing: 'Chargement des citations...',
+    batchComplete: 'Citations ajoutées : {count}',
+    batchNoLinks: 'Aucune référence trouvée dans le document',
+    menuParaCount: 'Nombre de paragraphes à citer ?',
+    menuCitationLink: 'Lien sur le texte cité ?',
+    quoteHeader: '> [!cite] CITATION',
+    quoteDone: 'Texte mis en forme comme citation',
+    citationLangOptions: { 'Auto': 'Détection automatique', 'Russian': 'Russe', 'English': 'Anglais', 'Spanish': 'Espagnol', 'Portuguese': 'Portugais', 'French': 'Français', 'German': 'Allemand', 'Dutch': 'Néerlandais' },
+  },
+  German: {
+    name: 'JWL Linker',
+    invalidScripture: '⚠️ Das ist keine gültige Bibelstellenangabe.',
+    invalidUrl: '⚠️ Das ist kein gültiger wol.jw.org-Link.',
+    invalidPublication: '⚠️ Das ist keine gültige Publikationsangabe.',
+    onlineLookupFailed: '⚠️ Der Text konnte nicht online abgerufen werden. Bitte erneut versuchen.',
+    noEditor: '⚠️ Kein aktiver Editor.',
+    noSelection: '⚠️ Kein Text in der Zeile des Cursors und keine Auswahl.',
+    noHistoryYet: 'Noch kein Verlauf vorhanden.',
+    noTitle: 'Titel fehlt',
+    loadingCitation: '⏳ Zitat wird geladen:',
+    copiedHistoryMsg: 'Verlaufseintrag in die Zwischenablage kopiert',
+    helpIntro: 'In dieser Seitenleiste stehen die Verse, Absätze und Publikationen, die du zuletzt mit dem Plugin zitiert hast.',
+    helpCopy: 'Klicke oben auf einen Eintrag, um ihn in die Zwischenablage zu kopieren.',
+    helpClear: 'Hier klicken, um den Verlauf zu löschen.',
+    hideTip: 'Zum Ausblenden klicken',
+    help: 'Hilfe',
+    emptyPara: '*⟪ Leerer Absatz ⟫*',
+    paragraphOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10' },
+    historySize: { 0: '0', 10: 10, 20: 20, 30: 30, 40: 40, 50: 50, 75: 75, 100: 100 },
+    settingsDisplay: 'Darstellung',
+    settingsDisplayDesc: 'In den Vorlagen kannst du diese Platzhalter verwenden: {title}, {text}',
+    settingsVerseTemplate: 'Vorlage für Bibelzitate',
+    settingsVerseTemplateDesc: 'Wird verwendet, wenn Bibelverse als normaler Text zitiert werden',
+    settingsVerseCallout: 'Vorlage für Bibelzitate als Callout',
+    settingsVerseCalloutDesc: 'Wird verwendet, wenn Bibelverse als Callout zitiert werden',
+    settingsPubTemplate: 'Vorlage für Publikationszitate',
+    settingsPubTemplateDesc: 'Wird verwendet, wenn eine Publikation als normaler Text zitiert wird (jw.org oder Artikelsuche)',
+    settingsPubCallout: 'Vorlage für Publikationszitate als Callout',
+    settingsPubCalloutDesc: 'Wird verwendet, wenn eine Publikation als Callout zitiert wird (jw.org oder Artikelsuche)',
+    settingsInterfaceLang: 'Sprache der Oberfläche',
+    settingsInterfaceLangDesc: 'Wähle die Sprache der Plugin-Oberfläche.',
+    settingsCitationLang: 'Sprache der Zitate',
+    settingsCitationLangDesc: 'Wähle die Sprache der Zitate oder nutze die automatische Erkennung.',
+    settingsHistorySize: 'Anzahl der Verlaufseinträge',
+    settingsHistorySizeDesc: 'Wie viele Verlaufseinträge in der Seitenleiste angezeigt werden.',
+    settingsBoldNumbers: 'Anfangsnummern fett',
+    settingsBoldNumbersDesc: 'Die Nummern am Anfang zitierter Verse oder Absätze werden fett dargestellt.',
+    settingsVersePreview: 'Verstext beim Darüberfahren',
+    settingsVersePreviewDesc: 'Zeigt den Verstext in einem Fenster, wenn man mit der Maus über einen Bibellink fährt (nur am Computer).',
+    settingsSuggestions: 'Vorschläge beim Tippen',
+    settingsSuggestionsDesc: 'Gib das Auslösezeichen am Wortanfang ein, dann den Anfang eines Buchnamens oder Publikationskürzels (zum Beispiel @röm oder @od), und wähle aus der Liste.',
+    settingsSuggestTrigger: 'Auslöser für Vorschläge',
+    settingsSuggestTriggerDesc: 'Zeichen, die die Vorschläge öffnen. Standard: @.',
+    suggestBible: 'Bibel',
+    suggestPublication: 'Publikation',
+    settingsLivePreviewLinks: 'Bibellinks beim Bearbeiten',
+    settingsLivePreviewLinksDesc: 'Unterstreicht Bibelstellen im Live Preview. Cmd/Strg+Klick öffnet den Vers in JW Library; der Text der Notiz wird nicht geändert.',
+    versePreviewLoading: 'Wird geladen…',
+    versePreviewMore: '… und {count} weitere Verse',
+    settingsCitationLink: 'Zitierte Bibelstelle verlinken',
+    settingsCitationLinkDesc: 'Verlinkt die Bibelstelle beim Zitieren von Versen mit JW Library.',
+    settingsDualMode: 'Zweisprachige Publikationen',
+    settingsDualModeDesc: 'Publikationen gleichzeitig in zwei Sprachen anzeigen.',
+    settingsDualModeSection: 'Zweisprachiger Modus',
+    settingsDualModeSectionDesc: 'Einstellungen für Zitate in zwei Sprachen gleichzeitig',
+    settingsDualModeVerses: 'Zweisprachiger Modus für Bibelverse',
+    settingsDualModeVersesDesc: 'Bibeltexte gleichzeitig in zwei Sprachen anzeigen',
+    settingsDualModePublications: 'Zweisprachiger Modus für Publikationen',
+    settingsDualModePublicationsDesc: 'Publikationen gleichzeitig in zwei Sprachen anzeigen',
+    settingsDualLangFirst: 'Erste Sprache',
+    settingsDualLangFirstDesc: 'Sprache, die im zweisprachigen Modus zuerst angezeigt wird',
+    settingsDualLangSecond: 'Zweite Sprache',
+    settingsDualLangSecondDesc: 'Sprache, die im zweisprachigen Modus als zweite angezeigt wird',
+    settingsDualLangSameError: 'Erste und zweite Sprache dürfen nicht gleich sein',
+    dualLangOptions: { 'Auto': 'Automatisch erkennen', 'ru': 'Russisch', 'en': 'Englisch', 'es': 'Spanisch', 'pt': 'Portugiesisch', 'fr': 'Französisch', 'de': 'Deutsch' },
+    settingsReset: 'Zurücksetzen',
+    settingsResetDesc: 'Dies kann nicht rückgängig gemacht werden.',
+    settingsResetDefault: 'Standardwerte wiederherstellen',
+    settingsResetDefaultDesc: 'Setzt alle Einstellungen auf ihre ursprünglichen Werte zurück.',
+    settingsClearHistory: 'Verlauf löschen',
+    settingsClearHistoryDesc: 'Leert die Liste in der Verlaufs-Seitenleiste.',
+    settingsOpenSidebarOnStartup: 'Seitenleiste beim Start öffnen',
+    settingsOpenSidebarOnStartupDesc: 'Wenn aktiviert, öffnet sich die JWL-Linker-Seitenleiste automatisch beim Start von Obsidian.',
+    settingsDebug: 'Debug-Modus',
+    settingsDebugDesc: 'Wenn aktiviert, schreibt das Plugin Details zu seiner Arbeit in die Entwicklerkonsole.',
+    menuCiteVerses: 'Verse zitieren',
+    menuCiteVersesCallout: 'Verse als Callout zitieren',
+    menuCiteJworgUrl: 'jw.org-Link zitieren',
+    menuCiteJworgCallout: 'jw.org-Link als Callout zitieren',
+    menuCitePublication: 'Publikation zitieren',
+    menuLookupWOL: 'Markierten Text in WOL suchen',
+    menuCiteSelectedText: 'Markierten Text zitieren',
+    menuAddTitle: 'Titel zum jw.org-Link hinzufügen',
+    menuConvertScripture: 'Bibelstellen in JW-Library-Links umwandeln',
+    menuConvertJworg: 'jw.org-Link in JW-Library-Link umwandeln',
+    menuOpenJWLibrary: 'Bibelstelle am Cursor in JW Library öffnen',
+    menuOpenSidebar: 'Seitenleiste öffnen',
+    menuOpenMenu: 'Menü öffnen',
+    menuBatchConvert: 'Alle Angaben im Dokument zitieren',
+    batchProcessing: 'Zitate werden geladen...',
+    batchComplete: 'Hinzugefügte Zitate: {count}',
+    batchNoLinks: 'Keine Angaben im Dokument gefunden',
+    menuParaCount: 'Wie viele Absätze zitieren?',
+    menuCitationLink: 'Zitierte Bibelstelle verlinken?',
+    quoteHeader: '> [!cite] ZITAT',
+    quoteDone: 'Text als Zitat formatiert',
+    citationLangOptions: { 'Auto': 'Automatisch erkennen', 'Russian': 'Russisch', 'English': 'Englisch', 'Spanish': 'Spanisch', 'Portuguese': 'Portugiesisch', 'French': 'Französisch', 'German': 'Deutsch', 'Dutch': 'Niederländisch' },
+  },
 };
 
 // Dynamic Lang object based on interface language setting
@@ -366,72 +681,96 @@ function debugLog(...args) {
   if (debugEnabled) console.log(...args);
 }
 
-// Publications not available online by language
+// Publications not available online, by citation language
 const OfflinePublications = {
-  Russian: {
+  RU: {
     'ep': 'Евангелизаторы',
     'po': 'Пособие для проповедников',
     'sg': 'Руководство для школы служения',
     'yb': 'Ежегодник Свидетелей Иеговы'
   },
-  English: {
+  EN: {
     'ep': 'Evangelizers',
     'po': 'Preaching Handbook',
     'sg': 'School Guidebook',
     'yb': 'Yearbook of Jehovah\'s Witnesses'
   },
-  Spanish: {
+  ES: {
     'ep': 'Evangelizadores',
     'po': 'Manual para predicadores',
     'sg': 'Guía para la escuela de servicio',
     'yb': 'Anuario de los testigos de Jehová'
-  }
+  },
+  PT: {
+    'ep': 'Evangelizadores',
+    'po': 'Manual para pregadores',
+    'sg': 'Guia para a escola do ministério',
+    'yb': 'Anuário das Testemunhas de Jeová'
+  },
+  FR: {
+    'ep': 'Évangélisateurs',
+    'po': 'Manuel du prédicateur',
+    'sg': 'Guide pour l’école du ministère',
+    'yb': 'Annuaire des Témoins de Jéhovah'
+  },
+  DE: {
+    'ep': 'Evangeliumsverkündiger',
+    'po': 'Handbuch für Prediger',
+    'sg': 'Leitfaden für die Predigtdienstschule',
+    'yb': 'Jahrbuch der Zeugen Jehovas'
+  },
+};
+
+/** Messages for publications that cannot be cited online, by citation language */
+const OfflineMessages = {
+  RU: {
+    watchtowerYear: (year, minYear) => `📅 Сторожевая башня ${year} года недоступна онлайн. Доступны выпуски с ${minYear} года`,
+    printOnly: (title) => `📖 "${title}" доступна только в печатном варианте`,
+  },
+  EN: {
+    watchtowerYear: (year, minYear) => `📅 The Watchtower ${year} is not available online. Available from ${minYear} onwards`,
+    printOnly: (title) => `📖 "${title}" is available only in print format`,
+  },
+  ES: {
+    watchtowerYear: (year, minYear) => `📅 La Atalaya ${year} no está disponible en línea. Disponible desde ${minYear} en adelante`,
+    printOnly: (title) => `📖 "${title}" está disponible solo en formato impreso`,
+  },
+  PT: {
+    watchtowerYear: (year, minYear) => `📅 A Sentinela de ${year} não está disponível online. Disponível a partir de ${minYear}`,
+    printOnly: (title) => `📖 "${title}" está disponível apenas na versão impressa`,
+  },
+  FR: {
+    watchtowerYear: (year, minYear) => `📅 La Tour de Garde ${year} n’est pas disponible en ligne. Disponible à partir de ${minYear}`,
+    printOnly: (title) => `📖 « ${title} » est disponible uniquement en version imprimée`,
+  },
+  DE: {
+    watchtowerYear: (year, minYear) => `📅 Der Wachtturm ${year} ist nicht online verfügbar. Verfügbar ab ${minYear}`,
+    printOnly: (title) => `📖 „${title}“ ist nur gedruckt erhältlich`,
+  },
 };
 
 /**
  * Check if publication is available online
  * @param {string} pubCode - Publication code (e.g., 'ep', 'be')
- * @param {string} lang - Language code ('RU', 'EN')
+ * @param {string} lang - Language code ('RU', 'EN', 'ES', 'PT', 'FR', 'DE')
  * @param {number} year - Publication year (optional, for Watchtower filtering)
  * @returns {Object} - {isOffline: boolean, message: string}
  */
 function checkPublicationAvailability(pubCode, lang = 'EN', year = null) {
-  const offlineList = OfflinePublications[lang === 'RU' ? 'Russian' : lang === 'ES' ? 'Spanish' : 'English'];
+  const key = OfflineMessages[lang] ? lang : 'EN';
+  const offlineList = OfflinePublications[key];
+  const messages = OfflineMessages[key];
 
   // Check Watchtower year availability
   if (pubCode === 'w' && year !== null) {
-    const minYear = (lang === 'RU') ? 1986 : 1950; // Same for Spanish and English
+    const minYear = (lang === 'RU') ? 1986 : 1950;
     if (year < minYear) {
-      let message;
-      if (lang === 'RU') {
-        message = `📅 Сторожевая башня ${year} года недоступна онлайн. Доступны выпуски с ${minYear} года`;
-      } else if (lang === 'ES') {
-        message = `📅 La Atalaya ${year} no está disponible en línea. Disponible desde ${minYear} en adelante`;
-      } else {
-        message = `📅 The Watchtower ${year} is not available online. Available from ${minYear} onwards`;
-      }
-
-      return {
-        isOffline: true,
-        message: message
-      };
+      return { isOffline: true, message: messages.watchtowerYear(year, minYear) };
     }
   }
 
   if (offlineList[pubCode]) {
-    let message;
-    if (lang === 'RU') {
-      message = `📖 "${offlineList[pubCode]}" доступна только в печатном варианте`;
-    } else if (lang === 'ES') {
-      message = `📖 "${offlineList[pubCode]}" está disponible solo en formato impreso`;
-    } else {
-      message = `📖 "${offlineList[pubCode]}" is available only in print format`;
-    }
-
-    return {
-      isOffline: true,
-      message: message
-    };
+    return { isOffline: true, message: messages.printOnly(offlineList[pubCode]) };
   }
 
   return {
@@ -446,37 +785,55 @@ const Languages = {
   German: 'DE',
   Dutch: 'NL',
   French: 'FR',
+  Portuguese: 'PT',
   Russian: 'RU',
   Spanish: 'ES',
 };
 
+/**
+ * Fully supported citation languages: JW language code (wtlocale), WOL library
+ * (wol.jw.org/<site>/wol/…/<rsconf>/<lib>) and the word that replaces BIBLE in callout headers
+ */
+const LanguageInfo = {
+  EN: { wtlocale: 'E', site: 'en', rsconf: 'r1', lib: 'lp-e', bibleLabel: 'BIBLE' },
+  RU: { wtlocale: 'U', site: 'ru', rsconf: 'r2', lib: 'lp-u', bibleLabel: 'БИБЛИЯ' },
+  ES: { wtlocale: 'S', site: 'es', rsconf: 'r4', lib: 'lp-s', bibleLabel: 'BIBLIA' },
+  PT: { wtlocale: 'T', site: 'pt', rsconf: 'r5', lib: 'lp-t', bibleLabel: 'BÍBLIA' }, // Portuguese (Brazil)
+  FR: { wtlocale: 'F', site: 'fr', rsconf: 'r30', lib: 'lp-f', bibleLabel: 'BIBLE' },
+  DE: { wtlocale: 'X', site: 'de', rsconf: 'r10', lib: 'lp-x', bibleLabel: 'BIBEL' },
+};
+
+/** JW language codes for links (Dutch links work, but Dutch has no book names yet) */
+const WtLocales = { EN: 'E', RU: 'U', ES: 'S', PT: 'T', FR: 'F', DE: 'X', NL: 'O' };
+/** wtlocale → language key */
+const LangByWtlocale = { E: 'EN', U: 'RU', S: 'ES', T: 'PT', F: 'FR', X: 'DE', O: 'NL' };
+
+/** Callout header words for "BIBLE" in every language, so a template written in one language is translated */
+const BibleLabelRegex = /BÍBLIA|BIBLIA|BIBLE|BIBEL|БИБЛИЯ/g;
+
+/**
+ * Replace the word BIBLE (in any supported language) in a callout template
+ * @param {string} template
+ * @param {string} lang - EN | RU | ES | PT | FR | DE
+ * @returns {string}
+ */
+function translateBibleLabel(template, lang) {
+  const label = (LanguageInfo[lang] ?? LanguageInfo.EN).bibleLabel;
+  return template.replace(BibleLabelRegex, label);
+}
+
 // Function to get appropriate URLs based on language
 function getConfigForLanguage(lang = 'EN') {
-  if (lang === 'RU') {
-    return {
-      jwlLocale: '&wtlocale=U',  // Russian uses 'U' in JW Library
-      wolRoot: 'https://wol.jw.org/ru/wol/d/',
-      wolPublications: 'https://wol.jw.org/ru/wol/d/r2/lp-u/',
-      wolLookup: 'https://wol.jw.org/ru/wol/l/r2/lp-u?q=',
-      webFinder: 'https://www.jw.org/finder?wtlocale=U&'  // Web finder also uses U for Russian
-    };
-  } else if (lang === 'ES') {
-    return {
-      jwlLocale: '&wtlocale=S',  // Spanish uses 'S' in JW Library
-      wolRoot: 'https://wol.jw.org/es/wol/d/',
-      wolPublications: 'https://wol.jw.org/es/wol/d/r4/lp-s/',
-      wolLookup: 'https://wol.jw.org/es/wol/l/r4/lp-s?q=',
-      webFinder: 'https://www.jw.org/finder?wtlocale=S&'  // Web finder uses S for Spanish
-    };
-  } else {
-    return {
-      jwlLocale: '&wtlocale=E',
-      wolRoot: 'https://wol.jw.org/en/wol/d/',
-      wolPublications: 'https://wol.jw.org/en/wol/d/r1/lp-e/',
-      wolLookup: 'https://wol.jw.org/en/wol/l/r1/lp-e?q=',
-      webFinder: 'https://www.jw.org/finder?wtlocale=E&'
-    };
-  }
+  const info = LanguageInfo[lang] ?? LanguageInfo.EN;
+  const wol = `https://wol.jw.org/${info.site}/wol`;
+  const library = `${info.rsconf}/${info.lib}`;
+  return {
+    jwlLocale: `&wtlocale=${info.wtlocale}`,
+    wolRoot: `${wol}/d/`,
+    wolPublications: `${wol}/d/${library}/`,
+    wolLookup: `${wol}/l/${library}?q=`,
+    webFinder: `https://www.jw.org/finder?wtlocale=${info.wtlocale}&`,
+  };
 }
 
 const Config = {
@@ -490,10 +847,12 @@ const Config = {
   urlParam: 'bible=',
   // [1] whole scripture match [2] plain text [3] book name [4] chapter/verse passages [5] already link
   // Updated to support Russian book names and Cyrillic characters
+  // German numbered books are written "1. Mose"; multi-word names are listed in full
   scriptureRegex:
-    /(('?)((?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона))((?: ?(?:\d{1,3})[:\u003A\u0437](?:\d{1,3})(?:[-,\u2013\u2014] ?\d{1,3})*;?)+))(\]|<\/a>)?/gimu,
-  scriptureNoChpRegex: /(('?)(obadiah|ob|phm|philemon|(?:2|3)(?: )?jo(?:hn)?|jud(?:e)?)(?: ?)(\d{1,2}))(\]|<\/a>)?/gim,
-  scriptureNoVerseRegex: /(('?)((?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.]{2,}|song of solomon))((?: ?(?:\d{1,3})(?![\d:]);?)+))(\]|<\/a>)?/gimu,
+    /(('?)((?:[123]\.[\u0020\u00A0](?:mose|samuel|könige|chronika|korinther|thessalonicher|timotheus|petrus|johannes))|(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.\u0410-\u044F\u0401\u0451]{2,}|song of solomon|песня саломона|hohes lied|chant de salomon|cântico de salomão))((?: ?(?:\d{1,3})[:\u003A\u0437](?:\d{1,3})(?:[-,\u2013\u2014] ?\d{1,3})*;?)+))(\]|<\/a>)?/gimu,
+  // Books with one chapter (Obadiah, Philemon, 2 and 3 John, Jude): the number is the verse
+  scriptureNoChpRegex: /(('?)(obadiah|obadias|obadja|abdias|obd|abd|ob|philemon|philémon|filêmon|philem|philém|filêm|phm|flm|(?:2|3)\.?(?: )?(?:jo(?:hn|ão|ao|hannes|h)?|jean)|jude|judas|jud)(?: ?)(\d{1,2}))(\]|<\/a>)?/gim,
+  scriptureNoVerseRegex: /(('?)((?:[123]\.[\u0020\u00A0](?:mose|samuel|könige|chronika|korinther|thessalonicher|timotheus|petrus|johannes))|(?:[123][\u0020\u00A0]?)?(?:[\p{L}\p{M}\.]{2,}|song of solomon|hohes lied|chant de salomon|cântico de salomão))((?: ?(?:\d{1,3})(?![\d:]);?)+))(\]|<\/a>)?/gimu,
   wolLinkRegex: /(\[([^\[\]]*)\]\()?(https\:\/\/wol\.jw\.org[^\s\)]{2,})(\))?/gim,
   jworgLinkRegex: /(\[([^\[\]]*)\]\()?(https[^\s\)]+jw\.org[^\s\)]{2,})(\))?/gim,
   // Russian publication with month names regex (w25 Март с. 8 абз. 2, ws12 Февраль с. 15 абз. 2)
@@ -511,7 +870,8 @@ const Config = {
   spanishPubDayMonthRegex: /w(s)?(\d{2})\s+(1|15)\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+pág\.\s*(\d+)\s+párr\.\s*(\d+)/gi,
   // Other JW publications regex (od, it-1, it-2, si, etc.)
   // Formats: od 15 par. 3, od 15 абз. 3, od 15 párr. 3, it-1 332, cl chap. 8 p. 77 par. 2, od глава 15 абз. 3, od cap. 15 párr. 3, si pp. 300-301 par. 11, si págs. 300-301 párr. 11
-  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:pars?\.|абз\.|párrs?\.)\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?))?/g,
+  // French: chap. … § 3, German: Kap. … S. 150 Abs. 3, Portuguese: cap. … p. 150 par. 3
+  otherPubRegex: /\b([a-z]{1,3}(?:-\d)?)\s+(?:(?:chap\.|глава|cap\.|Kap\.)\s*)?(\d+(?:\/\d+)?)(?![\d:\/])\s*(?:(?:pp?\.|сс?\.|págs?\.|S\.)\s*(\d+(?:-\d+)?)\s+)?(?:(?:pars?\.|абз\.|párrs?\.|§|Abs\.)\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?))?/g,
   initialNumRegex: /^([\n\s]?)(\d{1,3}) /gim,
   delay: 3000,
 };
@@ -534,7 +894,7 @@ const KnownPubCodes = new Set([
 function isLikelyPublication(match) {
   const [full, pubCode] = match;
   if (KnownPubCodes.has(pubCode.toLowerCase())) return true;
-  return /(?:chap\.|глава|cap\.|pp?\.|сс?\.|págs?\.|pars?\.|абз\.|párrs?\.)/i.test(full);
+  return /(?:chap\.|глава|cap\.|kap\.|pp?\.|сс?\.|págs?\.|(?:^|\s)S\.|pars?\.|абз\.|párrs?\.|§|abs\.)/i.test(full);
 }
 
 /**
@@ -590,42 +950,33 @@ const JWL_LINKER_VIEW = 'jwl-linker-view';
  */
 function detectLanguage(text) {
   debugLog('detectLanguage called with:', text);
-  if (!text) {
-    debugLog('detectLanguage returning: EN (no text)');
-    return 'EN';
+  if (!text) return 'EN';
+  // Cyrillic characters: Russian
+  if (/[\u0400-\u04FF]/.test(text)) return 'RU';
+  LanguagePatterns ??= buildLanguagePatterns();
+  for (const [lang, pattern] of LanguagePatterns) {
+    if (pattern.test(text)) {
+      debugLog('detectLanguage returning:', lang);
+      return lang;
+    }
   }
-
-  // Check for Cyrillic characters (Russian)
-  if (/[\u0400-\u04FF]/.test(text)) {
-    debugLog('detectLanguage returning: RU (Cyrillic detected)');
-    return 'RU';
-  }
-
-  // Check for Spanish terms and patterns (check before other languages)
-  if (/párr\.|cap\.|pág\.|págs\.|Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro|^(1|2|3)\s*(Samuel|Reyes|Crónicas)/.test(text)) {
-    debugLog('detectLanguage returning: ES (Spanish terms detected)');
-    return 'ES';
-  }
-
-  // Check for common German book patterns
-  if (/^(1|2|3)\s*(Mose|Samuel|Könige|Chronik)|Offenbarung|Römer|Korinther|Galater|Epheser|Philipper|Kolosser|Thessalonicher|Timotheus|Hebräer|Petrus/.test(text)) {
-    return 'DE';
-  }
-
-  // Check for French patterns
-  if (/^(1|2|3)\s*(Samuel|Rois|Chroniques)|Apocalypse|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Hébreux|Pierre/.test(text)) {
-    return 'FR';
-  }
-
-  // Check for Dutch patterns
-  if (/^(1|2|3)\s*(Samuel|Koningen|Kronieken)|Openbaring|Romeinen|Korintiërs|Galaten|Efeziërs|Filippenzen|Kolossenzen|Tessalonicenzen|Timotheüs|Hebreeën|Petrus/.test(text)) {
-    return 'NL';
-  }
-
-  // Default to English
-  debugLog('detectLanguage returning: EN (default)');
   return 'EN';
 }
+
+/**
+ * Words and publication markers that only one language uses, checked in this order
+ * (Portuguese before Spanish: they share many book names, so only Portuguese-only words are listed).
+ * Letters around a word are excluded with lookarounds, because \b does not work for "João".
+ * Built on first use: compiling these Unicode regexes at startup costs ~0.6 ms.
+ */
+let LanguagePatterns = null;
+const buildLanguagePatterns = () => [
+  ['PT', /(?<!\p{L})(?:João|Atos|Apocalipse|Gênesis|Êxodo|Deuteronômio|Juízes|Crônicas|Neemias|Provérbios|Lamentações|Oseias|Miqueias|Malaquias|Mateus|Coríntios|Efésios|Colossenses|Tessalonicenses|Timóteo|Filêmon|Hebreus|Tiago|Sentinela|Despertai)(?!\p{L})|cap\.\s*\d+\s+par\./iu],
+  ['ES', /párr\.|págs?\.|cap\.|(?<!\p{L})(?:Apocalipsis|Romanos|Corintios|Gálatas|Efesios|Filipenses|Colosenses|Tesalonicenses|Timoteo|Hebreos|Pedro|Reyes|Crónicas)(?!\p{L})/iu],
+  ['FR', /§|(?<!\p{L})(?:Révélation|Apocalypse|Genèse|Lévitique|Deutéronome|Néhémie|Psaumes|Proverbes|Ecclésiaste|Isaïe|Jérémie|Ézéchiel|Matthieu|Actes|Romains|Corinthiens|Galates|Éphésiens|Philippiens|Colossiens|Thessaloniciens|Timothée|Hébreux|Jacques|Pierre|Jean|Rois|Chroniques|Tour de Garde|Réveillez-vous)(?!\p{L})/iu],
+  ['DE', /Abs\.|Kap\.|(?<!\p{L})S\.\s*\d|(?<!\p{L})(?:Mose|Könige|Chronika|Offenbarung|Römer|Korinther|Galater|Epheser|Philipper|Kolosser|Thessalonicher|Timotheus|Hebräer|Petrus|Johannes|Matthäus|Apostelgeschichte|Psalmen|Sprüche|Wachtturm|Erwachet)(?!\p{L})/iu],
+  ['NL', /(?<!\p{L})(?:Openbaring|Romeinen|Korintiërs|Galaten|Efeziërs|Filippenzen|Kolossenzen|Tessalonicenzen|Timotheüs|Hebreeën|Koningen|Kronieken)(?!\p{L})/iu],
+];
 
 /**
  * Get appropriate finder URL based on language
@@ -633,15 +984,7 @@ function detectLanguage(text) {
  * @returns {string} - Finder URL
  */
 function getFinderUrl(lang) {
-  const urls = {
-    'RU': 'https://www.jw.org/finder?wtlocale=U&',  // Russian uses 'U' for both JW Library and web finder
-    'EN': 'https://www.jw.org/finder?wtlocale=E&',
-    'DE': 'https://www.jw.org/finder?wtlocale=X&',
-    'FR': 'https://www.jw.org/finder?wtlocale=F&',
-    'NL': 'https://www.jw.org/finder?wtlocale=O&',
-    'ES': 'https://www.jw.org/finder?wtlocale=S&'   // Spanish uses 'S'
-  };
-  return urls[lang] || urls['EN'];
+  return `https://www.jw.org/finder?wtlocale=${WtLocales[lang] ?? 'E'}&`;
 }
 
 /**
@@ -650,15 +993,7 @@ function getFinderUrl(lang) {
  * @returns {string} - Locale string
  */
 function getJWLibraryLocale(lang) {
-  const locales = {
-    'RU': '&wtlocale=U',  // Russian uses 'U' in JW Library
-    'EN': '&wtlocale=E',
-    'DE': '&wtlocale=X',
-    'FR': '&wtlocale=F',
-    'NL': '&wtlocale=O',
-    'ES': '&wtlocale=S'   // Spanish uses 'S'
-  };
-  return locales[lang] || locales['EN'];
+  return `&wtlocale=${WtLocales[lang] ?? 'E'}`;
 }
 
 /**
@@ -800,6 +1135,9 @@ function autoFormatLatinWatchtower(input, opts) {
       return `${pubCode}${year}.${monthNumber} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
     }
     const issueDay = day ? Number(day) : guessIssueDay(monthNumber);
+    if (opts.issue) {
+      return `${pubCode}${year} ${opts.issue(issueDay, Number(monthNumber))} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
+    }
     if (opts.dayFirst) {
       return `${pubCode}${year} ${issueDay}/${Number(monthNumber)} ${opts.pageTerm} ${page} ${opts.parTerm} ${paragraph}`;
     }
@@ -859,9 +1197,11 @@ function normalizeInput(input) {
   s = s.replace(/\b(págs?\.|pág\.|pp?\.|сс?\.)\s*(\d)/gi, '$1 $2');
   // Paragraph markers — \b only works for ASCII; абз. and párr. matched without it
   s = s.replace(/\b(pars?\.)\s*(\d)/gi, '$1 $2');
-  s = s.replace(/(абз\.|párrs?\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/(абз\.|párrs?\.|§|Abs\.)\s*(\d)/gi, '$1 $2');
+  // German page marker (S. 20) — capital S only, "s." is not a page marker
+  s = s.replace(/\b(S\.)\s*(\d)/g, '$1 $2');
   // Chapter markers — same: глава and cap. don't use \b
-  s = s.replace(/\b(chap\.)\s*(\d)/gi, '$1 $2');
+  s = s.replace(/\b(chap\.|Kap\.)\s*(\d)/gi, '$1 $2');
   s = s.replace(/(глава|cap\.)\s*(\d)/gi, '$1 $2');
 
   // Final cleanup for multiple spaces introduced by rules
@@ -901,6 +1241,47 @@ function autoFormatSpanishWatchtower(input) {
     dayFirst: true, // Spanish WOL uses day/month: w10 15/1
     label: 'Spanish',
   });
+}
+
+/**
+ * Month-name Watchtower formats of the other languages, e.g.
+ *   w25 março p. 8 par. 2 | w10 15 de janeiro p. 3 par. 1   (Portuguese)
+ *   w25 mars p. 8 § 2 | w10 15 janvier p. 3 § 1             (French)
+ *   w25 März S. 8 Abs. 2 | w10 15. Januar S. 3 Abs. 1       (German)
+ */
+const MonthNameWatchtowerFormats = [
+  { label: 'Portuguese', months: () => PortugueseMonthNames, page: 'p', par: 'par\\.', pageTerm: 'p.', parTerm: 'par.', dayFirst: true },
+  { label: 'French', months: () => FrenchMonthNames, page: 'p', par: '§', pageTerm: 'p.', parTerm: '§', dayFirst: true },
+  {
+    label: 'German', months: () => GermanMonthNames, page: 'S', par: 'Abs\\.', pageTerm: 'S.', parTerm: 'Abs.',
+    issue: (day, month) => `${day}. ${month}.`,
+  },
+];
+
+/**
+ * Auto-format Portuguese, French and German Watchtower references with month names
+ * @param {string} input
+ * @returns {string} formatted text or the original
+ */
+function autoFormatOtherWatchtower(input) {
+  for (const format of MonthNameWatchtowerFormats) {
+    const names = format.months().slice(1);
+    const months = Object.fromEntries(names.map((name, i) => [name.toLowerCase(), String(i + 1).padStart(2, '0')]));
+    const monthAlt = names.join('|');
+    const tail = `\\s+${format.page}\\.\\s*(\\d+)\\s+${format.par}\\s*(\\d+)`;
+    const formatted = autoFormatLatinWatchtower(input, {
+      dayMonthRegex: new RegExp(`w(s)?(\\d{2})\\s+(1|15)(?:er|\\.)?\\s+(?:de\\s+)?(${monthAlt})${tail}`, 'giu'),
+      monthRegex: new RegExp(`w(s)?(\\d{2})\\s+(${monthAlt})${tail}`, 'giu'),
+      months,
+      pageTerm: format.pageTerm,
+      parTerm: format.parTerm,
+      dayFirst: format.dayFirst,
+      issue: format.issue,
+      label: format.label,
+    });
+    if (formatted !== input) return formatted;
+  }
+  return input;
 }
 
 const RussianMonthNames = ['', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -944,6 +1325,13 @@ function fillCitationTemplate(template, title, text) {
 
 const SpanishMonthNames = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const PortugueseMonthNames = ['', 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const FrenchMonthNames = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const GermanMonthNames = ['', 'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+  'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 const EnglishMonthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -973,7 +1361,46 @@ const PubLangs = {
     month: (m) => SpanishMonthNames[m].charAt(0).toUpperCase() + SpanishMonthNames[m].slice(1),
     issue: (day, m) => `${day} de ${SpanishMonthNames[m]}`,
   },
+  PT: {
+    label: 'PUBL.', chapter: 'cap.', page: 'p.', pages: 'pp.', par: 'par.',
+    dayFirst: true, // w10 15/1 = 15 de janeiro
+    notFound: 'Texto não encontrado. Tente a pesquisa:',
+    watchtower: 'A Sentinela', watchtowerStudy: 'A Sentinela (Edição de Estudo)',
+    month: (m) => capitalize(PortugueseMonthNames[m]),
+    issue: (day, m) => `${day} de ${PortugueseMonthNames[m]}`,
+  },
+  FR: {
+    label: 'PUB.', chapter: 'chap.', page: 'p.', pages: 'p.', par: '§',
+    dayFirst: true, // w10 15/1 = 15 janvier
+    notFound: 'Texte introuvable. Essayez la recherche :',
+    watchtower: 'La Tour de Garde', watchtowerStudy: 'La Tour de Garde (édition d’étude)',
+    month: (m) => capitalize(FrenchMonthNames[m]),
+    issue: (day, m) => `${day === 1 ? '1er' : day} ${FrenchMonthNames[m]}`,
+  },
+  DE: {
+    label: 'PUBL.', chapter: 'Kap.', page: 'S.', pages: 'S.', par: 'Abs.',
+    dayFirst: true, // w10 15. 1. = 15. Januar
+    issueQuery: (day, m) => `${day}. ${m}.`, // German WOL writes the issue as "15. 1."
+    notFound: 'Text nicht gefunden. Versuche die Suche:',
+    watchtower: 'Der Wachtturm', watchtowerStudy: 'Der Wachtturm (Studienausgabe)',
+    month: (m) => GermanMonthNames[m],
+    issue: (day, m) => `${day}. ${GermanMonthNames[m]}`,
+  },
 };
+
+/**
+ * Citation language for publication references typed in the English format ("p. 20 par. 7"),
+ * which Portuguese also uses: Portuguese when the interface is in Portuguese.
+ * Updated from the settings (see updatePublicationFormatLanguage).
+ */
+let LatinFormatLang = 'EN';
+
+/**
+ * @param {Object} settings - plugin settings
+ */
+function updatePublicationFormatLanguage(settings) {
+  LatinFormatLang = settings?.interfaceLang === 'Portuguese' ? 'PT' : 'EN';
+}
 
 /** Publication titles by citation language */
 const PublicationTitles = {
@@ -981,7 +1408,7 @@ const PublicationTitles = {
     od: 'Organized to Do Jehovah\'s Will', 'it-1': 'Insight on the Scriptures, Volume 1',
     'it-2': 'Insight on the Scriptures, Volume 2', si: 'All Scripture Is Inspired of God and Beneficial',
     g: 'Awake!', w: 'The Watchtower', km: 'Our Kingdom Ministry',
-    mwb: 'Our Christian Life and Ministry—Meeting Workbook', lff: 'Listen to God and Live Forever',
+    mwb: 'Our Christian Life and Ministry—Meeting Workbook', lff: 'Enjoy Life Forever!',
     rs: 'Reasoning From the Scriptures', cl: 'Draw Close to Jehovah',
     jv: 'Jehovah\'s Witnesses—Proclaimers of God\'s Kingdom', dp: 'Pay Attention to Daniel\'s Prophecy!',
     'ip-1': 'Isaiah\'s Prophecy—Light for All Mankind I', 'ip-2': 'Isaiah\'s Prophecy—Light for All Mankind II',
@@ -991,7 +1418,7 @@ const PublicationTitles = {
     od: 'Организованы исполнять волю Иеговы', 'it-1': 'Понимание Писания, том 1',
     'it-2': 'Понимание Писания, том 2', si: 'Все Писание вдохновлено Богом и полезно',
     g: 'Пробудитесь!', w: 'Сторожевая башня', km: 'Наше царственное служение',
-    mwb: 'Наша христианская жизнь и служение', lff: 'Слушай Бога и живи вечно',
+    mwb: 'Наша христианская жизнь и служение', lff: 'Радуйтесь жизни сейчас и вечно!',
     rs: 'Рассуждение на основании Писаний', cl: 'Приближайтесь к Иегове',
     jv: 'Свидетели Иеговы — возвещатели Царства Бога', dp: 'Обратите внимание на пророчество Даниила!',
     'ip-1': 'Пророчество Исаии — свет для всего человечества I', 'ip-2': 'Пророчество Исаии — свет для всего человечества II',
@@ -1001,11 +1428,41 @@ const PublicationTitles = {
     od: 'Organizados para hacer la voluntad de Jehová', 'it-1': 'Perspicacia para comprender las Escrituras, Volumen 1',
     'it-2': 'Perspicacia para comprender las Escrituras, Volumen 2', si: 'Toda Escritura es inspirada de Dios y provechosa',
     g: '¡Despertad!', w: 'La Atalaya', km: 'Nuestro Ministerio del Reino',
-    mwb: 'Nuestra Vida Cristiana y Ministerio—Cuaderno de reunión', lff: 'Escucha a Dios y vivirás para siempre',
+    mwb: 'Nuestra Vida Cristiana y Ministerio—Cuaderno de reunión', lff: '¡Disfrute de la vida para siempre!',
     rs: 'Razonamiento a partir de las Escrituras', cl: 'Acerquémonos a Jehová',
     jv: 'Los testigos de Jehová, proclamadores del Reino de Dios', dp: '¡Presta atención a la profecía de Daniel!',
     'ip-1': 'La profecía de Isaías: luz para toda la humanidad I', 'ip-2': 'La profecía de Isaías: luz para toda la humanidad II',
     be: 'Benefíciese de la Escuela del Ministerio Teocrático', th: 'Aplícate a la lectura y la enseñanza',
+  },
+  PT: {
+    od: 'Organizados para Fazer a Vontade de Jeová', 'it-1': 'Estudo Perspicaz das Escrituras, Volume 1',
+    'it-2': 'Estudo Perspicaz das Escrituras, Volume 2', si: 'Toda a Escritura É Inspirada por Deus e Proveitosa',
+    g: 'Despertai!', w: 'A Sentinela', km: 'Nosso Ministério do Reino',
+    mwb: 'Nossa Vida e Ministério Cristão — Apostila do Mês', lff: 'Seja Feliz para Sempre!',
+    rs: 'Raciocínios à Base das Escrituras', cl: 'Achegue-se a Jeová',
+    jv: 'Testemunhas de Jeová — Proclamadores do Reino de Deus', dp: 'Preste Atenção à Profecia de Daniel!',
+    'ip-1': 'Profecia de Isaías — Uma Luz para Toda a Humanidade I', 'ip-2': 'Profecia de Isaías — Uma Luz para Toda a Humanidade II',
+    be: 'Beneficie-se da Escola do Ministério Teocrático', th: 'Melhore Sua Leitura e Seu Ensino',
+  },
+  FR: {
+    od: 'Organisés pour faire la volonté de Jéhovah', 'it-1': 'Étude perspicace des Écritures, volume 1',
+    'it-2': 'Étude perspicace des Écritures, volume 2', si: '« Toute Écriture est inspirée de Dieu et utile »',
+    g: 'Réveillez-vous !', w: 'La Tour de Garde', km: 'Notre ministère du Royaume',
+    mwb: 'Cahier pour la réunion Vie chrétienne et ministère', lff: 'Vivez pour toujours !',
+    rs: 'Comment raisonner à partir des Écritures', cl: 'Approchez-vous de Jéhovah',
+    jv: 'Les Témoins de Jéhovah, prédicateurs du Royaume de Dieu', dp: 'Prêtons attention à la prophétie de Daniel !',
+    'ip-1': 'La prophétie d’Isaïe, lumière pour tous les humains I', 'ip-2': 'La prophétie d’Isaïe, lumière pour tous les humains II',
+    be: 'Tirez profit de l’École du ministère théocratique', th: 'Applique-toi à la lecture et à l’enseignement',
+  },
+  DE: {
+    od: 'Organisiert, Jehovas Willen zu tun', 'it-1': 'Einsichten über die Heilige Schrift, Band 1',
+    'it-2': 'Einsichten über die Heilige Schrift, Band 2', si: '„Die ganze Schrift ist von Gott inspiriert und nützlich“',
+    g: 'Erwachet!', w: 'Der Wachtturm', km: 'Unser Königreichsdienst',
+    mwb: 'Unser Leben und Dienst als Christ — Arbeitsheft', lff: 'Glücklich – für immer',
+    rs: 'Unterredungen anhand der Schriften', cl: 'Komm Jehova doch näher',
+    jv: 'Jehovas Zeugen — Verkündiger des Königreiches Gottes', dp: 'Die Prophezeiung Daniels — Achte darauf!',
+    'ip-1': 'Die Prophezeiung Jesajas — Licht für alle Menschen I', 'ip-2': 'Die Prophezeiung Jesajas — Licht für alle Menschen II',
+    be: 'Nutze die Belehrung der Theokratischen Predigtdienstschule', th: 'Werde ein besserer Leser und Lehrer',
   },
 };
 
@@ -1014,11 +1471,14 @@ const PublicationTitles = {
  *   w25.01 28, абз. 11 | w25.3 с. 8 абз. 2 | w10 15/1 с. 3 абз. 1   (Russian)
  *   w23.12 p. 20 par. 7 | w65 6/1 p. 329 par. 6 | ws12 2/15 15 par. 2 (English, month/day)
  *   w23.12 pág. 20 párr. 7 | w10 15/1 pág. 3 párr. 1                (Spanish, day/month)
+ *   w23.12 p. 20 par. 7 | w10 15/1 p. 3 par. 1                      (Portuguese = English markers, day/month)
+ *   w23.12 p. 20 § 7 | w10 15/1 p. 3 § 1                            (French, day/month)
+ *   w23.12 S. 20 Abs. 7 | w10 15. 1. S. 3 Abs. 1                    (German, day. month.)
  * Groups: 1 study, 2 year, 3 month (YY.MM), 4/5 day-month or month-day,
  *         6 page marker, 7 page, 8 paragraph marker, 9 paragraph
  */
 const WatchtowerRegex =
-  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})\/(\d{1,2}))\s+(?:(pág|p|с)\.\s*)?(\d+),?\s*(абз|párrs?|pars?)\.\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?)/i;
+  /\bw(s)?(\d{2})(?:\.(\d{1,2})|\s+(\d{1,2})(?:\/|\.\s?)(\d{1,2})\.?)\s+(?:(pág|p|с|S)\.\s*)?(\d+),?\s*(абз\.|párrs?\.|pars?\.|§|Abs\.)\s*(\d+(?:\s*[-–—]\s*\d+|(?:\s*,\s*\d+)+)?)/i;
 
 /**
  * Parse a Watchtower reference
@@ -1035,8 +1495,9 @@ function parseWatchtowerReference(input) {
 /** @param {RegExpMatchArray} m match of WatchtowerRegex */
 function watchtowerFromMatch(m) {
   const [whole, study, year, dotMonth, a, b, pageMarker, page, parMarker, paragraph] = m;
-  const marker = parMarker.toLowerCase();
-  const sourceLang = marker === 'абз' ? 'RU' : marker.startsWith('párr') ? 'ES' : 'EN';
+  const marker = parMarker.toLowerCase().replace('.', '');
+  const sourceLang = { 'абз': 'RU', '§': 'FR', abs: 'DE' }[marker]
+    ?? (marker.startsWith('párr') ? 'ES' : LatinFormatLang); // "par." is English or Portuguese
   let month;
   let day = null;
   if (dotMonth) {
@@ -1047,6 +1508,8 @@ function watchtowerFromMatch(m) {
   } else {
     month = Number(a);
     day = Number(b);
+    // "15/1" can only be day/month (typed in the Portuguese order)
+    if (month > 12 && day <= 12) [month, day] = [day, month];
   }
   if (month < 1 || month > 12 || (day !== null && (day < 1 || day > 31))) return null;
   return {
@@ -1121,7 +1584,7 @@ function formatWatchtowerQuery(ref, lang) {
   const L = PubLangs[lang];
   const code = ref.isStudy ? 'ws' : 'w';
   if (ref.day) {
-    const issue = L.dayFirst ? `${ref.day}/${ref.month}` : `${ref.month}/${ref.day}`;
+    const issue = L.issueQuery?.(ref.day, ref.month) ?? (L.dayFirst ? `${ref.day}/${ref.month}` : `${ref.month}/${ref.day}`);
     return `${code}${ref.year} ${issue} ${L.page} ${ref.page} ${L.par} ${ref.paragraph}`;
   }
   const month = String(ref.month).padStart(2, '0');
@@ -1150,11 +1613,18 @@ function parseOtherPublicationReference(input) {
   if (!m) return null;
   const [whole, pubCode, number, page, paragraph] = m;
   const text = whole.trim();
-  let sourceLang = 'EN';
+  let sourceLang = LatinFormatLang; // English markers (chap., p., par.) are also Portuguese page/paragraph markers
   if (/абз\.|глава|(?:^|\s)сс?\./i.test(text) || /[Ѐ-ӿ]/.test(input)) {
     sourceLang = 'RU';
-  } else if (/párrs?\.|(?:^|\s)cap\.|págs?\./i.test(text)) {
+  } else if (/párrs?\.|págs?\./i.test(text)) {
     sourceLang = 'ES';
+  } else if (/§/.test(text)) {
+    sourceLang = 'FR';
+  } else if (/Kap\.|Abs\.|(?:^|\s)S\./.test(text)) {
+    sourceLang = 'DE';
+  } else if (/(?:^|\s)cap\./i.test(text)) {
+    // cap. with par. is Portuguese; cap. alone is Spanish unless the interface is Portuguese
+    sourceLang = /pars?\./i.test(text) ? 'PT' : (LatinFormatLang === 'PT' ? 'PT' : 'ES');
   }
   return {
     whole: text,
@@ -1162,7 +1632,7 @@ function parseOtherPublicationReference(input) {
     number,
     page,
     paragraph: paragraph ? limitParagraphSpec(normalizeParagraphSpec(paragraph)) : undefined,
-    hasChapter: /chap\.|глава|(?:^|\s)cap\./i.test(text),
+    hasChapter: /chap\.|глава|(?:^|\s)cap\.|kap\./i.test(text),
     sourceLang,
   };
 }
@@ -1227,7 +1697,7 @@ function parseJwlBibleHref(href) {
   // a passage is always within one chapter: same book + chapter part (all but the last 3 digits)
   if (last < first || Math.floor(first / 1000) !== Math.floor(last / 1000)) return null;
   const wtlocale = params.get('wtlocale') ?? 'E';
-  const lang = { U: 'RU', S: 'ES', E: 'EN', X: 'DE', F: 'FR', O: 'NL' }[wtlocale] ?? 'EN';
+  const lang = LangByWtlocale[wtlocale] ?? 'EN';
   const ids = [];
   for (let id = first; id <= last; id++) ids.push(String(id));
   return { lang, ids, url: `${getFinderUrl(lang)}${Config.urlParam}${bible}` };
@@ -1261,13 +1731,41 @@ function lookUpBibleBook(bookKey, preferredLang) {
   const escaped = bookKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // (^| ) avoids matching inside book names, e.g. "eph" in "zephaniah"
   const bookRgx = new RegExp(`(^| )${escaped}`, 'm');
-  const langs = [preferredLang, 'EN', 'ES', 'RU'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+  const langs = [preferredLang, ...BibleSearchOrder].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
   for (const lang of langs) {
-    const index = Bible[lang].Abbreviation.findIndex((elem) => bookRgx.test(elem));
+    // An exact name or abbreviation wins over a longer name that starts with the key:
+    // Portuguese "Jo" is João, not Josué
+    let index = Bible[lang].Abbreviation.findIndex((elem) => elem.split(' ').includes(bookKey));
+    if (index === -1) index = Bible[lang].Abbreviation.findIndex((elem) => bookRgx.test(elem));
     if (index !== -1) return { index, lang };
   }
   return null;
 }
+
+/** Languages searched for a book name, after the preferred one (existing languages first) */
+const BibleSearchOrder = ['EN', 'ES', 'RU', 'PT', 'FR', 'DE'];
+
+/**
+ * Language of a book name as typed, for auto-detection: "juan" → ES, "jean" → FR, "1mo" → DE.
+ * English, Spanish and Russian keep their earlier behaviour: they claim every key that starts
+ * one of their names ("fil", "apo" stay Spanish). Portuguese, French and German only claim
+ * their exact names and abbreviations, so they never take over a short form.
+ * @param {string} bookKey - lower case, no spaces or dots
+ * @returns {string|null} language key, or null if no language has this name
+ */
+function detectBookLanguage(bookKey) {
+  if (!bookKey) return null;
+  if (BookLanguageCache.has(bookKey)) return BookLanguageCache.get(bookKey);
+  const startsName = (lang) => Bible[lang].Abbreviation.some((names) => ` ${names}`.includes(` ${bookKey}`));
+  const isName = (lang) => Bible[lang].Abbreviation.some((names) => names.split(' ').includes(bookKey));
+  const lang = ['EN', 'ES', 'RU'].find(startsName) ?? ['PT', 'FR', 'DE'].find(isName) ?? null;
+  if (BookLanguageCache.size >= BookLookupCacheSize) BookLanguageCache.clear();
+  BookLanguageCache.set(bookKey, lang);
+  return lang;
+}
+
+/** Results of detectBookLanguage */
+const BookLanguageCache = new Map();
 
 /* ---------------------------------------------------------------------------
  * Scripture links in Live Preview
@@ -1400,7 +1898,7 @@ function suggestionsFor(query, preferredLang) {
   const key = String(query ?? '').replace(/[\s .]/g, '').toLowerCase();
   if (!key) return [];
   const results = [];
-  const langs = [preferredLang, 'EN', 'RU', 'ES'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
+  const langs = [preferredLang, 'EN', 'RU', 'ES', 'PT', 'FR', 'DE'].filter((l, i, all) => Bible[l] && all.indexOf(l) === i);
 
   for (const lang of langs) {
     Bible[lang].Abbreviation.forEach((abbr, index) => {
@@ -1478,6 +1976,28 @@ function updateInterfaceLanguage(interfaceLang) {
   Lang = InterfaceStrings[interfaceLang] || InterfaceStrings.Russian;
 }
 
+/**
+ * Replace the book name at the start of a displayed reference with its name in another language
+ * @param {string} display - e.g. "John\u00A03:16"
+ * @param {number} bookNum - 1..66
+ * @param {string} lang - EN | RU | ES | PT | FR | DE
+ * @returns {string}
+ */
+function localizeBookName(display, bookNum, lang) {
+  const target = Bible[lang]?.Book[bookNum - 1];
+  if (!target) return display;
+  for (const books of Object.values(Bible)) {
+    const name = books.Book[bookNum - 1].replaceAll(' ', '\u00A0');
+    if (display.startsWith(name)) return target.replaceAll(' ', '\u00A0') + display.slice(name.length);
+  }
+  return display;
+}
+
+/** Interface language setting → dual-mode language code */
+const InterfaceLangCodes = { Russian: 'ru', English: 'en', Spanish: 'es', Portuguese: 'pt', French: 'fr', German: 'de' };
+/** Languages offered in dual mode */
+const DualLangCodes = ['en', 'ru', 'es', 'pt', 'fr', 'de'];
+
 
 class JWLLinkerPlugin extends Plugin {
   constructor() {
@@ -1491,25 +2011,19 @@ class JWLLinkerPlugin extends Plugin {
   /**
    * Resolve 'Auto' language setting to actual language code
    * Based on user's locale or interface language setting
-   * @returns {string} Language code: 'ru', 'en', or 'es'
+   * @returns {string} Language code: 'ru', 'en', 'es', 'pt', 'fr' or 'de'
    */
   _resolveAutoLanguage() {
     // Try to detect from interface language setting
-    const interfaceLang = this.settings.interfaceLang;
-    if (interfaceLang === 'Russian') return 'ru';
-    if (interfaceLang === 'Spanish') return 'es';
-    if (interfaceLang === 'English') return 'en';
+    const fromInterface = InterfaceLangCodes[this.settings.interfaceLang];
+    if (fromInterface) return fromInterface;
 
     // Try to detect from browser/system locale
     const locale = navigator.language || navigator.userLanguage || 'en';
     const langCode = locale.split('-')[0].toLowerCase();
 
-    // Map to supported languages
-    if (langCode === 'ru') return 'ru';
-    if (langCode === 'es') return 'es';
-
-    // Default to English if not in supported list
-    return 'en';
+    // Map to supported languages, default to English
+    return DualLangCodes.includes(langCode) ? langCode : 'en';
   }
 
   /**
@@ -1525,7 +2039,7 @@ class JWLLinkerPlugin extends Plugin {
     // Ensure second language is different from first
     if (secondLang === firstLang) {
       // Pick a different language
-      const alternatives = ['en', 'ru', 'es'].filter(l => l !== firstLang);
+      const alternatives = DualLangCodes.filter(l => l !== firstLang);
       return { firstLang, secondLang: alternatives[0] };
     }
 
@@ -1713,7 +2227,7 @@ class JWLLinkerPlugin extends Plugin {
   _suggestionLanguage() {
     const fixed = Languages[this.settings?.lang];
     if (fixed && Bible[fixed] && fixed !== 'AUTO') return fixed;
-    return { Russian: 'RU', Spanish: 'ES', English: 'EN' }[this.settings?.interfaceLang] ?? 'EN';
+    return InterfaceLangCodes[this.settings?.interfaceLang]?.toUpperCase() ?? 'EN';
   }
 
   /**
@@ -1732,12 +2246,7 @@ class JWLLinkerPlugin extends Plugin {
    * @returns {string} Formatted label like '**Russian:**'
    */
   _getLanguageLabel(langCode) {
-    const labels = {
-      'ru': Lang.dualLangOptions?.ru || 'Russian',
-      'en': Lang.dualLangOptions?.en || 'English',
-      'es': Lang.dualLangOptions?.es || 'Spanish'
-    };
-    return `**${labels[langCode]}:**`;
+    return `**${Lang.dualLangOptions?.[langCode] ?? langCode.toUpperCase()}:**`;
   }
 
   async onload() {
@@ -1817,9 +2326,11 @@ class JWLLinkerPlugin extends Plugin {
     debugEnabled = Boolean(this.settings.debug);
     // Update interface language based on settings
     updateInterfaceLanguage(this.settings.interfaceLang);
+    updatePublicationFormatLanguage(this.settings);
   }
 
   async saveSettings() {
+    updatePublicationFormatLanguage(this.settings);
     await this.saveData(this.settings);
   }
 
@@ -1916,17 +2427,8 @@ class JWLLinkerPlugin extends Plugin {
       const citationLines = lines.map(line => `> ${line}`);
 
       // Create citation callout with selected text
-      let citationHeader, successMessage;
-      if (this.settings.interfaceLang === 'Russian') {
-        citationHeader = '> [!cite] ЦИТАТА';
-        successMessage = 'Текст оформлен как цитата';
-      } else if (this.settings.interfaceLang === 'Spanish') {
-        citationHeader = '> [!cite] CITA';
-        successMessage = 'Texto formateado como cita';
-      } else {
-        citationHeader = '> [!cite] QUOTE';
-        successMessage = 'Text formatted as citation';
-      }
+      const citationHeader = Lang.quoteHeader;
+      const successMessage = Lang.quoteDone;
 
       const citation = `${citationHeader}\n${citationLines.join('\n')}`;
 
@@ -2049,6 +2551,7 @@ class JWLLinkerPlugin extends Plugin {
             formattedText = autoFormatRussianWatchtower(formattedText);
             formattedText = autoFormatEnglishWatchtower(formattedText);
             formattedText = autoFormatSpanishWatchtower(formattedText);
+            formattedText = autoFormatOtherWatchtower(formattedText);
 
             // In batch mode we always insert callout citations (both verses and publications)
             // so the output is consistent and easy to scan.
@@ -2177,6 +2680,7 @@ class JWLLinkerPlugin extends Plugin {
       selection = autoFormatRussianWatchtower(selection);
       selection = autoFormatEnglishWatchtower(selection);
       selection = autoFormatSpanishWatchtower(selection);
+      selection = autoFormatOtherWatchtower(selection);
 
       if (selection !== originalSelection) {
         debugLog('Auto-formatted Watchtower publication:', originalSelection, '→', selection);
@@ -2635,22 +3139,8 @@ class JWLLinkerPlugin extends Plugin {
             } else if (command === Cmd.citeVerseCallout) {
               template = this.settings.verseCalloutTemplate;
 
-              // Make Bible callout header dynamic based on detected language
-              let lang = this.settings?.lang || 'Auto';
-              if (lang === 'Auto') {
-                lang = detectLanguage(input);
-              } else {
-                lang = Languages[lang] || 'EN';
-              }
-
-              // Replace the Bible header based on detected language
-              if (lang === 'RU') {
-                template = template.replace(/BIBLE|BIBLIA/g, 'БИБЛИЯ');
-              } else if (lang === 'ES') {
-                template = template.replace(/BIBLE|БИБЛИЯ/g, 'BIBLIA');
-              } else {
-                template = template.replace(/БИБЛИЯ|BIBLIA/g, 'BIBLE');
-              }
+              // Callout header in the language of the reference ("BIBLE" → "BÍBLIA", "BIBEL", ...)
+              template = translateBibleLabel(template, reference.lang);
 
               // Start or extend a combined callout for the same chapter
               if (!calloutBlock) {
@@ -2740,12 +3230,7 @@ class JWLLinkerPlugin extends Plugin {
    */
   async _fetchBibleVerseByLanguage(passage, langCode, langToWol, view, command) {
     // Map langCode to uppercase language code used by getFinderUrl
-    const langMap = {
-      'en': 'EN',
-      'ru': 'RU',
-      'es': 'ES'
-    };
-    const upperLang = langMap[langCode] || 'EN';
+    const upperLang = LanguageInfo[langCode.toUpperCase()] ? langCode.toUpperCase() : 'EN';
 
     // Build verse ID from parIds
     const first = passage.link.parIds[0];
@@ -2788,7 +3273,8 @@ class JWLLinkerPlugin extends Plugin {
       }
 
       // Create title with link - use language-specific JW Library link
-      let title = passage.displayFull;
+      // and the book name in this language ("John 3:16" → "João 3:16")
+      let title = localizeBookName(passage.displayFull, Math.floor(Number(first) / 1000000), upperLang);
       if (this.settings.citationLink) {
         title = `[${title}](${jwlibUrl})`;
       }
@@ -2804,14 +3290,8 @@ class JWLLinkerPlugin extends Plugin {
       } else if (command === Cmd.citeVerseCallout) {
         template = this.settings.verseCalloutTemplate;
 
-        // Make Bible callout header dynamic based on language
-        if (langCode === 'ru') {
-          template = template.replace(/BIBLE|BIBLIA/g, 'БИБЛИЯ');
-        } else if (langCode === 'es') {
-          template = template.replace(/BIBLE|БИБЛИЯ/g, 'BIBLIA');
-        } else {
-          template = template.replace(/БИБЛИЯ|BIBLIA/g, 'BIBLE');
-        }
+        // Callout header in this language ("BIBLE" → "BÍBLIA", "BIBEL", ...)
+        template = translateBibleLabel(template, langCode.toUpperCase());
       }
 
       return fillCitationTemplate(template, title, text);
@@ -3143,7 +3623,7 @@ class JWLLinkerPlugin extends Plugin {
     if (elem) {
       if (type === TargetType.scripture) {
         {
-          // All jw.org Bible pages (en/ru/es) have #v<id> verse elements: the structured
+          // All jw.org Bible pages (every language) have #v<id> verse elements: the structured
           // path keeps chapter numbers ("1" not "23") and poetry line breaks
           // Block and paragraph break markers become line breaks, then take the plain text
           const clone = elem.cloneNode(true);
@@ -3426,10 +3906,11 @@ class JWLLinkerPlugin extends Plugin {
       // Auto-detect language or use setting
       let lang = this.settings?.lang || DEFAULT_SETTINGS.lang;
       const autoLang = lang === 'Auto';
+      const bookKey = reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase(); // no spaces, &nbsp; or .
       debugLog('validateReference - initial lang setting:', lang);
       debugLog('validateReference - reference.book:', reference.book);
       if (lang === 'Auto') {
-        lang = detectLanguage(reference.book);
+        lang = detectBookLanguage(bookKey) ?? detectLanguage(reference.book);
         debugLog('validateReference - detected lang:', lang);
       } else {
         // Convert setting name to language code
@@ -3447,7 +3928,6 @@ class JWLLinkerPlugin extends Plugin {
 
       // Check if Bible data exists for this language, fallback to English if not
       if (!Bible[lang]) lang = 'EN';
-      const bookKey = reference.book.replace(/[\s\u00A0.]/g, '').toLowerCase(); // no spaces, &nbsp; or .
       const found = findBibleBook(bookKey, lang);
       if (found) {
         bookNum = found.index + 1;
@@ -3456,6 +3936,7 @@ class JWLLinkerPlugin extends Plugin {
         if (autoLang) lang = found.lang;
         reference.book = Bible[lang].Book[found.index].replaceAll(' ', '\u00A0'); // avoid page breaks in book name
       }
+      reference.lang = lang;
 
       // Now handle each chapter:verse(s) passage
       /** @type {TPassage} */
@@ -3592,7 +4073,7 @@ class JWLLinkerPlugin extends Plugin {
       if (!docId) return null;
       // switch the link style from finder to wol
       // so that we can scrape the paragraph content later if needed
-      const lang = { U: 'RU', S: 'ES' }[wtlocale] ?? 'EN';
+      const lang = LangByWtlocale[wtlocale] ?? 'EN';
       url = `${getConfigForLanguage(lang).wolPublications}${docId}${parId ? `#h=${parId}${parEnd ? `-${parEnd}` : ''}` : ''}`;
     } else {
       return null;
@@ -4007,7 +4488,10 @@ class JWLLinkerSettingTab extends PluginSettingTab {
         const interfaceOptions = {
           'Russian': 'Русский',
           'English': 'English',
-          'Spanish': 'Español'
+          'Spanish': 'Español',
+          'Portuguese': 'Português',
+          'French': 'Français',
+          'German': 'Deutsch'
         };
         drop
           .addOptions(interfaceOptions)
@@ -4025,41 +4509,7 @@ class JWLLinkerSettingTab extends PluginSettingTab {
       .setName(Lang.settingsCitationLang)
       .setDesc(Lang.settingsCitationLangDesc)
       .addDropdown((drop) => {
-        let languageOptions;
-        if (Lang.settingsInterfaceLang === 'Язык интерфейса') {
-          // Russian interface
-          languageOptions = {
-            'Auto': 'Автоопределение',
-            'Russian': 'Русский',
-            'English': 'English',
-            'Spanish': 'Español',
-            'German': 'Deutsch',
-            'French': 'Français',
-            'Dutch': 'Nederlands'
-          };
-        } else if (Lang.settingsInterfaceLang === 'Idioma de la interfaz') {
-          // Spanish interface
-          languageOptions = {
-            'Auto': 'Detección automática',
-            'Russian': 'Ruso',
-            'English': 'Inglés',
-            'Spanish': 'Español',
-            'German': 'Alemán',
-            'French': 'Francés',
-            'Dutch': 'Holandés'
-          };
-        } else {
-          // English interface
-          languageOptions = {
-            'Auto': 'Auto-detection',
-            'Russian': 'Russian',
-            'English': 'English',
-            'Spanish': 'Spanish',
-            'German': 'German',
-            'French': 'French',
-            'Dutch': 'Dutch'
-          };
-        }
+        const languageOptions = Lang.citationLangOptions;
         drop
           .addOptions(languageOptions)
           .setValue(this.plugin.settings.lang)
@@ -4430,6 +4880,7 @@ const Bible = {
     ],
   },
   FR: {
+    // Canonical bible book names, as displayed (French NWT)
     Book: [
       'Genèse',
       'Exode',
@@ -4498,73 +4949,74 @@ const Bible = {
       'Jude',
       'Révélation',
     ],
+    // All possible abbreviations for each bible book (French NWT): full name, WOL long and short
     Abbreviation: [
-      'genèse gen ge',
-      'exode exo ex',
-      'lévitique lev le',
-      'nombres nom',
-      'deutéronome de deu deut',
-      'josué jos',
-      'juges jug',
+      'genèse gen gn genese',
+      'exode ex',
+      'lévitique lév lv levitique lev',
+      'nombres nomb nb',
+      'deutéronome deut dt deuteronome',
+      'josué jos josue',
+      'juges jg',
       'ruth ru',
-      '1samuel 1sam 1sa',
-      '2samuel 1sam 2sa',
-      '1rois 1ro',
-      '2rois 2ro',
-      '1chroniques 1chr 1ch',
-      '2chroniques 2chr 2ch',
+      '1samuel 1sam 1s',
+      '2samuel 2sam 2s',
+      '1rois 1r',
+      '2rois 2r',
+      '1chroniques 1chron 1ch',
+      '2chroniques 2chron 2ch',
       'esdras esd',
-      'néhémie neh',
+      'néhémie néh né nehemie neh',
       'esther est',
-      'job',
-      'psaumes psa ps',
-      'proverbes pr pro prov',
-      'ecclésiaste ec ecc eccl',
-      'chant de salomon chant',
-      'isaïe isa is',
-      'jérémie jer',
-      'lamentations lam la',
-      'ézéchiel eze ez',
-      'daniel dan da',
-      'osée os',
-      'joël',
-      'amos',
-      'abdias abd ab',
-      'jonas',
-      'michée mic',
-      'nahum',
+      'job jb',
+      'psaumes ps',
+      'proverbes prov pr',
+      'ecclésiaste eccl ec ecclesiaste',
+      'chantdesalomon chantdes ct chant salomon',
+      'isaïe is isaie',
+      'jérémie jér jr jeremie jer',
+      'lamentations lam lm',
+      'ézéchiel ézéch éz ezechiel ezech ez',
+      'daniel dan dn',
+      'osée os osee',
+      'joël jl joel',
+      'amos am',
+      'abdias abd',
+      'jonas jon',
+      'michée mich mi michee',
+      'nahum nah na',
       'habacuc hab',
-      'sophonie sph sop',
-      'aggée agg ag',
-      'zacharie zac',
-      'malachie mal',
-      'matthieu mt mat matt',
-      'marc',
-      'luc',
+      'sophonie soph sph',
+      'aggée agg ag aggee',
+      'zacharie zach za',
+      'malachie mal ml',
+      'matthieu mat mt',
+      'marc mc',
+      'luc lc',
       'jean',
       'actes ac',
-      'romains rom ro',
+      'romains rom rm',
       '1corinthiens 1cor 1co',
       '2corinthiens 2cor 2co',
       'galates gal ga',
-      'éphésiens eph',
-      'philippiens phil',
+      'éphésiens éph ephesiens eph',
+      'philippiens phil php',
       'colossiens col',
-      '1thessaloniciens 1th',
-      '2thessaloniciens 2th',
-      '1timothée 1tim 1ti',
-      '2timothée 2tim 2ti',
-      'tite',
-      'philémon phm',
-      'hébreux heb he',
-      'jacques jac',
-      '1pierre 1pi',
-      '2pierre 2pi',
-      '1jean 1je',
-      '2jean 2je',
-      '3jean 3 je',
+      '1thessaloniciens 1thess 1th',
+      '2thessaloniciens 2thess 2th',
+      '1timothée 1tim 1tm 1timothee',
+      '2timothée 2tim 2tm 2timothee',
+      'tite tt',
+      'philémon philém phm philemon',
+      'hébreux héb hé hebreux heb',
+      'jacques jacq jc',
+      '1pierre 1p',
+      '2pierre 2p',
+      '1jean 1j',
+      '2jean 2j',
+      '3jean 3j',
       'jude',
-      'révélation rev re',
+      'révélation rév ré revelation rev',
     ],
   },
   RU: {
@@ -4845,6 +5297,286 @@ const Bible = {
       '3juan 3jua 3jn',
       'judas jud',
       'apocalipsis apoc ap',
+    ],
+  },
+  PT: {
+    // Canonical bible book names, as displayed (Portuguese (Brazil) NWT)
+    Book: [
+      'Gênesis',
+      'Êxodo',
+      'Levítico',
+      'Números',
+      'Deuteronômio',
+      'Josué',
+      'Juízes',
+      'Rute',
+      '1 Samuel',
+      '2 Samuel',
+      '1 Reis',
+      '2 Reis',
+      '1 Crônicas',
+      '2 Crônicas',
+      'Esdras',
+      'Neemias',
+      'Ester',
+      'Jó',
+      'Salmos',
+      'Provérbios',
+      'Eclesiastes',
+      'Cântico de Salomão',
+      'Isaías',
+      'Jeremias',
+      'Lamentações',
+      'Ezequiel',
+      'Daniel',
+      'Oseias',
+      'Joel',
+      'Amós',
+      'Obadias',
+      'Jonas',
+      'Miqueias',
+      'Naum',
+      'Habacuque',
+      'Sofonias',
+      'Ageu',
+      'Zacarias',
+      'Malaquias',
+      'Mateus',
+      'Marcos',
+      'Lucas',
+      'João',
+      'Atos',
+      'Romanos',
+      '1 Coríntios',
+      '2 Coríntios',
+      'Gálatas',
+      'Efésios',
+      'Filipenses',
+      'Colossenses',
+      '1 Tessalonicenses',
+      '2 Tessalonicenses',
+      '1 Timóteo',
+      '2 Timóteo',
+      'Tito',
+      'Filêmon',
+      'Hebreus',
+      'Tiago',
+      '1 Pedro',
+      '2 Pedro',
+      '1 João',
+      '2 João',
+      '3 João',
+      'Judas',
+      'Apocalipse',
+    ],
+    // All possible abbreviations for each bible book (Portuguese (Brazil) NWT): full name, WOL long and short
+    Abbreviation: [
+      'gênesis gên genesis',
+      'êxodo êxo êx exodo',
+      'levítico lev le levitico',
+      'números núm numeros num',
+      'deuteronômio deut de deuteronomio',
+      'josué jos josue',
+      'juízes juí jz juizes',
+      'rute ru',
+      '1samuel 1sam 1sa',
+      '2samuel 2sam 2sa',
+      '1reis 1rs',
+      '2reis 2rs',
+      '1crônicas 1crô 1cr 1cronicas',
+      '2crônicas 2crô 2cr 2cronicas',
+      'esdras esd',
+      'neemias nee ne',
+      'ester est',
+      'jó',
+      'salmos sal',
+      'provérbios pro pr proverbios',
+      'eclesiastes ecl ec',
+      'cânticodesalomão cân canticodesalomao cantico salomão salomao',
+      'isaías isa is isaias',
+      'jeremias jer je',
+      'lamentações lam la lamentacoes',
+      'ezequiel eze ez',
+      'daniel dan da',
+      'oseias ose os',
+      'joel jl',
+      'amós am amos',
+      'obadias obd ob',
+      'jonas jon',
+      'miqueias miq',
+      'naum na',
+      'habacuque hab',
+      'sofonias sof',
+      'ageu ag',
+      'zacarias zac za',
+      'malaquias mal',
+      'mateus mat mt',
+      'marcos mar mr',
+      'lucas luc lu',
+      'joão jo joao',
+      'atos at',
+      'romanos rom ro',
+      '1coríntios 1cor 1co 1corintios',
+      '2coríntios 2cor 2co 2corintios',
+      'gálatas gál galatas gal',
+      'efésios efé ef efesios',
+      'filipenses fil',
+      'colossenses col',
+      '1tessalonicenses 1tes 1te',
+      '2tessalonicenses 2tes 2te',
+      '1timóteo 1tim 1ti 1timoteo',
+      '2timóteo 2tim 2ti 2timoteo',
+      'tito tit',
+      'filêmon filêm flm filemon',
+      'hebreus heb he',
+      'tiago tia tg',
+      '1pedro 1ped 1pe',
+      '2pedro 2ped 2pe',
+      '1joão 1jo 1joao',
+      '2joão 2jo 2joao',
+      '3joão 3jo 3joao',
+      'judas ju jud',
+      'apocalipse apo ap',
+    ],
+  },
+  DE: {
+    // Canonical bible book names, as displayed (German NWT)
+    Book: [
+      '1. Mose',
+      '2. Mose',
+      '3. Mose',
+      '4. Mose',
+      '5. Mose',
+      'Josua',
+      'Richter',
+      'Ruth',
+      '1. Samuel',
+      '2. Samuel',
+      '1. Könige',
+      '2. Könige',
+      '1. Chronika',
+      '2. Chronika',
+      'Esra',
+      'Nehemia',
+      'Esther',
+      'Hiob',
+      'Psalmen',
+      'Sprüche',
+      'Prediger',
+      'Hohes Lied',
+      'Jesaja',
+      'Jeremia',
+      'Klagelieder',
+      'Hesekiel',
+      'Daniel',
+      'Hosea',
+      'Joel',
+      'Amos',
+      'Obadja',
+      'Jona',
+      'Micha',
+      'Nahum',
+      'Habakuk',
+      'Zephanja',
+      'Haggai',
+      'Sacharja',
+      'Maleachi',
+      'Matthäus',
+      'Markus',
+      'Lukas',
+      'Johannes',
+      'Apostelgeschichte',
+      'Römer',
+      '1. Korinther',
+      '2. Korinther',
+      'Galater',
+      'Epheser',
+      'Philipper',
+      'Kolosser',
+      '1. Thessalonicher',
+      '2. Thessalonicher',
+      '1. Timotheus',
+      '2. Timotheus',
+      'Titus',
+      'Philemon',
+      'Hebräer',
+      'Jakobus',
+      '1. Petrus',
+      '2. Petrus',
+      '1. Johannes',
+      '2. Johannes',
+      '3. Johannes',
+      'Judas',
+      'Offenbarung',
+    ],
+    // All possible abbreviations for each bible book (German NWT): full name, WOL long and short
+    Abbreviation: [
+      '1mose 1mo',
+      '2mose 2mo',
+      '3mose 3mo',
+      '4mose 4mo',
+      '5mose 5mo',
+      'josua jos',
+      'richter ri',
+      'ruth ru',
+      '1samuel 1sam 1sa',
+      '2samuel 2sam 2sa',
+      '1könige 1kö 1koenige 1konige',
+      '2könige 2kö 2koenige 2konige',
+      '1chronika 1chr 1ch',
+      '2chronika 2chr 2ch',
+      'esra esr',
+      'nehemia neh ne',
+      'esther esth est',
+      'hiob hi',
+      'psalmen psalm ps',
+      'sprüche spr sprueche spruche',
+      'prediger pred pr',
+      'hoheslied hoh lied',
+      'jesaja jes',
+      'jeremia jer',
+      'klagelieder klag klg',
+      'hesekiel hes',
+      'daniel dan da',
+      'hosea hos',
+      'joel',
+      'amos am',
+      'obadja ob',
+      'jona jon',
+      'micha mi',
+      'nahum nah',
+      'habakuk hab',
+      'zephanja zeph ze',
+      'haggai hag',
+      'sacharja sach',
+      'maleachi mal',
+      'matthäus mat matthaeus matthaus',
+      'markus mar',
+      'lukas luk',
+      'johannes joh',
+      'apostelgeschichte apg',
+      'römer röm rö roemer romer',
+      '1korinther 1kor 1ko',
+      '2korinther 2kor 2ko',
+      'galater gal',
+      'epheser eph',
+      'philipper phil php',
+      'kolosser kol',
+      '1thessalonicher 1thes 1th',
+      '2thessalonicher 2thes 2th',
+      '1timotheus 1tim 1ti',
+      '2timotheus 2tim 2ti',
+      'titus tit',
+      'philemon philem phm',
+      'hebräer heb hebraeer hebraer',
+      'jakobus jak',
+      '1petrus 1pet 1pe',
+      '2petrus 2pet 2pe',
+      '1johannes 1joh 1jo',
+      '2johannes 2joh 2jo',
+      '3johannes 3joh 3jo',
+      'judas jud',
+      'offenbarung offb off',
     ],
   },
 };

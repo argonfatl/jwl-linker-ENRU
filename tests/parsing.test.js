@@ -337,8 +337,9 @@ test('Live Preview links cover each passage as typed, without changing the text'
 test('suggestions list Bible books and publication codes after the trigger', () => {
   const books = (q, lang) => jwl.suggestionsFor(q, lang).filter((s) => s.kind === 'book').map((s) => `${s.label} ${s.lang}`);
   assert.deepEqual(books('рим', 'RU'), ['Римлянам RU']);
-  assert.deepEqual(books('rom', 'EN'), ['Romans EN', 'Romanos ES']); // preferred language first
-  assert.deepEqual(books('1 co', 'EN'), ['1 Corinthians EN', '1 Corintios ES']);
+  assert.deepEqual(books('rom', 'EN'), ['Romans EN', 'Romanos ES', 'Romanos PT', 'Romains FR', 'Römer DE']); // preferred language first
+  assert.deepEqual(books('1 co', 'EN'), ['1 Corinthians EN', '1 Corintios ES', '1 Coríntios PT', '1 Corinthiens FR']);
+  assert.deepEqual(books('joh', 'DE'), ['Johannes DE', 'John EN']);
   assert.deepEqual(books('juan', 'RU'), ['Juan ES']);
   const od = jwl.suggestionsFor('od', 'RU').find((s) => s.kind === 'publication');
   assert.equal(od.insert, 'od ');
@@ -368,4 +369,136 @@ test('Live Preview link ranges are cached per line and follow setting changes', 
   const russian = jwl.scriptureLinkRanges(plugin, text);
   assert.notEqual(russian, first);
   assert.match(russian[0].href, /wtlocale=U$/);
+});
+
+test('Portuguese, French and German references link to the right book and language', () => {
+  const plugin = createPlugin(jwl, { lang: 'Auto' });
+  const link = (text) => jwl.scriptureLinkRanges(plugin, text).map((r) => `${text.slice(r.from, r.to)} ${r.href.replace(/^.*bible=/, '')}`);
+  const cases = {
+    'João 3:16': '43003016&wtlocale=T',
+    'Jó 1:1': '18001001&wtlocale=T',
+    'Atos 2:4': '44002004&wtlocale=T',
+    'Apocalipse 21:4': '66021004&wtlocale=T',
+    '1 Coríntios 13:4': '46013004&wtlocale=T',
+    'Cântico de Salomão 2:1': '22002001&wtlocale=T',
+    'Tg 1:5': '59001005&wtlocale=T',
+    'Jean 3:16': '43003016&wtlocale=F',
+    'Ré 21:4': '66021004&wtlocale=F',
+    'Lc 1:1': '42001001&wtlocale=F',
+    'Chant de Salomon 2:1': '22002001&wtlocale=F',
+    'Psaumes 83:18': '19083018&wtlocale=F',
+    'Johannes 3:16': '43003016&wtlocale=X',
+    '1. Mose 3:15': '01003015&wtlocale=X',
+    '1Mo 3:15': '01003015&wtlocale=X',
+    'Hohes Lied 2:1': '22002001&wtlocale=X',
+    'Römer 8:28': '45008028&wtlocale=X',
+    'Apg 2:4': '44002004&wtlocale=X',
+    'Offenbarung 21:4': '66021004&wtlocale=X',
+  };
+  for (const [text, href] of Object.entries(cases)) {
+    assert.deepEqual(link(text), [`${text} ${href.replace(/^0/, '')}`], text);
+  }
+  // books with one chapter: the number is the verse
+  assert.deepEqual(link('Filêmon 10'), ['Filêmon 10 57001010&wtlocale=T']);
+  assert.deepEqual(link('Abdias 3'), ['Abdias 3 31001003&wtlocale=F']);
+  assert.deepEqual(link('2. Johannes 5'), ['2. Johannes 5 63001005&wtlocale=X']);
+  // a numbered list item is not part of the book name
+  assert.deepEqual(link('1. Rom 8:28'), ['Rom 8:28 45008028&wtlocale=E']);
+});
+
+test('English, Spanish and Russian book names keep their language', () => {
+  const plugin = createPlugin(jwl, { lang: 'Auto' });
+  const href = (text) => jwl.scriptureLinkRanges(plugin, text)[0]?.href.replace(/^.*bible=/, '');
+  assert.equal(href('John 3:16'), '43003016&wtlocale=E');
+  assert.equal(href('1 Samuel 1:1'), '9001001&wtlocale=E'); // was taken for Spanish before
+  assert.equal(href('Juan 3:16'), '43003016&wtlocale=S');
+  assert.equal(href('Romanos 8:28'), '45008028&wtlocale=S'); // shared with Portuguese
+  assert.equal(href('Fil 4:13'), '50004013&wtlocale=S'); // short Spanish form, also Portuguese
+  assert.equal(href('Apo 21:4'), '66021004&wtlocale=S');
+  assert.equal(href('Ис 41:10'), '23041010&wtlocale=U'); // Isaiah (Исх is Exodus)
+  assert.equal(jwl.detectBookLanguage('jean'), 'FR');
+  assert.equal(jwl.detectBookLanguage('jud'), 'EN'); // an English name starts with it
+});
+
+test('a fixed citation language reads its own abbreviations first', () => {
+  const href = (lang, text) => jwl.scriptureLinkRanges(createPlugin(jwl, { lang }), text)[0]?.href.replace(/^.*bible=/, '');
+  assert.equal(href('Portuguese', 'Jo 3:16'), '43003016&wtlocale=T'); // João, not Josué
+  assert.equal(href('Portuguese', 'John 3:16'), '43003016&wtlocale=T');
+  assert.equal(href('German', 'Off 21:4'), '66021004&wtlocale=X');
+  assert.equal(href('French', 'Jean 3:16'), '43003016&wtlocale=F');
+});
+
+test('Portuguese, French and German publication references build the WOL queries', () => {
+  const wt = (text) => {
+    const ref = jwl.parseWatchtowerReference(jwl.normalizeInput(text));
+    return [ref.sourceLang, jwl.formatWatchtowerQuery(ref, ref.sourceLang), jwl.formatWatchtowerTitle(ref, ref.sourceLang)];
+  };
+  assert.deepEqual(wt('w23.12 p. 20 § 7'), ['FR', 'w23.12 p. 20 § 7', 'La Tour de Garde 2023 Décembre p. 20 § 7']);
+  assert.deepEqual(wt('w10 15/1 p. 3 §1'), ['FR', 'w10 15/1 p. 3 § 1', 'La Tour de Garde 2010 15 janvier p. 3 § 1']);
+  assert.deepEqual(wt('w23.12 S. 20 Abs. 7'), ['DE', 'w23.12 S. 20 Abs. 7', 'Der Wachtturm 2023 Dezember S. 20 Abs. 7']);
+  assert.deepEqual(wt('w10 15. 1. S. 3 Abs. 1'), ['DE', 'w10 15. 1. S. 3 Abs. 1', 'Der Wachtturm 2010 15. Januar S. 3 Abs. 1']);
+  // "p. … par." is English unless the interface is Portuguese
+  assert.deepEqual(wt('w10 15/1 p. 3 par. 1').slice(0, 2), ['EN', 'w10 1/15 p. 3 par. 1']); // 15/1 can only be day/month
+  jwl.updatePublicationFormatLanguage({ interfaceLang: 'Portuguese' });
+  try {
+    assert.deepEqual(wt('w23.12 p. 20 par. 7'), ['PT', 'w23.12 p. 20 par. 7', 'A Sentinela 2023 Dezembro p. 20 par. 7']);
+    assert.deepEqual(wt('w10 15/1 p. 3 par. 1'), ['PT', 'w10 15/1 p. 3 par. 1', 'A Sentinela 2010 15 de janeiro p. 3 par. 1']);
+  } finally {
+    jwl.updatePublicationFormatLanguage({ interfaceLang: 'Russian' });
+  }
+
+  const other = (text) => {
+    const ref = jwl.parseOtherPublicationReference(jwl.normalizeInput(text));
+    return [ref.sourceLang, jwl.formatOtherPublicationQuery(ref, ref.sourceLang), jwl.formatOtherPublicationTitle(ref, ref.sourceLang)];
+  };
+  assert.deepEqual(other('od cap. 15 par. 3'), ['PT', 'od cap. 15 par. 3', 'Organizados para Fazer a Vontade de Jeová cap. 15 par. 3']);
+  assert.deepEqual(other('od chap. 15 § 3'), ['FR', 'od chap. 15 § 3', 'Organisés pour faire la volonté de Jéhovah chap. 15 § 3']);
+  assert.deepEqual(other('od Kap. 15 Abs. 3'), ['DE', 'od Kap. 15 Abs. 3', 'Organisiert, Jehovas Willen zu tun Kap. 15 Abs. 3']);
+  assert.equal(other('od cap. 15 párr. 3')[0], 'ES');
+
+  // a reference typed in one language is cited in another
+  const ref = jwl.parseWatchtowerReference('w23.12 p. 20 par. 7');
+  assert.equal(jwl.formatWatchtowerQuery(ref, 'DE'), 'w23.12 S. 20 Abs. 7');
+  assert.equal(jwl.formatWatchtowerQuery(ref, 'FR'), 'w23.12 p. 20 § 7');
+  assert.equal(jwl.formatWatchtowerQuery({ ...ref, month: 1, day: 15, year: '10' }, 'DE'), 'w10 15. 1. S. 20 Abs. 7');
+});
+
+test('Watchtower references with month names are formatted in Portuguese, French and German', () => {
+  const f = jwl.autoFormatOtherWatchtower;
+  assert.equal(f('w25 março p. 8 par. 2'), 'w25.03 p. 8 par. 2');
+  assert.equal(f('w10 15 de janeiro p. 3 par. 1'), 'w10 15/1 p. 3 par. 1');
+  assert.equal(f('w25 mars p. 8 § 2'), 'w25.03 p. 8 § 2');
+  assert.equal(f('w10 15 janvier p. 3 § 1'), 'w10 15/1 p. 3 § 1');
+  assert.equal(f('w25 März S. 8 Abs. 2'), 'w25.03 S. 8 Abs. 2');
+  assert.equal(f('w10 15. Januar S. 3 Abs. 1'), 'w10 15. 1. S. 3 Abs. 1');
+  assert.equal(f('Rom 8:28'), 'Rom 8:28');
+});
+
+test('every language has WOL addresses, offline messages and a complete interface', () => {
+  assert.deepEqual(jwl.getConfigForLanguage('RU'), {
+    jwlLocale: '&wtlocale=U',
+    wolRoot: 'https://wol.jw.org/ru/wol/d/',
+    wolPublications: 'https://wol.jw.org/ru/wol/d/r2/lp-u/',
+    wolLookup: 'https://wol.jw.org/ru/wol/l/r2/lp-u?q=',
+    webFinder: 'https://www.jw.org/finder?wtlocale=U&',
+  });
+  assert.equal(jwl.getConfigForLanguage('PT').wolLookup, 'https://wol.jw.org/pt/wol/l/r5/lp-t?q=');
+  assert.equal(jwl.getConfigForLanguage('FR').wolLookup, 'https://wol.jw.org/fr/wol/l/r30/lp-f?q=');
+  assert.equal(jwl.getConfigForLanguage('DE').wolLookup, 'https://wol.jw.org/de/wol/l/r10/lp-x?q=');
+  assert.equal(jwl.getConfigForLanguage('NL').wolLookup, 'https://wol.jw.org/en/wol/l/r1/lp-e?q='); // no Dutch library yet
+
+  assert.match(jwl.checkPublicationAvailability('w', 'DE', 1940).message, /Der Wachtturm 1940/);
+  assert.match(jwl.checkPublicationAvailability('yb', 'PT').message, /Anuário/);
+  assert.equal(jwl.checkPublicationAvailability('od', 'FR').isOffline, false);
+
+  assert.equal(jwl.translateBibleLabel('> [!verse] BIBLE — {title}', 'PT'), '> [!verse] BÍBLIA — {title}');
+  assert.equal(jwl.translateBibleLabel('> [!verse] БИБЛИЯ — {title}', 'DE'), '> [!verse] BIBEL — {title}');
+  assert.equal(jwl.localizeBookName('John\u00A03:16', 43, 'PT'), 'João\u00A03:16');
+  assert.equal(jwl.localizeBookName('1.\u00A0Mose\u00A03:15', 1, 'FR'), 'Genèse\u00A03:15');
+
+  const keys = Object.keys(jwl.InterfaceStrings.English).sort();
+  for (const [lang, strings] of Object.entries(jwl.InterfaceStrings)) {
+    assert.deepEqual(Object.keys(strings).sort(), keys, lang);
+    assert.deepEqual(Object.keys(strings.dualLangOptions), ['Auto', 'ru', 'en', 'es', 'pt', 'fr', 'de'], lang);
+  }
 });
