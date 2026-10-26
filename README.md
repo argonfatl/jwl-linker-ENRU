@@ -37,11 +37,13 @@ Once this plugin is published to the Obsidian Community Plugins directory, insta
 
 ## Bible References
 - **English**: `Rom 1:20`, `1 Cor 9:26`, `Psalm 89:18`
-- **Russian**: `Рим 1:20`, `1 Кор 9:26`, `Псалом 89:18`
-- **Spanish**: `Rom 1:20`, `1 Cor 9:26`, `Salmo 89:18`, `Juan 3:16`
-- **Portuguese**: `João 3:16`, `Atos 2:4`, `1 Co 13:4`, `Tg 1:5`
+- **Russian**: `Рим 1:20`, `1 Кор 9:26`, `Пс 89:18`
+- **Spanish**: `Romanos 1:20`, `1 Corintios 9:26`, `Salmo 89:18`, `Juan 3:16`
+- **Portuguese**: `João 3:16`, `Atos 2:4`, `1 Coríntios 13:4`, `Tg 1:5`
 - **French**: `Jean 3:16`, `Rm 8:28`, `Ré 21:4`, `Psaumes 83:18`
 - **German**: `Johannes 3:16`, `1. Mose 3:15`, `1Mo 3:15`, `Röm 8:28`
+
+Short forms that several languages share (`Rom`, `Joh`, `1 Co`) are read as English. To link them in another language, set that language as the citation language.
 
 ## Watchtower Publications
 ![Plugin in action](demo/RunW.gif)
@@ -76,6 +78,9 @@ List or range the paragraphs; up to 10 are cited at once:
 - **English**: `w23.12 p. 20 par. 7, 8`, `w23.12 p. 20 pars. 7-9`, `od 15 par. 3, 4`
 - **Russian**: `w25.01 28, абз. 11, 12`, `w25.3 с. 8 абз. 2—4`
 - **Spanish**: `w23.12 pág. 20 párrs. 7, 8`, `od cap. 15 párr. 3-5`
+- **Portuguese**: `w23.12 p. 20 par. 7, 8`, `od cap. 15 par. 3-5`
+- **French**: `w23.12 p. 20 § 7, 8`, `od chap. 15 § 3-5`
+- **German**: `w23.12 S. 20 Abs. 7, 8`, `od Kap. 15 Abs. 3-5`
 
 A wol.jw.org link to a paragraph range (`…#h=5-7`) also cites the whole range.
 
@@ -85,6 +90,7 @@ A wol.jw.org link to a paragraph range (`…#h=5-7`) also cites the whole range.
 - **English**: `od 15 par. 3` → `od chap. 15 par. 3`
 - **Russian**: `od 15 абз. 3` → `od глава 15 абз. 3`
 - **Spanish**: `od 15 párr. 3` → `od cap. 15 párr. 3`
+- **Portuguese** (interface in Portuguese): `od 15 par. 3` → `od cap. 15 par. 3`
 - **French**: `od 15 § 3` → `od chap. 15 § 3`
 - **German**: `od 15 Abs. 3` → `od Kap. 15 Abs. 3`
 
@@ -97,7 +103,7 @@ A wol.jw.org link to a paragraph range (`…#h=5-7`) also cites the whole range.
 - **French**: `w10 15 janvier p. 3 § 1` → `w10 15/1 p. 3 § 1`
 - **German**: `w10 15. Januar S. 3 Abs. 1` → `w10 15. 1. S. 3 Abs. 1`
 
-Without a day (`w10 January ...`) the issue is ambiguous, so add the day for issues before 2016.
+Without a day (`w10 January ...`) the plugin has to guess the issue (1st or 15th), so add the day for issues before 2016.
 
 **Post-2016 (One issue per month):**
 - **Russian**: `w16 Январь с. 3 абз. 1` → `w16.01 3, абз. 1`
@@ -133,7 +139,9 @@ In Live Preview, scripture references are underlined (the note text does not cha
 ## Suggestions while typing
 Type `@` at the start of a word, then the start of a Bible book or publication code, and pick from the list:
 - `@рим` → `Римлянам`, `@rom` → `Romans` / `Romanos` / `Romains` / `Römer`, `@juan` → `Juan`
-- `@joão` → `João`, `@jean` → `Jean`, `@joh` → `Johannes`
+- `@joão` → `João`, `@jean` → `Jean`, `@joh` → `Johannes` / `John`
+
+Books of the citation language (or, with auto-detection, of the interface language) are listed first.
 - `@od` → `od` (*Organized to Do Jehovah's Will*), `@it` → `it-1`, `it-2`
 
 The trigger can be changed in settings (*Suggestion trigger*). Normal typing never opens the list, and an email address such as `a@b.com` does not trigger it.
@@ -211,7 +219,7 @@ od 15 párr. 3
 
 ## Bible Citation (German)
 ```markdown
-Joh 3:16
+Johannes 3:16
 > [!verse] BIBEL — [Johannes 3:16](jwlibrary://...)
 > **16** Denn Gott hat die Welt so sehr geliebt, dass er seinen einziggezeugten Sohn gegeben hat...
 ```
@@ -231,6 +239,7 @@ od cap. 15 par. 3
 ```
 
 ## Dual Language Mode Output
+The language labels (**English:**, **Russian:**, …) are written in the interface language; these examples use the English interface.
 
 ### Bible Verses (Dual Mode)
 ```markdown
@@ -281,7 +290,21 @@ Russian: "Это важная информация"
 Spanish: "Esta es información importante"
 > [!cite] CITA
 > Esta es información importante
+
+Portuguese: "Esta é uma informação importante"
+> [!cite] CITAÇÃO
+> Esta é uma informação importante
+
+French: "C’est une information importante"
+> [!cite] CITATION
+> C’est une information importante
+
+German: "Das ist eine wichtige Information"
+> [!cite] ZITAT
+> Das ist eine wichtige Information
 ```
+
+The header (QUOTE, ЦИТАТА, …) follows the interface language.
 
 # ⚙️ Plugin Settings
 
@@ -301,10 +324,13 @@ Spanish: "Esta es información importante"
 - **History Size**: Number of recent citations to keep in sidebar
 - **Bold Numbers**: Apply bold formatting to verse/paragraph numbers
 - **Citation Links**: Enable JW Library links for scripture references
-- **Paragraph Count**: Default number of paragraphs to cite
+- **Paragraph Count**: Number of paragraphs cited from a jw.org link (chosen in the *JWL Linker* menu)
 - **Verse Text on Hover**: Popup with the verse text when hovering a scripture link (desktop)
 - **Scripture Links While Editing**: Underline scripture references in Live Preview
 - **Suggestions While Typing** and **Suggestion Trigger**: Book and publication suggestions after `@`
+- **Open Sidebar on Startup**: Open the history sidebar when Obsidian starts
+- **Debug Mode**: Write details of the plugin's work to the developer console
+- **Reset to Default** and **Clear History**
 
 # 🔗 Opening Links
 
